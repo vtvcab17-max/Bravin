@@ -1,0 +1,11 @@
+const { chromium } = require('playwright');
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-webgl']}); const errs=[];
+const p=await b.newPage({viewport:{width:1440,height:900}}); p.on('pageerror',e=>errs.push(e.message)); await p.goto('http://localhost:8772/index.html'); await p.waitForTimeout(2500);
+console.log('font', await p.evaluate(()=>[document.fonts.check('600 14px "Plus Jakarta Sans"'), getComputedStyle(document.body).fontFamily.slice(0,40)]));
+await p.screenshot({path:'/tmp/claude-0/t5_home.png'});
+await p.evaluate(()=>newFromTemplate()); await p.waitForTimeout(6000);
+await p.evaluate(()=>{t=2.3; addTextPreset(TEXT_PRESETS[5],2); const c=findSel(); c.text='Chọn tôi'; inspTabs.text='style'; renderAll();}); await p.waitForTimeout(1200); await p.evaluate(()=>drawFrame());
+await p.screenshot({path:'/tmp/claude-0/t5_editor.png'});
+const q=await b.newPage({viewport:{width:412,height:892},deviceScaleFactor:2,isMobile:true,hasTouch:true}); await q.goto('http://localhost:8772/index.html'); await q.waitForTimeout(2500); await q.screenshot({path:'/tmp/claude-0/t5_ph_home.png'});
+await q.evaluate(()=>newFromTemplate()); await q.waitForTimeout(5000); await q.evaluate(()=>{openSheet('lib'); showAssets('fx');}); await q.waitForTimeout(500); await q.screenshot({path:'/tmp/claude-0/t5_ph_lib.png'});
+console.log(errs); await b.close();})();

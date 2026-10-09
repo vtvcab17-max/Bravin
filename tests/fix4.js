@@ -1,0 +1,11 @@
+const { chromium } = require('playwright');
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader']}); const errs=[];
+const p=await b.newPage({viewport:{width:1400,height:900}}); p.on('pageerror',e=>errs.push(e.message+' '+(e.stack||'').split('\n')[1]));
+await p.goto('http://localhost:8772/index.html'); await p.waitForTimeout(2500);
+await p.evaluate(()=>newFromTemplate()); await p.waitForTimeout(6000);
+const r=await p.evaluate(async()=>{ const toasts=[]; confirm2=async()=>false; const _t=toast; toast=(m)=>{toasts.push(m); _t(m);};
+ const sr=48000, L=8; const mk=(off)=>{ const B=new AudioBuffer({length:sr*L,sampleRate:sr,numberOfChannels:1}); const d=B.getChannelData(0); let seed=7; const rnd=()=>{seed=(seed*16807)%2147483647; return seed/2147483647;}; const ev=[]; for(let i=0;i<14;i++) ev.push([rnd()*6, 0.05+rnd()*0.3, rnd()]); for(const [s0,len,a] of ev){ const st=Math.floor((s0+off)*sr); for(let j=0;j<len*sr && st+j<d.length; j++) if(st+j>=0) d[st+j]=a*Math.sin(j*0.07)*(1-j/(len*sr)); } for(let i=0;i<d.length;i++) d[i]+= (Math.random()-.5)*0.01; return B; };
+ const m1={id:nid('m'),kind:'audio',name:'cam.wav',buf:mk(0),dur:L}, m2={id:nid('m'),kind:'audio',name:'rec.wav',buf:mk(1.37),dur:L}; media.set(m1.id,m1); media.set(m2.id,m2);
+ const tr=tracks.find(x=>x.type==='audio'); const a1={id:nid('c'),track:tr.id,type:'audio',mediaId:m1.id,start:20,in:0,out:7,vol:1}, a2={id:nid('c'),track:tr.id,type:'audio',mediaId:m2.id,start:40,in:0,out:8,vol:1}; C.push(a1,a2);
+ msel.clear(); msel.add(a1.id); msel.add(a2.id); sel=null; await syncAudio(); return [a1.start, a2.start, a2.in, toasts]; });
+console.log(JSON.stringify(r)); console.log(errs); await b.close();})();

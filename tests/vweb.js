@@ -1,0 +1,17 @@
+const { chromium } = require('playwright'); const fs=require('fs');
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-webgl','--ignore-gpu-blocklist']});
+const errs=[]; const hook=p=>{p.on('pageerror',e=>errs.push('PE '+e.message));p.on('console',m=>{if(m.type()==='error'&&!/TUNNEL|GL Driver/.test(m.text()))errs.push(m.text().slice(0,200))});};
+const ctx=await b.newContext({viewport:{width:1440,height:900},acceptDownloads:true}); await ctx.addInitScript(()=>{delete window.showSaveFilePicker;});
+const p=await ctx.newPage(); hook(p);
+await p.goto('http://localhost:8773/index.html'); await p.waitForTimeout(3000);
+console.log('home', await p.evaluate(()=>({home:!homeEl.hidden, tpl:[...document.querySelectorAll('#hTpl .hcard b')].map(x=>x.textContent), fonts:document.fonts.check('800 20px Montserrat'), build:window.VINCUT_BUILD, sw:!!navigator.serviceWorker.controller||'pending', mode:document.compatMode})));
+await p.screenshot({path:'/tmp/claude-0/web_home.png'});
+await p.evaluate(()=>newProject('9:16','Web test')); await p.waitForTimeout(1200);
+await p.setInputFiles('#file',{name:'clip.mp4',mimeType:'video/mp4',buffer:fs.readFileSync('/tmp/claude-0/pt2/rot_vp9.mp4')}); await p.waitForTimeout(3000);
+await p.evaluate(()=>{const m=[...media.values()].find(x=>x.user); appendMedia(m); appendMedia(m); V[0].out=3; V[0].tr={type:'circle',dur:.6}; addTextPreset(TEXT_PRESETS[12],0.3); addSticker({emoji:'✨'},0.5); addEffect('sparkle',0); renderAll(); t=2.9; drawFrame();});
+await p.waitForTimeout(1500); await p.screenshot({path:'/tmp/claude-0/web_editor.png'});
+const dlP=p.waitForEvent('download',{timeout:120000}); p.evaluate(()=>exportWebCodecs(720,30,0.11,'web-test'));
+const dl=await dlP; await dl.saveAs('/tmp/claude-0/web-test.mp4');
+await p.reload(); await p.waitForTimeout(3000);
+console.log('after reload', await p.evaluate(()=>[...document.querySelectorAll('#hProj .hcard b')].map(x=>x.textContent)), await p.evaluate(()=>!!navigator.serviceWorker.controller));
+console.log(errs.slice(0,8)); await b.close();})();

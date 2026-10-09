@@ -1,0 +1,49 @@
+﻿VINCUT - BẢN CHẠY TRÊN MÁY (WINDOWS)
+
+MỞ APP
+1. Bấm đúp file "Mo VINCut.bat".
+2. Một cửa sổ đen hiện ra và trình duyệt tự mở http://localhost:8765
+   Giữ cửa sổ đen mở trong lúc dùng. Đóng cửa sổ đó là tắt app.
+3. Nếu Windows hỏi về tường lửa, chọn Cho phép (app chỉ chạy trong máy này).
+
+CÀI ĐẶT AI (trong tab Trợ lý, nút "Cài đặt AI")
+- Bảng 1 "AI qua API": Anthropic (Claude), OpenAI và các dịch vụ kiểu OpenAI
+  (DeepSeek, Groq, OpenRouter, xAI, Gemini kiểu OpenAI), Google Gemini.
+  Điền model và API key. Key chỉ lưu trong trình duyệt của máy này.
+- Bảng 2 "AI local": Ollama hoặc LM Studio / llama.cpp / vLLM / Jan.
+- Bấm dấu + giữa các thẻ để thêm AI vào chuỗi: AI1 + AI2 + AI3 ...
+  Mỗi AI có ô "Skill" riêng. AI sau đọc kết quả của AI trước.
+  AI có vai trò "Thao tác timeline" (hoặc AI cuối chuỗi khi để Tự động) sẽ sửa timeline.
+- Ô "Dùng" phía trên khung chat: chọn Chuỗi AI qua API hoặc Chuỗi AI local.
+- Nút "Thử kết nối" và "Lấy danh sách model" để kiểm tra từng AI.
+
+AI LOCAL
+- Ollama: cài từ ollama.com, chạy "ollama pull <tên model>".
+  Nếu báo lỗi kết nối: mở PowerShell, chạy
+      setx OLLAMA_ORIGINS "*"
+  rồi thoát Ollama (biểu tượng ở khay hệ thống) và mở lại.
+- LM Studio: tab Developer > Start Server, bật "Enable CORS". Địa chỉ mặc định http://localhost:1234/v1
+
+CẬP NHẬT LÊN BẢN 3.0
+- Giải nén VINCut_3_cap_nhat_may_tinh.zip vào thư mục VINCut này, chọn "Thay thế" khi Windows hỏi.
+  Các file video có sẵn vẫn giữ nguyên.
+
+MÀN HÌNH DỰ ÁN
+- Mở app sẽ vào màn hình Dự án: Tạo dự án (chọn 9:16, 16:9, 1:1, 4:5), ô "Bạn muốn dựng gì hôm nay?",
+  công cụ nhanh, Mẫu, và danh sách Dự án của bạn (bấm ⋯ để đổi tên, nhân bản, xuất .json, xoá).
+- Dự án tự lưu trong trình duyệt của máy này, kể cả video bạn nhập vào. Nút "Dự án" góc trái để quay lại.
+
+XUẤT VIDEO
+- Chọn 720p / 1080p / 2K / 4K, 24–60 khung/giây, mức chất lượng. Cách "Nhanh, chính xác từng khung"
+  xuất MP4 (H.264 + AAC) nhanh hơn thời gian thực trên Chrome/Edge và cho chọn nơi lưu file.
+- Video gốc bạn tự nhập được xuất ở chất lượng đầy đủ. Dự án mẫu dùng bản xem trước 540p.
+
+AI CHẠY TRÊN MÁY (không cần API key, lần đầu cần mạng để tải model)
+- Phụ đề tự động: Thư viện > Chữ > "Phụ đề tự động (AI)". Model Small chính xác hơn với tiếng Việt.
+- Tách nền người: chọn clip > Thuộc tính > Tách nền.
+- Chữ thành giọng nói: dùng giọng đọc của Windows. Muốn giọng tiếng Việt: Cài đặt > Thời gian và ngôn ngữ
+  > Giọng nói > Thêm giọng nói > Tiếng Việt.
+
+LƯU Ý
+- Chế độ "Claude Opus 5.5 (claude.ai)" chỉ có khi mở VINCut trên claude.ai.
+  Bản trên máy dùng hai bảng chuỗi AI.

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/bg</item>
+        <item name="android:colorPrimary">#7b6cf6</item>
+        <item name="android:colorPrimaryDark">#131417</item>
+        <item name="android:colorAccent">#7b6cf6</item>
+        <item name="android:statusBarColor">#131417</item>
+        <item name="android:navigationBarColor">#131417</item>
+        <item name="android:alertDialogTheme">@style/VinDialog</item>
+    </style>
+    <style name="VinDialog" parent="@android:style/Theme.Material.Dialog.Alert">
+        <item name="android:colorAccent">#9d92fa</item>
+        <item name="android:colorBackground">#1b1c21</item>
+        <item name="android:textColorPrimary">#e7e7ec</item>
+        <item name="android:textColorSecondary">#9d9ea9</item>
+        <item name="android:windowBackground">@drawable/dialog_bg</item>
+    </style>
+    <color name="bg">#131417</color>
+</resources>

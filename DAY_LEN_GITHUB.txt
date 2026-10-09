@@ -1,0 +1,21 @@
+ĐẨY BRAVIN LÊN GITHUB (repo riêng)
+
+1. Trên github.com bấm New repository, đặt tên (ví dụ: bravin), chọn Public hoặc Private,
+   KHÔNG tick "Add a README". Bấm Create repository.
+0. Giải nén cả 2 file bravin_1 và bravin_2 vào CÙNG một chỗ (chọn "Extract here"); file 2 là bộ chạy AI nhúng.
+
+2. Mở thư mục bravin, mở Terminal / Git Bash trong thư mục đó, chạy:
+
+   git init -b main
+   git add -A
+   git commit -m "Bravin: toàn bộ mã nguồn"
+   git remote add origin https://github.com/<tên-tài-khoản>/bravin.git
+   git push -u origin main
+
+   (Lần đầu push, GitHub sẽ hỏi đăng nhập; dùng trình duyệt hoặc Personal Access Token.)
+
+Lưu ý
+- File khoá ký Android (*.jks) đã được .gitignore loại ra, sẽ không lên GitHub. Giữ file đó cẩn thận:
+  mất nó thì không cập nhật được app Android đã cài.
+- Mọi file đều dưới 100 MB nên push bình thường, không cần Git LFS.
+- Repo không chứa video, ảnh hay dữ liệu nào của phòng khám.

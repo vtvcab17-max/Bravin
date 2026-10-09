@@ -1,0 +1,10 @@
+# Khoá ký ứng dụng Android: bí mật, KHÔNG đưa lên GitHub (giữ bản sao an toàn ở máy bạn)
+*.jks
+*.keystore
+# Thư mục sinh ra khi build
+build/
+node_modules/
+.gradle/
+*.apk
+.DS_Store
+Thumbs.db

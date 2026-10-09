@@ -1,0 +1,14 @@
+const { chromium } = require('playwright'); const fs=require('fs');
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-webgl','--ignore-gpu-blocklist']}); const errs=[];
+const p=await b.newPage({viewport:{width:1400,height:900}}); p.on('pageerror',e=>errs.push(e.message)); p.on('console',m=>{if(/effect|FX shader|warn/i.test(m.text()) && m.type()!=='log')errs.push(m.text().slice(0,200))});
+await p.goto('http://localhost:8772/index.html'); await p.waitForTimeout(2500);
+await p.evaluate(()=>newFromTemplate()); await p.waitForTimeout(6000);
+await p.evaluate(()=>{seek(1.2); C=C.filter(c=>c.type!=='text'&&c.type!=='sticker'); drawFrame();}); await p.waitForTimeout(1200);
+const keys = await p.evaluate(()=>Object.keys(FX2));
+const thumbs = await p.evaluate(async(keys)=>{ const out=[]; for (const k of keys){ addEffect(k, 1.0); const c=C[C.length-1]; c.dur=2; drawFrame(); await new Promise(r=>setTimeout(r,30)); drawFrame(); const s=document.createElement('canvas'); s.width=90; s.height=160; s.getContext('2d').drawImage(cv,0,0,90,160); out.push([k, s.toDataURL('image/jpeg',.7)]); C.pop(); } return out; }, keys);
+const trs = await p.evaluate(()=>Object.keys(TR2));
+const tthumbs = await p.evaluate(async(trs)=>{ const out=[]; const st=vStarts(); for (const k of trs){ V[1].tr={type:k,dur:1}; drawFrame(st[2]-0.0); await new Promise(r=>setTimeout(r,20)); drawFrame(st[2]); const s=document.createElement('canvas'); s.width=90; s.height=160; s.getContext('2d').drawImage(cv,0,0,90,160); out.push([k, s.toDataURL('image/jpeg',.7)]); } return out; }, trs);
+const html='<body style="margin:0;background:#222;color:#fff;font:10px sans-serif;display:flex;flex-wrap:wrap;width:1200px">'+[...thumbs,...tthumbs].map(([k,u])=>`<div style="margin:2px;text-align:center"><img src="${u}" width=90><br>${k}</div>`).join('')+'</body>';
+fs.writeFileSync('/tmp/claude-0/fxsheet.html',html);
+const p2=await b.newPage({viewport:{width:1200,height:900}}); await p2.goto('file:///tmp/claude-0/fxsheet.html'); await p2.screenshot({path:'/tmp/claude-0/fxsheet.png',fullPage:true});
+console.log(keys.length, trs.length, errs); await b.close();})();

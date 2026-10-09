@@ -1,0 +1,10 @@
+const { chromium } = require('playwright'); const fs=require('fs');
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader','--enable-webgl','--ignore-gpu-blocklist']});const ctx=await b.newContext({viewport:{width:1440,height:900},acceptDownloads:true});
+await ctx.addInitScript(()=>{ try{ window.showSaveFilePicker=undefined; }catch(e){} });
+const p=await ctx.newPage(); const errs=[]; p.on('pageerror',e=>errs.push(e.message));
+await p.goto('http://localhost:8772/index.html');await p.waitForTimeout(2500);
+await p.evaluate(()=>newProject('9:16','Mask test')); await p.waitForTimeout(1500);
+await p.setInputFiles('#file',{name:'rot_vp9.mp4',mimeType:'video/mp4',buffer:fs.readFileSync('/tmp/claude-0/pt2/rot_vp9.mp4')}); await p.waitForTimeout(3500);
+await p.evaluate(()=>{const m=[...media.values()].find(x=>x.name==='rot_vp9.mp4'); appendMedia(m); V[0].out=2; V[0].masks=[Object.assign(newMask('ellipse',1),{w:0.5,h:0.5,feather:0.1}), Object.assign(newMask('rect',2),{mode:'sub',w:0.1,h:0.1})]; V[0].nodes=[Object.assign(NODE_DEF(),{gain:{x:0.5,y:0,l:0.2}, win:[Object.assign(newMask('ellipse',1),{w:0.3,h:0.3})]})]; renderAll();});
+const dlP=p.waitForEvent('download',{timeout:120000}); p.evaluate(()=>exportWebCodecs(720,30,0.11,'mask-export').catch(e=>console.error('EXPORT FAIL '+e.message)));
+const dl=await dlP; await dl.saveAs('/tmp/claude-0/mask-export.mp4'); console.log('ok', errs); await b.close();})();

@@ -1,0 +1,11 @@
+const { chromium } = require('playwright');
+(async()=>{const b=await chromium.launch();const p=await b.newPage({viewport:{width:1600,height:950}});const errs=[];p.on('pageerror',e=>errs.push('PE '+e.message));
+await p.goto('http://localhost:8771/index.html');await p.waitForTimeout(6000);
+await p.evaluate(()=>{addTrack('overlay');renderAll();});
+const item=await p.$('.mitem[data-mid="m_h25"]');await item.scrollIntoViewIfNeeded();const ib=await item.boundingBox();
+const ov=await p.$('.tcontent.ovl');const ob=await ov.boundingBox();
+const info=await p.evaluate(([x,y])=>({tr:trackAtY(y)&&trackAtY(y).id, sc:scroller.getBoundingClientRect().left+headW(), x}),[ob.x+120,ob.y+ob.height/2]);
+await p.mouse.move(ib.x+40,ib.y+50);await p.mouse.down();await p.mouse.move(ib.x+80,ib.y+100,{steps:3});await p.mouse.move(ob.x+120,ob.y+ob.height/2,{steps:12});
+const mid=await p.evaluate(()=>({over:[...document.querySelectorAll('.tcontent.over')].map(e=>e.dataset.track)}));
+await p.mouse.up();await p.waitForTimeout(300);
+console.log(JSON.stringify({ob,info,mid,ov:await p.evaluate(()=>C.filter(c=>c.type==='video').length)}),errs);await b.close();})();

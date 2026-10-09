@@ -1,0 +1,12 @@
+const { chromium } = require('playwright');
+(async()=>{const b=await chromium.launch({args:['--use-gl=swiftshader']}); const errs=[]; const p=await b.newPage({viewport:{width:1600,height:1000}}); p.on('pageerror',e=>errs.push(e.message));
+await p.goto('http://localhost:8772/index.html'); await p.waitForTimeout(2000); await p.evaluate(()=>newFromTemplate()); await p.waitForTimeout(5000);
+const v=await p.evaluate(()=>{const d=[...document.querySelectorAll('.clip[data-k="v"]')][2]; const r=d.getBoundingClientRect(); return {x:r.x+r.width/2,y:r.y+r.height/2, hit:document.elementFromPoint(r.x+r.width/2,r.y+r.height/2).className};});
+console.log(v);
+await p.mouse.click(v.x,v.y,{button:'right'}); await p.waitForTimeout(300); console.log(await p.evaluate(()=>[document.querySelectorAll('.menu button').length,[...document.querySelectorAll('.menu .mh')].map(x=>x.textContent)]));
+await p.screenshot({path:'/tmp/claude-0/ws_clipmenu.png'});
+await p.evaluate(()=>closeMenu());
+const e=await p.evaluate(()=>{const r=document.querySelector('.tcontent.text').getBoundingClientRect(); return {x:r.x+900,y:r.y+r.height/2};}); await p.mouse.click(e.x,e.y,{button:'right'}); await p.waitForTimeout(200); console.log(await p.evaluate(()=>[...document.querySelectorAll('.menu .mh')].map(x=>x.textContent)));
+await p.evaluate(()=>closeMenu());
+const sp=await p.evaluate(()=>{const r=document.querySelector('.vsplit.r').getBoundingClientRect(); return {x:r.x+6,y:r.y+r.height/2};}); await p.mouse.click(sp.x,sp.y); await p.waitForTimeout(200); await p.screenshot({path:'/tmp/claude-0/ws_edge.png'});
+console.log(errs); await b.close();})();
