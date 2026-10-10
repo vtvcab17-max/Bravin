@@ -5,6 +5,7 @@
    exporting, so the exact same code renders preview and final video.
    ========================================================================== */
 let cv = $("#pv"), g = cv.getContext("2d");
+let slotBase = 0;                    // lớp compound: dời chỉ số trình phát video để không đụng nhau
 let renderMode = "preview";          // "preview" | "export"
 let frameProvider = null;            // export: (c, srcT, slot) => {img,w,h} | null
 const lastBoxes = new Map();         // clip id → on-canvas box (for direct manipulation in the preview)
@@ -158,21 +159,17 @@ function drawMain(ctx, T) {
     mixTransition(ctx, W, H, tw.type, tw.p, A.canvas, B.canvas, T); return;
   }
   const a = activeVideo(T); if (!a || a.c.disabled) return;
-  const box = drawMediaLayer(ctx, a.c, T - a.start, a.i % 2, true, T); if (box && renderMode === "preview") lastBoxes.set(a.c.id, box);
+  const box = drawMediaLayer(ctx, a.c, T - a.start, a.i % 2, true, T); if (box && renderMode === "preview" && !slotBase) lastBoxes.set(a.c.id, box);
 }
 
-/* ---------- full frame ---------- */
-function drawFrame(Tin) {
-  const T = Tin != null ? Tin : (hoverT != null && !playing) ? hoverT : t;
+/* ---------- một cảnh: track chính → lớp phủ → hiệu ứng → chữ (dùng cho cả compound) ---------- */
+function drawScene(T) {
   const W = cv.width, H = cv.height;
-  if (renderMode === "preview") lastBoxes.clear();
-  g.save(); g.globalAlpha = 1; g.globalCompositeOperation = "source-over"; g.filter = "none"; g.fillStyle = "#000"; g.fillRect(0, 0, W, H); g.restore();
   drawMain(g, T);
-  if (!V.length && !C.some(c => c.type === "video" || c.type === "text" || c.type === "sticker")) { g.fillStyle = "#87a0a7"; g.font = `600 ${28 * sx()}px Montserrat, sans-serif`; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("Thêm clip để bắt đầu", W / 2, H / 2); }
   // overlay layers: lower rows first so upper rows sit on top
   tracks.map((tr, ti) => [tr, ti]).filter(([tr]) => tr.type === "overlay").reverse().forEach(([tr, ti]) => {
     if (tr.off) return;
-    for (const c of C) if (c.track === tr.id && !c.disabled && T >= c.start && T < cend(c)) { const b = drawMediaLayer(g, c, T - c.start, 2 + ti, false, T); if (b && renderMode === "preview") lastBoxes.set(c.id, b); }
+    for (const c of C) if (c.track === tr.id && !c.disabled && T >= c.start && T < cend(c)) { const b = drawMediaLayer(g, c, T - c.start, 2 + ti, false, T); if (b && renderMode === "preview" && !slotBase) lastBoxes.set(c.id, b); }
   });
   // effect / filter layers (apply to everything below them, not to text)
   tracksOf("fx").slice().reverse().forEach(tr => {
@@ -185,8 +182,18 @@ function drawFrame(Tin) {
   // text + sticker layers
   tracksOf("text").slice().reverse().forEach(tr => {
     if (tr.off) return;
-    for (const c of C) if (c.track === tr.id && !c.disabled && T >= c.start && T < cend(c)) { g.save(); const b = drawTextLike(g, c, T - c.start); g.restore(); if (b && renderMode === "preview") lastBoxes.set(c.id, b); }
+    for (const c of C) if (c.track === tr.id && !c.disabled && T >= c.start && T < cend(c)) { g.save(); const b = drawTextLike(g, c, T - c.start); g.restore(); if (b && renderMode === "preview" && !slotBase) lastBoxes.set(c.id, b); }
   });
+}
+
+/* ---------- full frame ---------- */
+function drawFrame(Tin) {
+  const T = Tin != null ? Tin : (hoverT != null && !playing) ? hoverT : t;
+  const W = cv.width, H = cv.height;
+  if (renderMode === "preview" && !slotBase) lastBoxes.clear();
+  g.save(); g.globalAlpha = 1; g.globalCompositeOperation = "source-over"; g.filter = "none"; g.fillStyle = "#000"; g.fillRect(0, 0, W, H); g.restore();
+  if (!V.length && !C.some(c => c.type === "video" || c.type === "text" || c.type === "sticker")) { g.fillStyle = "#87a0a7"; g.font = `600 ${28 * sx()}px Montserrat, sans-serif`; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText("Thêm clip để bắt đầu", W / 2, H / 2); }
+  drawScene(T);
   if (renderMode === "preview" && typeof drawSelection === "function") drawSelection();
   if (renderMode === "preview" && scopeOn) drawScopes();
 }
@@ -203,7 +210,7 @@ function setPlayUI() { $("#playTxt").textContent = playing ? "Dừng" : "Phát";
 function clipGain(c, lt, len) { return dbToGain(kfVal(c, "vol", lt, c.vol || 0)) * fadeGain(c, lt, len); }
 function syncOne(c, lt, k, off, len) {
   const m = media.get(c.mediaId); if (!m || m.kind !== "video" || !m.url) return null;
-  const el = getEl(m, k), want = srcTime(c, lt), sp = hasRamp(c) ? speedAt(c, Math.max(0, lt)) : (c.speed || 1);
+  const el = getEl(m, k + slotBase), want = srcTime(c, lt), sp = hasRamp(c) ? speedAt(c, Math.max(0, lt)) : (c.speed || 1);
   if (c.reverse || c.freeze || lt < 0) { if (!el.paused) el.pause(); if (Math.abs(el.currentTime - want) > 1 / FPS && !el.seeking) el.currentTime = want; }
   else {
     if (Math.abs(el.playbackRate - clamp(sp, 0.0625, 16)) > (hasRamp(c) ? 0.03 : 1e-3)) { try { el.preservesPitch = c.pitch !== false; el.playbackRate = clamp(sp, 0.0625, 16); } catch (_) {} }
@@ -217,18 +224,21 @@ function syncOne(c, lt, k, off, len) {
   return el;
 }
 function syncVideo() {
-  const act = new Set(), vtr = trackById("v"), off = vtr && vtr.off, tw = transitionAt(t);
+  const act = new Set(); syncScope(act);
+  for (const m of media.values()) (m.els || []).forEach(el => { if (el && !act.has(el) && !el.paused) { el.pause(); if (el._gain) el._gain.gain.value = 0; } });
+}
+function syncScope(act) {
+  const vtr = trackById("v"), off = vtr && vtr.off, tw = transitionAt(t);
   if (tw) { const st = vStarts(); [[tw.i, tw.ltA], [tw.i + 1, tw.ltB]].forEach(([i, lt]) => { const el = syncOne(V[i], lt, i % 2, off); if (el) act.add(el); }); }
   else {
     const a = activeVideo(t);
     if (a) {
       const el = syncOne(a.c, t - a.start, a.i % 2, off); if (el) act.add(el);
       const nx = V[a.i + 1];
-      if (nx && a.start + vlen(a.c) + (nx.gap || 0) - t < 1.0) { const nm = media.get(nx.mediaId); if (nm && nm.kind === "video" && nm.url) { const ne = getEl(nm, (a.i + 1) % 2), w = srcTime(nx, a.c.tr ? -Math.min(a.c.tr.dur || 0.5, 1) / 2 : 0); if (ne !== el && ne.paused && !ne.seeking && Math.abs(ne.currentTime - w) > 0.05) ne.currentTime = w; } }
+      if (nx && a.start + vlen(a.c) + (nx.gap || 0) - t < 1.0) { const nm = media.get(nx.mediaId); if (nm && nm.kind === "video" && nm.url) { const ne = getEl(nm, (a.i + 1) % 2 + slotBase), w = srcTime(nx, a.c.tr ? -Math.min(a.c.tr.dur || 0.5, 1) / 2 : 0); if (ne !== el && ne.paused && !ne.seeking && Math.abs(ne.currentTime - w) > 0.05) ne.currentTime = w; } }
     }
   }
-  tracks.forEach((tr, ti) => { if (tr.type !== "overlay") return; for (const c of C) if (c.track === tr.id && t >= c.start && t < cend(c)) { const el = syncOne(c, t - c.start, 2 + ti, tr.off, clen(c)); if (el) act.add(el); } });
-  for (const m of media.values()) (m.els || []).forEach(el => { if (el && !act.has(el) && !el.paused) { el.pause(); if (el._gain) el._gain.gain.value = 0; } });
+  tracks.forEach((tr, ti) => { if (tr.type !== "overlay") return; for (const c of C) if (c.track === tr.id && t >= c.start && t < cend(c)) { if (c.type === "compound") { if (!tr.off && !c.disabled && typeof inScope === "function") inScope(c, t - c.start, () => syncScope(act)); continue; } const el = syncOne(c, t - c.start, 2 + ti, tr.off, clen(c)); if (el) act.add(el); } });
 }
 function tick() {
   if (!playing) return;

@@ -15,12 +15,12 @@ let uid = 1; const nid = p => p + "_" + (uid++).toString(36);
 /* ---------- helpers ---------- */
 const fmt = s => { s = Math.max(0, s); const m = Math.floor(s / 60), r = s - m * 60; return String(m).padStart(2, "0") + ":" + r.toFixed(2).padStart(5, "0"); };
 const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
-const isDur = c => c.type === "text" || c.type === "sticker" || c.type === "fx";
+const isDur = c => c.type === "text" || c.type === "sticker" || c.type === "fx" || c.type === "compound";
 const vlen = c => c.freeze ? c.dur : (c.kf && c.kf.speed && c.kf.speed.length) ? rampLen(c) : (c.out - c.in) / (c.speed || 1);
 const clen = c => isDur(c) ? c.dur : (c.kf && c.kf.speed && c.kf.speed.length) ? rampLen(c) : (c.out - c.in) / (c.speed || 1);
 const cend = c => c.start + clen(c);
 const trackById = id => tracks.find(x => x.id === id);
-const ttype = c => c.type === "video" ? "overlay" : c.type === "sticker" ? "text" : c.type;
+const ttype = c => c.type === "video" || c.type === "compound" ? "overlay" : c.type === "sticker" ? "text" : c.type;
 const isLocked = id => !!(trackById(id) || {}).lock;
 const clipTrack = (k, c) => k === "v" ? "v" : c.track;
 const tracksOf = type => tracks.filter(x => x.type === type);
@@ -52,7 +52,7 @@ function nowT() { if (actx && actx.state === "running") return clock.t0 + (actx.
 function fadeGain(c, lt, len) { let k = 1; if (c.fadeIn > 0) k *= clamp(lt / c.fadeIn, 0, 1); if (c.fadeOut > 0) k *= clamp((len - lt) / c.fadeOut, 0, 1); return k; }
 function scheduleAudio() {
   stopAudio(); if (!actx) return;
-  for (const c of C) {
+  for (const c of (typeof withSubClips === "function" ? withSubClips(C) : C)) {
     if (c.type !== "audio") continue; const tr = trackById(c.track); if (!tr || tr.off || c.muted || c.disabled) continue;
     const m = media.get(c.mediaId); if (!m || !m.buf) continue;
     const e = cend(c); if (e <= t) continue;

@@ -9,5 +9,6 @@ window.vincutBack = () => {
 (async function boot() {
   setupAssetTabs(); initAI(); renderAll();
   try { await Promise.all(["800 62px Montserrat", "900 70px Montserrat", 'italic 700 72px "Playfair Display"'].map(f => document.fonts.load(f))); } catch (_) {}
+  try { if (window.FM && FM.ready) await Promise.race([FM.ready, new Promise(r => setTimeout(r, 2500))]); } catch (_) {}
   await initHome();
 })();

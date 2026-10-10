@@ -90,7 +90,7 @@ grid.addEventListener("pointerdown", e => {
     } else {
       if (handle === "l") {
         const ns = snapTime(orig.start + dx, c.id); let d = ns.v - orig.start;
-        if (isDur(c)) { d = clamp(d, -orig.start, orig.dur - MINLEN); c.start = orig.start + d; c.dur = orig.dur - d; }
+        if (isDur(c)) { d = clamp(d, -orig.start, orig.dur - MINLEN); c.start = orig.start + d; c.dur = orig.dur - d; if (c.type === "compound") c.off = (orig.off || 0) + d; }
         else { const sp = c.speed || 1; d = clamp(d, -Math.min(orig.in / sp, orig.start), clen(orig) - MINLEN); c.in = orig.in + d * sp; c.start = orig.start + d; }
         showSnap(ns.s); layoutClips();
       } else if (handle === "r") {

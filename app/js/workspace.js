@@ -51,10 +51,13 @@ grid.addEventListener("pointerdown", e => {
   if (d && (e.shiftKey || e.ctrlKey || e.metaKey)) { // toggle membership
     e.preventDefault(); e.stopImmediatePropagation(); const id = d.dataset.id, p = findSel();
     if (p && !msel.has(p.id) && p.id !== id) msel.add(p.id);
+    const gm = (clipById(id) || { c: {} }).c.grp ? grpMembers(clipById(id).c.grp).map(x => x.id) : [id];
+    if (gm.length > 1) { if (msel.has(id)) gm.forEach(x => msel.delete(x)); else gm.forEach(x => msel.add(x)); const nx = [...msel][0], f2 = nx && clipById(nx); sel = f2 ? { k: f2.k, id: nx } : null; renderInspector(); syncButtons(); renderTimeline(); return; }
     if (msel.has(id)) { msel.delete(id); if (sel && sel.id === id) { const nx = [...msel][0]; const f = nx && clipById(nx); sel = f ? { k: f.k, id: nx } : null; } }
     else { msel.add(id); const f = clipById(id); if (f) sel = { k: f.k, id }; }
     renderInspector(); syncButtons(); renderTimeline(); return;
   }
+  if (d && !msel.has(d.dataset.id) && !e.target.dataset.h && typeof expandGroupSel === "function") expandGroupSel(d.dataset.id);
   if (d && msel.size > 1 && msel.has(d.dataset.id) && !e.target.dataset.h) { groupDrag(e, d); return; }
   if (d && !msel.has(d.dataset.id)) { clearMsel(); return; }
   if (!d && e.pointerType === "mouse" && e.target.closest(".tcontent") && !e.target.closest(".ruler") && !e.target.closest(".marker,.trb")) marquee(e);
@@ -69,7 +72,7 @@ function marquee(e) {
   };
   const up = ev => { window.removeEventListener("pointermove", mv); window.removeEventListener("pointerup", up);
     if (!box) { clearMsel(); sel = null; renderInspector(); syncButtons(); renderTimeline(); seek(clamp(laneX(ev), 0, total())); return; }
-    box.remove(); const first = [...msel][0], f = first && clipById(first); sel = f ? { k: f.k, id: first } : null; renderInspector(); syncButtons(); renderTimeline(); if (msel.size) toast(`Đã chọn ${msel.size} clip · Delete xoá · Ctrl+C chép · kéo để dời cả nhóm`); };
+    box.remove(); [...msel].forEach(id => { const f3 = clipById(id); if (f3 && f3.c.grp) grpMembers(f3.c.grp).forEach(x => msel.add(x.id)); }); paintMsel(); const first = [...msel][0], f = first && clipById(first); sel = f ? { k: f.k, id: first } : null; renderInspector(); syncButtons(); renderTimeline(); if (msel.size) toast(`Đã chọn ${msel.size} clip · Delete xoá · Ctrl+C chép · kéo để dời cả nhóm`); };
   window.addEventListener("pointermove", mv); window.addEventListener("pointerup", up);
 }
 function groupDrag(e, d) {
@@ -91,9 +94,9 @@ function deleteMany(ripple) {
 let groupClip = null;
 function copyMany(cut) { const L = selectedClips(); if (L.length < 2) return false; const t0 = Math.min(...L.map(f => f.k === "v" ? vStarts()[V.indexOf(f.c)] : f.c.start)); groupClip = L.map(f => ({ k: f.k, c: deep(f.c), off: (f.k === "v" ? vStarts()[V.indexOf(f.c)] : f.c.start) - t0 })); clipBoard = null; if (cut) deleteMany(false); toast((cut ? "Đã cắt " : "Đã chép ") + L.length + " clip."); return true; }
 function pasteMany() {
-  if (!groupClip) return false; pushUndo(); msel.clear(); const vs = groupClip.filter(g2 => g2.k === "v"), cs = groupClip.filter(g2 => g2.k === "c");
-  if (vs.length) { const h = vAt(t); let at = V.length; if (h) { const r = splitV(h.c, t - h.start); at = V.indexOf(r); } else { const st = vStarts(); const i = st.findIndex(s => s >= t - 0.02); if (i >= 0) at = i; } const before = vMap(); vs.forEach((g2, i) => { const b = { ...deep(g2.c), id: nid("v"), gap: 0 }; delete b.tr; V.splice(at + i, 0, b); msel.add(b.id); }); linkShift(before); }
-  for (const g2 of cs) { const L = clen(g2.c), st = t + g2.off; const tr = trackById(g2.c.track) && !isLocked(g2.c.track) && !overlapsOn(g2.c.track, st, L) ? trackById(g2.c.track) : freeTrack(ttype(g2.c), st, L); const b = { ...deep(g2.c), id: nid("c"), start: st, track: tr.id }; C.push(b); msel.add(b.id); }
+  if (!groupClip) return false; pushUndo(); msel.clear(); const gmap = new Map(); const rg = b => { if (b.grp) { if (!gmap.has(b.grp)) gmap.set(b.grp, nid("g")); b.grp = gmap.get(b.grp); } return b; }; const vs = groupClip.filter(g2 => g2.k === "v"), cs = groupClip.filter(g2 => g2.k === "c");
+  if (vs.length) { const h = vAt(t); let at = V.length; if (h) { const r = splitV(h.c, t - h.start); at = V.indexOf(r); } else { const st = vStarts(); const i = st.findIndex(s => s >= t - 0.02); if (i >= 0) at = i; } const before = vMap(); vs.forEach((g2, i) => { const b = rg({ ...deep(g2.c), id: nid("v"), gap: 0 }); delete b.tr; V.splice(at + i, 0, b); msel.add(b.id); }); linkShift(before); }
+  for (const g2 of cs) { const L = clen(g2.c), st = t + g2.off; const tr = trackById(g2.c.track) && !isLocked(g2.c.track) && !overlapsOn(g2.c.track, st, L) ? trackById(g2.c.track) : freeTrack(ttype(g2.c), st, L); const b = rg({ ...deep(g2.c), id: nid("c"), start: st, track: tr.id }); C.push(b); msel.add(b.id); }
   renderAll(); toast("Đã dán " + groupClip.length + " clip tại " + fmt(t) + "."); return true;
 }
 window.addEventListener("keydown", e => {

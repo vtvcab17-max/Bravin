@@ -77,7 +77,7 @@ function paintStrips(only) {
 function clipEl(c, k, left) {
   const m = c.mediaId ? media.get(c.mediaId) : null; const d = document.createElement("div");
   const isText = k === "c" && (c.type === "text" || c.type === "sticker" || c.type === "jz"), isFx = k === "c" && c.type === "fx", isSfx = k === "c" && c.type === "audio" && (/^sfx/.test(c.track) || (m && (m.gen || /^SFX/.test(m.name)))), isOv = k === "c" && c.type === "video";
-  d.className = "clip" + (k === "c" ? (isText ? (c.type === "sticker" ? " t st" : " t") : isFx ? (c.fxType === "filter" ? " fx flt" : " fx") : isSfx ? " sfx" : isOv ? " ov" : " a") : "") + (sel && sel.id === c.id ? " sel" : "");
+  d.className = "clip" + (k === "c" ? (isText ? (c.type === "sticker" ? " t st" : " t") : isFx ? (c.fxType === "filter" ? " fx flt" : " fx") : isSfx ? " sfx" : isOv ? " ov" : (k === "c" && c.type === "compound") ? " ov cmp" : " a") : "") + (sel && sel.id === c.id ? " sel" : "");
   d.dataset.id = c.id; d.dataset.k = k; d.tabIndex = -1;
   const L = k === "v" ? vlen(c) : clen(c);
   d.style.left = left * pps + "px"; d.style.width = Math.max(3, L * pps) + "px";
@@ -87,7 +87,7 @@ function clipEl(c, k, left) {
     else if (m.stripN && m.kind === "video") { d.classList.add("tiled"); }
     else { d.style.backgroundImage = `url(${m.strip})`; d.style.backgroundSize = `${m.duration * pps}px 100%`; d.style.backgroundPosition = `${-c.in * pps}px 0`; }
   }
-  const label = isText ? textLabel(c) : isFx ? (c.fxType === "filter" ? "Bộ lọc · " + (FILTERS[c.filter] || FILTERS.none).n : "Hiệu ứng · " + (EFFECTS[c.effect] || "")) : (m ? m.name : "?");
+  const label = k === "c" && c.type === "compound" ? "▣ " + (c.name || "Compound") + " · " + cmpCount(c) + " clip" : isText ? textLabel(c) : isFx ? (c.fxType === "filter" ? "Bộ lọc · " + (FILTERS[c.filter] || FILTERS.none).n : "Hiệu ứng · " + (EFFECTS[c.effect] || "")) : (m ? m.name : "?");
   d.innerHTML = '<div class="h l" data-h="l"></div><div class="h r" data-h="r"></div><span class="cl"></span>' + (L * pps > 70 && !isText ? '<span class="cd"></span>' : "") + (c.muted ? '<span class="mute">Tắt tiếng</span>' : "") + (c.freeze || c.reverse || c.flip || c.rot || (c.speed && c.speed !== 1) || c.anim || (c.filter && c.filter !== "none" && !isFx) || c.bgRemove || c.chroma || c.audioOut ? `<span class="tag2">${[c.speed && c.speed !== 1 ? c.speed + "x" : "", c.freeze ? "Đứng hình" : "", c.reverse ? "Đảo" : "", c.flip ? "Lật" : "", c.rot ? c.rot + "°" : "", c.anim ? "Hoạt ảnh" : "", c.filter && c.filter !== "none" && !isFx ? (FILTERS[c.filter] || {}).n : "", c.bgRemove ? "Tách nền" : "", c.chroma ? "Phông xanh" : "", c.audioOut ? "Đã tách tiếng" : ""].filter(Boolean).join(" · ")}</span>` : "") + (sel && sel.id === c.id && c.kf ? kfTimes(c).map(kt => `<span class="kfd" style="left:${kt * pps - 5}px" title="Keyframe ${fmt(kt)}"></span>`).join("") : "");
   d.querySelector(".cl").textContent = label; const cd = d.querySelector(".cd"); if (cd) cd.textContent = fmt(L);
   d.title = label + " · " + fmt(L);

@@ -184,9 +184,9 @@ function renderInspector0() {
   const c = findSel();
   if (!c) { box.innerHTML = `<div class="empty">Bấm vào một clip trên timeline (hoặc trên khung xem trước) để chỉnh. Thêm chữ, sticker, hiệu ứng, chuyển cảnh và bộ lọc ở Thư viện.</div>` + HELP; return; }
   const head = el("div", "ihead"); const nm = el("b"); const m = c.mediaId ? media.get(c.mediaId) : null;
-  nm.textContent = c.type === "text" || c.type === "sticker" ? textLabel(c) : c.type === "fx" ? (c.fxType === "filter" ? "Bộ lọc" : "Hiệu ứng · " + EFFECTS[c.effect]) : (m ? m.name : "?");
+  nm.textContent = c.type === "text" || c.type === "sticker" ? textLabel(c) : c.type === "fx" ? (c.fxType === "filter" ? "Bộ lọc" : "Hiệu ứng · " + EFFECTS[c.effect]) : (c.type === "compound" ? (c.name || "Compound") + " · " + cmpCount(c) + " clip" : m ? m.name : "?");
   const meta = el("span", "tc"); meta.textContent = `${fmt(clipStart(c))} · dài ${fmt(clipLen(c))}`; head.append(nm, meta); box.appendChild(head);
-  const isVid = sel.k === "v" || c.type === "video";
+  const isVid = sel.k === "v" || c.type === "video" || c.type === "compound";
   if (isVid) videoPanel(box, c, m);
   else if (c.type === "text") textPanel(box, c);
   else if (c.type === "sticker") stickerPanel(box, c);
@@ -231,7 +231,8 @@ function textPanel(box, c) {
     if (custom) {
       const b = section(box, "Nội dung");
       const ta = el("textarea"); ta.rows = 3; ta.value = c.text || ""; ta.setAttribute("aria-label", "Nội dung chữ"); ta.oninput = () => { beginEdit(); c.text = ta.value; layoutLabels(c); drawFrame(); }; ta.onblur = () => { gestureOpen = false; }; b.appendChild(ta);
-      select(b, "Phông chữ", Object.fromEntries(Object.keys(FONTS).map(k => [k, k === "sans-serif" ? "Không chân (hệ thống)" : k === "serif" ? "Có chân (hệ thống)" : k === "monospace" ? "Đơn cách" : k === "cursive" ? "Viết tay" : k])), () => c.font || "Montserrat", v => c.font = v);
+      { const fo = Object.fromEntries(Object.keys(FONTS).map(k => [k, k === "sans-serif" ? "Không chân (hệ thống)" : k === "serif" ? "Có chân (hệ thống)" : k === "monospace" ? "Đơn cách" : k === "cursive" ? "Viết tay" : (window.fmInstalled && fmInstalled(k) ? "★ " + k : k)])); if (c.font && !fo[c.font]) fo[c.font] = c.font + " (chưa cài)"; fo.__more = "＋ Cài thêm phông chữ…";
+        select(b, "Phông chữ", fo, () => c.font || "Montserrat", v => { if (v === "__more") { if (window.openFonts) openFonts(f => { pushUndo(); c.font = f; fmRedraw(); }); return; } c.font = v; }); }
       const r = el("div", "row"); b.appendChild(r);
       select(r, "Độ đậm", { 400: "Thường", 500: "Vừa", 600: "Hơi đậm", 700: "Đậm", 800: "Rất đậm", 900: "Đen" }, () => String(c.weight || 800), v => c.weight = +v);
       select(r, "Căn lề", { center: "Giữa", left: "Trái", right: "Phải" }, () => c.align || "center", v => c.align = v);

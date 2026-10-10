@@ -1,20 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="app.vincut" android:versionCode="2" android:versionName="3.0">
+    package="app.vincut" android:versionCode="3" android:versionName="4.0"
+    android:installLocation="auto">
     <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="34" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
+    <!-- chạy được cả trên máy không có cảm ứng/micro (Samsung DeX, bàn phím + chuột) -->
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+    <uses-feature android:name="android.hardware.microphone" android:required="false" />
+    <uses-feature android:name="android.hardware.faketouch" android:required="false" />
+    <supports-screens android:smallScreens="true" android:normalScreens="true" android:largeScreens="true"
+        android:xlargeScreens="true" android:anyDensity="true" android:resizeable="true" />
     <application android:label="Bravin" android:icon="@mipmap/ic_launcher"
         android:theme="@style/AppTheme" android:usesCleartextTraffic="true" android:hardwareAccelerated="true"
-        android:largeHeap="true" android:allowBackup="false">
+        android:largeHeap="true" android:allowBackup="false" android:supportsRtl="true">
+        <!-- Samsung: đa cửa sổ đời cũ, DeX giữ app khi đổi mật độ/màn hình, tỉ lệ màn hình dài -->
+        <meta-data android:name="com.sec.android.support.multiwindow" android:value="true" />
+        <meta-data android:name="com.samsung.android.keepalive.density" android:value="true" />
+        <meta-data android:name="com.samsung.android.multidisplay.keep_process_alive" android:value="true" />
+        <meta-data android:name="android.max_aspect" android:value="3.0" />
         <activity android:name=".MainActivity" android:exported="true" android:launchMode="singleTask"
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboard|keyboardHidden|navigation|uiMode"
+            android:screenOrientation="unspecified"
+            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboard|keyboardHidden|navigation|uiMode|fontScale|locale|layoutDirection|mcc|mnc|touchscreen"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
             </intent-filter>
         </activity>
     </application>

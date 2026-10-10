@@ -110,11 +110,12 @@ async function renderMix(sr, range) {
     const s0 = srcOffset(c, skip); s.start(when, c.in + s0, Math.max(0.01, srcOffset(c, skip + play) - s0) + 0.05);
   };
   const den = async (b, c) => c.afx && c.afx.den && typeof denoiseCached === "function" ? await denoiseCached(b, c.afx.den) : b;
-  for (const c of C) { if (c.type !== "audio" || c.muted || c.disabled) continue; const tr = trackById(c.track); if (!tr || tr.off) continue; const m = media.get(c.mediaId); if (m && m.buf) place(await den(m.buf, c), c, c.start, clen(c), c.voice, c.track); }
+  const CS = typeof withSubClips === "function" ? withSubClips(C) : C;
+  for (const c of CS) { if (c.type !== "audio" || c.muted || c.disabled) continue; const tr = trackById(c.track); if (!tr || tr.off) continue; const m = media.get(c.mediaId); if (m && m.buf) place(await den(m.buf, c), c, c.start, clen(c), c.voice, c.track); }
   const vtr = trackById("v"), st = vStarts();
   const videoAudio = async (c, start, len, off, trId) => { if (off || c.muted || c.disabled || c.audioOut || c.reverse || c.freeze) return; if (start + len < ra || start > rb) return; const m = media.get(c.mediaId); if (!m || m.kind !== "video" || !m.hasAudio) return; try { const am = await extractAudioMedia(m); place(await den(am.buf, c), c, start, len, undefined, trId); } catch (_) {} };
   for (let i = 0; i < V.length; i++) await videoAudio(V[i], st[i], vlen(V[i]), vtr && vtr.off, "v");
-  for (const c of C) if (c.type === "video") { const tr = trackById(c.track); await videoAudio(c, c.start, clen(c), !tr || tr.off, c.track); }
+  for (const c of CS) if (c.type === "video") { const tr = trackById(c.track); await videoAudio(c, c.start, clen(c), !tr || tr.off, c.track); }
   const res = await oc.startRendering();
   if (exportNorm && typeof normalizeMix === "function") await normalizeMix(res, exportNorm);
   return res;
@@ -205,7 +206,7 @@ async function makeSource(m, reverse) {
 function layersAt(T) {
   const need = []; const vtr = trackById("v");
   if (!(vtr && vtr.off)) { const tw = transitionAt(T); if (tw) need.push([V[tw.i], tw.ltA, tw.i % 2], [V[tw.i + 1], tw.ltB, (tw.i + 1) % 2]); else { const a = activeVideo(T); if (a) need.push([a.c, T - a.start, a.i % 2]); } }
-  tracks.forEach((tr, ti) => { if (tr.type !== "overlay" || tr.off) return; for (const c of C) if (c.track === tr.id && T >= c.start && T < cend(c)) need.push([c, T - c.start, 2 + ti]); });
+  tracks.forEach((tr, ti) => { if (tr.type !== "overlay" || tr.off) return; for (const c of C) if (c.track === tr.id && T >= c.start && T < cend(c)) { need.push([c, T - c.start, 2 + ti]); if (c.type === "compound" && !c.disabled && typeof inScope === "function") inScope(c, T - c.start, () => { for (const [cc, l2, s2] of layersAt(T - c.start + (c.off || 0))) need.push([cc, l2, s2 + slotBase]); }); } });
   return need;
 }
 
@@ -227,6 +228,7 @@ async function exportWebCodecs(short, fps, bpp, name, range) {
   const vc = await pickVideoCodec(W, H, fps, br); if (!vc) throw new Error("thiết bị không có bộ mã hoá video phù hợp");
   const ac = await pickAudioCodec(48000);
   const tgt = await exportTarget(name + ".mp4");
+  try { if (window.fmEnsureUsed) await fmEnsureUsed(); } catch (_) {}
   exporting = true; expCancel = false;
   exportUI("Đang xuất video", `${W}×${H} · ${fps} fps · ${vc.cfg.codec}${ac ? " + " + ac.cfg.codec : ""}. Có thể dùng máy bình thường; giữ app mở.`);
   $("#expCancel").onclick = () => { expCancel = true; };

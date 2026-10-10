@@ -16,7 +16,7 @@ Trình dựng video chạy trên trình duyệt, Android và máy tính (bản w
 | Thư mục | Nội dung |
 |---|---|
 | `app/` | Mã nguồn ứng dụng web hiện tại (HTML/CSS/JS thuần, không cần build). `vendor/transformers/` là bộ chạy AI nhúng. |
-| `desktop/` | Bản chạy trên máy tính (Windows): ứng dụng + `serve.ps1`, `HUONG_DAN.txt`. Thư mục `models/` để đặt model AI chạy không mạng. |
+| `desktop/` | Bản cài cho Windows: `Cai dat Bravin.bat` (tạo biểu tượng Desktop/Start Menu), `Mo Bravin.bat` (chạy không cần cài). `bravin.ps1` là máy chủ nội bộ, mở Bravin trong cửa sổ riêng của Edge/Chrome; `app/` là bản ứng dụng chạy không cần mạng (phông chữ và bộ chạy AI có sẵn). |
 | `android/` | Dự án Android (WebView) + `www/` là ứng dụng. `build.sh` để dựng APK (đặt biến `KS_PASS` là mật khẩu keystore). |
 | `tools/` | Script dựng bản web/PWA, logo, `package.json` các thư viện gốc. |
 | `docs/` | `ARCHITECTURE.md` (kiến trúc và từng nhóm tính năng), tài sản logo. |
@@ -29,7 +29,7 @@ cd app
 python3 -m http.server 8080     # hoặc: node ../tests/serve_static.js . 8080
 # mở http://localhost:8080
 ```
-Trên Windows: mở `desktop/` và làm theo `HUONG_DAN.txt`.
+Trên Windows: mở `desktop/` và làm theo `HUONG_DAN.txt`. Khi sửa `app/`, chép lại vào `desktop/app/` (giữ phần đầu `index.html` dùng phông chữ cục bộ).
 
 ## Kiểm thử
 ```bash
@@ -42,3 +42,6 @@ node tests/fix4.js    # ví dụ: đồng bộ âm thanh (không cần video m�
 - Mã định danh nội bộ giữ tên cũ để tương thích dữ liệu: IndexedDB `vincut`, localStorage `vincut-*`, định dạng dự án `vincut`, `window.VINCutAndroid`, package `app.vincut`.
 - Khoá ký APK (`*.jks`) bị loại khỏi git bằng `.gitignore`; giữ bản sao an toàn riêng.
 - Repo không kèm video hay dự án mẫu. Nút "Dự án mẫu" ở màn hình chính chỉ hiện khi có `project.json` cạnh ứng dụng.
+
+## Triển khai bản web lên Cloudflare Workers
+`wrangler.jsonc` ở thư mục gốc trỏ tới `./app` (bản web Bravin). Cấu hình build trên Cloudflare: Build command để trống, Deploy command `npx wrangler deploy`, Root directory `/`. Mỗi file tĩnh phải nhỏ hơn 25 MiB (file lớn nhất hiện tại là ort-wasm…wasm ≈ 20,6 MiB).

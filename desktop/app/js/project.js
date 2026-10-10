@@ -5,7 +5,7 @@
    ========================================================================== */
 let projName = "Bravin", curProjectId = null, lastSavedJSON = "";
 function projectJSON() {
-  const used = new Set([...V.map(c => c.mediaId), ...C.map(c => c.mediaId)].filter(Boolean));
+  const used = new Set((typeof allClipsDeep === "function" ? allClipsDeep() : [...V, ...C]).map(c => c.mediaId).filter(Boolean));
   const med = [...media.values()].map(m => ({ id: m.id, name: m.name, kind: m.kind, duration: Math.round((m.duration || 0) * 1000) / 1000, file: m.user ? (m.persist || null) : (m.url || null), strip: m.user && (m.kind === "audio" || /^blob:/.test(m.strip || "")) ? undefined : m.strip, thumb: m.user && /^blob:/.test(m.thumb || "") ? undefined : m.thumb, stripN: m.stripN, stripAR: m.stripAR, user: !!m.user, used: used.has(m.id), stored: m.stored || undefined, gen: m.gen, fromVideo: m.fromVideo, hasAudio: m.hasAudio || undefined }));
   return JSON.stringify({ format: "vincut", version: 3, saved: new Date().toISOString(), name: projName, aspect: $("#aspect").value, tracks, media: med, V, C, markers, markerNotes: typeof markerNotes !== "undefined" ? markerNotes : undefined, coverT }, null, 1);
 }
@@ -31,7 +31,7 @@ function resetEditor() {
   pause(); for (const m of media.values()) { if (m.url && m.url.startsWith("blob:")) URL.revokeObjectURL(m.url); (m.els || []).forEach(el => { try { el.removeAttribute("src"); el.load(); el.remove(); } catch (_) {} }); }
   media.clear(); tracks = []; V = []; C = []; markers = []; if (typeof markerNotes !== "undefined") markerNotes = {}; coverT = null; undoStack = []; redoStack = []; sel = null; t = 0; hoverT = null;
 }
-function bumpUid() { let mx = uid; const scan = id => { const m = /_([0-9a-z]+)$/.exec(String(id || "")); if (m) mx = Math.max(mx, parseInt(m[1], 36) + 1); }; tracks.forEach(x => scan(x.id)); V.forEach(x => scan(x.id)); C.forEach(x => scan(x.id)); media.forEach(x => scan(x.id)); uid = mx; }
+function bumpUid() { let mx = uid; const scan = id => { const m = /_([0-9a-z]+)$/.exec(String(id || "")); if (m) mx = Math.max(mx, parseInt(m[1], 36) + 1); }; tracks.forEach(x => scan(x.id)); (typeof allClipsDeep === "function" ? allClipsDeep(true) : [...V, ...C]).forEach(x => scan(x.id || x));  media.forEach(x => scan(x.id)); uid = mx; }
 async function loadProjectObj(o, opts = {}) {
   if (!o || !["vincut"].includes(o.format) || !Array.isArray(o.V)) { toast("File này không phải dự án Bravin."); return false; }
   resetEditor();
@@ -53,6 +53,7 @@ async function loadProjectObj(o, opts = {}) {
   const vfirst = V[0] && media.get(V[0].mediaId); if (vfirst && vfirst.url) { const el = getEl(vfirst, 0); el.addEventListener("loadeddata", () => { if (!playing) drawFrame(); }, { once: true }); }
   if (later.length) { if (!opts.quiet) toast("Đang tải media của dự án…"); for (const f of later.filter((_, i) => i < later.length)) { try { await f(); } catch (_) {} } renderBin(); renderAll(); }
   if (missing) toast(`Còn ${missing} file chưa có trong máy này. Nhập lại đúng tên file để hiện hình.`);
+  if (!opts.quiet && window.fmCheckProject) setTimeout(fmCheckProject, 500);
   lastSavedJSON = projectJSON(); return true;
 }
 

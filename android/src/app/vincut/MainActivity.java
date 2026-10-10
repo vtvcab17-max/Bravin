@@ -9,6 +9,9 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.pm.ActivityInfo;
+import android.hardware.display.DisplayManager;
+import android.view.Display;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
@@ -53,6 +56,20 @@ public class MainActivity extends Activity {
     PermissionRequest pendingPerm;
     SharedPreferences prefs;
     int backTries = 0;
+    DisplayManager dm;
+    DisplayManager.DisplayListener dmListener;
+    void notifyDisplays() { if (web != null) web.post(new Runnable() { public void run() { web.evaluateJavascript("window.dispatchEvent(new Event('bravin-display'))", null); } }); }
+    String displaysJson() {
+        StringBuilder sb = new StringBuilder("{\"displays\":[");
+        try {
+            Display[] all = dm.getDisplays(); Display[] pres = dm.getDisplays(DisplayManager.DISPLAY_CATEGORY_PRESENTATION);
+            for (int i = 0; i < all.length; i++) { Display d = all[i]; boolean p = false; for (Display q : pres) if (q.getDisplayId() == d.getDisplayId()) p = true;
+                if (i > 0) sb.append(',');
+                sb.append("{\"id\":").append(d.getDisplayId()).append(",\"name\":\"").append(String.valueOf(d.getName()).replace("\\", "").replace("\"", "'")).append("\",\"presentation\":").append(p).append('}'); }
+            sb.append("],\"external\":").append(pres.length).append(",\"current\":").append(getWindowManager().getDefaultDisplay().getDisplayId());
+        } catch (Throwable e) { sb.append("],\"external\":0"); }
+        return sb.append('}').toString();
+    }
 
     @Override
     protected void onCreate(Bundle b) {
@@ -78,10 +95,26 @@ public class MainActivity extends Activity {
         s.setAllowFileAccess(false);
         s.setAllowContentAccess(true);
         s.setTextZoom(100);
+        s.setUseWideViewPort(true);   // cho phép "chế độ máy tính" đổi bề rộng khung nhìn
+        s.setLoadWithOverviewMode(true);
         s.setSupportZoom(false);
         s.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
         s.setUserAgentString(s.getUserAgentString() + " VINCutAndroid/1.0");
         web.addJavascriptInterface(new Bridge(), "VINCutAndroid");
+        try {
+            dm = (DisplayManager) getSystemService(DISPLAY_SERVICE);
+            dmListener = new DisplayManager.DisplayListener() {
+                public void onDisplayAdded(int id) { notifyDisplays(); }
+                public void onDisplayRemoved(int id) { notifyDisplays(); }
+                public void onDisplayChanged(int id) { }
+            };
+            dm.registerDisplayListener(dmListener, null);
+        } catch (Throwable ignored) { }
+        // Samsung One UI: không để chế độ tối ép màu giao diện; ưu tiên tiến trình dựng hình của WebView
+        try { View.class.getMethod("setForceDarkAllowed", boolean.class).invoke(web, false); } catch (Throwable ignored) { }
+        try { WebView.class.getMethod("setRendererPriorityPolicy", int.class, boolean.class).invoke(web, 2, true); } catch (Throwable ignored) { }
+        web.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+        web.setOverScrollMode(View.OVER_SCROLL_NEVER);
 
         web.setWebViewClient(new WebViewClient() {
             @Override
@@ -160,6 +193,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        try { if (dm != null && dmListener != null) dm.unregisterDisplayListener(dmListener); } catch (Throwable ignored) { }
         if (server != null) server.stop();
         if (web != null) web.destroy();
         super.onDestroy();
@@ -246,7 +280,20 @@ public class MainActivity extends Activity {
         int seq = 0;
 
         @JavascriptInterface
-        public String version() { return "1.0"; }
+        public String version() { return "1.1"; }
+
+        @JavascriptInterface
+        public String displays() { return displaysJson(); }
+
+        @JavascriptInterface
+        public void setOrientation(final String mode) {
+            runOnUiThread(new Runnable() { public void run() {
+                int o = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
+                if ("landscape".equals(mode)) o = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE;
+                else if ("portrait".equals(mode)) o = ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT;
+                setRequestedOrientation(o);
+            } });
+        }
 
         @JavascriptInterface
         public synchronized String begin(String name, String mime) {

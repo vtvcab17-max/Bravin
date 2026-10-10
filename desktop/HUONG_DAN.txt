@@ -1,49 +1,37 @@
-﻿VINCUT - BẢN CHẠY TRÊN MÁY (WINDOWS)
+﻿BRAVIN CHO MÁY TÍNH (WINDOWS 10 / 11)
 
-MỞ APP
-1. Bấm đúp file "Mo VINCut.bat".
-2. Một cửa sổ đen hiện ra và trình duyệt tự mở http://localhost:8765
-   Giữ cửa sổ đen mở trong lúc dùng. Đóng cửa sổ đó là tắt app.
-3. Nếu Windows hỏi về tường lửa, chọn Cho phép (app chỉ chạy trong máy này).
+CÀI ĐẶT (khuyên dùng)
+1. Giải nén file zip ra một thư mục bất kỳ.
+2. Bấm đúp "Cai dat Bravin.bat". Nếu Windows hiện cảnh báo SmartScreen, bấm "More info" → "Run anyway".
+3. Bravin được chép vào máy, tạo biểu tượng "Bravin" ở màn hình Desktop và Start Menu, rồi tự mở.
+   Lần sau chỉ cần bấm biểu tượng Bravin.
 
-CÀI ĐẶT AI (trong tab Trợ lý, nút "Cài đặt AI")
-- Bảng 1 "AI qua API": Anthropic (Claude), OpenAI và các dịch vụ kiểu OpenAI
-  (DeepSeek, Groq, OpenRouter, xAI, Gemini kiểu OpenAI), Google Gemini.
-  Điền model và API key. Key chỉ lưu trong trình duyệt của máy này.
-- Bảng 2 "AI local": Ollama hoặc LM Studio / llama.cpp / vLLM / Jan.
-- Bấm dấu + giữa các thẻ để thêm AI vào chuỗi: AI1 + AI2 + AI3 ...
-  Mỗi AI có ô "Skill" riêng. AI sau đọc kết quả của AI trước.
-  AI có vai trò "Thao tác timeline" (hoặc AI cuối chuỗi khi để Tự động) sẽ sửa timeline.
-- Ô "Dùng" phía trên khung chat: chọn Chuỗi AI qua API hoặc Chuỗi AI local.
-- Nút "Thử kết nối" và "Lấy danh sách model" để kiểm tra từng AI.
+DÙNG KHÔNG CẦN CÀI
+- Bấm đúp "Mo Bravin.bat" ngay trong thư mục đã giải nén.
 
-AI LOCAL
-- Ollama: cài từ ollama.com, chạy "ollama pull <tên model>".
-  Nếu báo lỗi kết nối: mở PowerShell, chạy
-      setx OLLAMA_ORIGINS "*"
-  rồi thoát Ollama (biểu tượng ở khay hệ thống) và mở lại.
-- LM Studio: tab Developer > Start Server, bật "Enable CORS". Địa chỉ mặc định http://localhost:1234/v1
+CÁCH HOẠT ĐỘNG
+- Bravin mở trong một cửa sổ riêng (dùng Microsoft Edge hoặc Chrome có sẵn trong máy, ở chế độ ứng dụng,
+  không có thanh địa chỉ), chạy hoàn toàn trên máy, không cần mạng để dựng và xuất video.
+- Đóng cửa sổ Bravin là tắt hẳn. Dự án tự lưu trong máy (thư mục %LOCALAPPDATA%\Bravin\Profile).
+- Nếu Windows hỏi về tường lửa, chọn Cho phép (Bravin chỉ mở cổng trong máy này, cổng 8765).
 
-CẬP NHẬT LÊN BẢN 3.0
-- Giải nén VINCut_3_cap_nhat_may_tinh.zip vào thư mục VINCut này, chọn "Thay thế" khi Windows hỏi.
-  Các file video có sẵn vẫn giữ nguyên.
+AI
+- Nút bánh răng "Cài đặt AI" ở khung Trợ lý mở canvas Luồng AI.
+- API: dán mã (OpenAI, Claude, Gemini, DeepSeek, Groq, OpenRouter...) rồi bấm Kết nối.
+- AI local: bấm "Dò AI local". Với Ollama, nếu báo lỗi kết nối: mở PowerShell, chạy
+      setx OLLAMA_ORIGINS "http://localhost:8765"
+  rồi thoát Ollama (khay hệ thống) và mở lại.
+- Model nhúng (chạy ngay trong Bravin): chọn "Nhúng trong Bravin". Bộ chạy đã có sẵn; lần đầu tải model.
+  Muốn chạy không mạng: đặt model vào thư mục app\models (xem README trong đó).
 
-MÀN HÌNH DỰ ÁN
-- Mở app sẽ vào màn hình Dự án: Tạo dự án (chọn 9:16, 16:9, 1:1, 4:5), ô "Bạn muốn dựng gì hôm nay?",
-  công cụ nhanh, Mẫu, và danh sách Dự án của bạn (bấm ⋯ để đổi tên, nhân bản, xuất .json, xoá).
-- Dự án tự lưu trong trình duyệt của máy này, kể cả video bạn nhập vào. Nút "Dự án" góc trái để quay lại.
+PHÍM TẮT CHÍNH
+- Space phát/dừng · J K L tua · I / O điểm vào ra · C dao cắt · V chọn · P bút · Ctrl+K cắt tại kim
+- Ctrl+Z / Ctrl+Shift+Z hoàn tác / làm lại · Shift+6 trang chỉnh màu · F toàn màn hình
+- Chuột phải trên clip, timeline, khung xem để mở menu.
 
-XUẤT VIDEO
-- Chọn 720p / 1080p / 2K / 4K, 24–60 khung/giây, mức chất lượng. Cách "Nhanh, chính xác từng khung"
-  xuất MP4 (H.264 + AAC) nhanh hơn thời gian thực trên Chrome/Edge và cho chọn nơi lưu file.
-- Video gốc bạn tự nhập được xuất ở chất lượng đầy đủ. Dự án mẫu dùng bản xem trước 540p.
+GỠ CÀI ĐẶT
+- Start Menu → "Go cai dat Bravin".
 
-AI CHẠY TRÊN MÁY (không cần API key, lần đầu cần mạng để tải model)
-- Phụ đề tự động: Thư viện > Chữ > "Phụ đề tự động (AI)". Model Small chính xác hơn với tiếng Việt.
-- Tách nền người: chọn clip > Thuộc tính > Tách nền.
-- Chữ thành giọng nói: dùng giọng đọc của Windows. Muốn giọng tiếng Việt: Cài đặt > Thời gian và ngôn ngữ
-  > Giọng nói > Thêm giọng nói > Tiếng Việt.
-
-LƯU Ý
-- Chế độ "Claude Opus 5.5 (claude.ai)" chỉ có khi mở VINCut trên claude.ai.
-  Bản trên máy dùng hai bảng chuỗi AI.
+YÊU CẦU
+- Windows 10 hoặc 11, Microsoft Edge hoặc Google Chrome (Windows 10/11 đã có Edge sẵn).
+- Nên có 8 GB RAM trở lên khi dựng video dài hoặc 4K.

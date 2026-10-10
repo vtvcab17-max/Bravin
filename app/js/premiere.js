@@ -69,7 +69,7 @@ const SH = [-8, -4, -2, -1, 0, 1, 2, 4, 8];
 const ATTR_KEYS = ["x", "y", "scale", "angle", "opacity", "flip", "flipV", "rot", "blur", "kf", "anim", "filter", "filterAmt", "adj", "curves", "wheels", "ctint", "hsl", "lumv", "lut", "mask", "blend", "chroma", "fit", "bg", "bgColor", "crop", "vol", "fadeIn", "fadeOut", "voice"];
 function copyClip(cut) { const s = selClipObj(); if (!s) { toast("Chọn một clip trước."); return; } clipBoard = { k: s.k, c: deep(s.c), len: s.k === "v" ? vlen(s.c) : clen(s.c) }; if (cut) { deleteSel(); toast("Đã cắt clip."); } else toast("Đã chép clip. Ctrl+V để dán tại kim."); }
 function pasteClip() {
-  if (!clipBoard) { toast("Chưa chép clip nào."); return; } pushUndo(); const src = deep(clipBoard.c);
+  if (!clipBoard) { toast("Chưa chép clip nào."); return; } pushUndo(); const src = deep(clipBoard.c); delete src.grp;
   if (clipBoard.k === "v") { const b = { ...src, id: nid("v"), gap: 0 }; delete b.tr; const h = vAt(t); let at = V.length; if (h) { const right = splitV(h.c, t - h.start); at = V.indexOf(right); } else { const st = vStarts(); const i = st.findIndex((s, k) => s >= t - 0.02); if (i >= 0) at = i; } const before = vMap(); V.splice(at, 0, b); linkShift(before); sel = { k: "v", id: b.id }; }
   else { const L = clipBoard.len, tr = trackById(src.track) && !isLocked(src.track) && !overlapsOn(src.track, t, L) ? trackById(src.track) : freeTrack(ttype(src) === "overlay" ? "overlay" : ttype(src), t, L); const b = { ...src, id: nid("c"), start: t, track: tr.id }; C.push(b); sel = { k: "c", id: b.id }; }
   renderAll(); toast("Đã dán clip tại " + fmt(t) + ".");
@@ -91,7 +91,7 @@ function toggleEnable() { const s = selClipObj(); if (!s) { toast("Chọn một 
 function extendEdit() { // E: move the nearest edge of the selected clip to the playhead
   const s = selClipObj(); if (!s) return; const c = s.c, k = s.k, st0 = k === "v" ? vStarts()[V.indexOf(c)] : c.start, L = k === "v" ? vlen(c) : clen(c), m = c.mediaId ? media.get(c.mediaId) : null, maxD = m ? (m.kind === "image" ? 600 : m.duration) : 1e9;
   pushUndo(); const before = vMap();
-  if (Math.abs(t - st0) < Math.abs(t - (st0 + L))) { const d = t - st0; if (isDur(c)) { c.start += d; c.dur -= d; } else { const sp = c.speed || 1; c.in = clamp(c.in + d * sp, 0, c.out - MINLEN * sp); if (k === "c") c.start = t; } }
+  if (Math.abs(t - st0) < Math.abs(t - (st0 + L))) { const d = t - st0; if (isDur(c)) { c.start += d; c.dur -= d; if (c.type === "compound") c.off = (c.off || 0) + d; } else { const sp = c.speed || 1; c.in = clamp(c.in + d * sp, 0, c.out - MINLEN * sp); if (k === "c") c.start = t; } }
   else { const d = t - (st0 + L); if (isDur(c) || c.freeze) c.dur = Math.max(MINLEN, (c.dur || L) + d); else { const sp = c.speed || 1; c.out = clamp(c.out + d * sp, c.in + MINLEN * sp, maxD); } }
   if (k === "v") linkShift(before); renderAll();
 }
@@ -127,7 +127,7 @@ grid.addEventListener("pointerdown", e => {
       const d2 = clamp(dx, Math.max(-(oa.out - oa.in) / as + MINLEN, -ob.in / bs), Math.min((amax - oa.out) / as, (ob.out - ob.in) / bs - MINLEN));
       if (a.freeze) a.dur = oa.dur + d2; else a.out = oa.out + d2 * as; if (b.freeze) b.dur = ob.dur - d2; else b.in = ob.in + d2 * bs; hint(`Điểm cắt ${d2 >= 0 ? "+" : ""}${d2.toFixed(2)}s`);
     } else if ((tool === "ripple" || tool === "roll") && edge) {
-      if (isDur(c) || c.freeze) { if (edge === "r") c.dur = Math.max(MINLEN, orig.dur + dx); else { const d2 = clamp(dx, -orig.start, orig.dur - MINLEN); c.dur = orig.dur - d2; if (tool === "roll") c.start = orig.start + d2; } }
+      if (isDur(c) || c.freeze) { if (edge === "r") c.dur = Math.max(MINLEN, orig.dur + dx); else { const d2 = clamp(dx, -orig.start, orig.dur - MINLEN); c.dur = orig.dur - d2; if (c.type === "compound") c.off = (orig.off || 0) + d2; if (tool === "roll") c.start = orig.start + d2; } }
       else if (edge === "r") c.out = clamp(orig.out + dx * sp, orig.in + MINLEN * sp, maxD);
       else { c.in = clamp(orig.in + dx * sp, 0, orig.out - MINLEN * sp); if (tool === "roll" && k === "c") c.start = orig.start + (c.in - orig.in) / sp; }
       if (tool === "ripple" && k === "c") { const delta = cend(c) - cend(orig) ; for (const [x, s0] of trackAfter) x.start = Math.max(0, s0 + delta); }

@@ -41,7 +41,8 @@ function renderAssets() {
     const r = document.createElement("div"); r.className = "row"; r.style.gridColumn = "1/-1";
     const add = document.createElement("button"); add.className = "primary"; add.type = "button"; add.textContent = "+ Thêm chữ"; add.onclick = () => addTextPreset(TEXT_PRESETS[5]); r.appendChild(add);
     const ac = document.createElement("button"); ac.type = "button"; ac.textContent = "Phụ đề tự động (AI)"; ac.onclick = () => openAutoCaptions(); r.appendChild(ac);
-    const ly = document.createElement("button"); ly.type = "button"; ly.textContent = "Video lời bài hát"; ly.onclick = () => window.openLyrics && openLyrics(); r.appendChild(ly); box.appendChild(r);
+    const ly = document.createElement("button"); ly.type = "button"; ly.textContent = "Video lời bài hát"; ly.onclick = () => window.openLyrics && openLyrics(); r.appendChild(ly);
+    const fb = document.createElement("button"); fb.type = "button"; fb.textContent = "Phông chữ…"; fb.onclick = () => window.openFonts && openFonts(); r.appendChild(fb); box.appendChild(r);
     aHead(box, "Mẫu chữ");
     TEXT_PRESETS.forEach(p => assetTile(box, p.n, textPresetThumb(p), () => addTextPreset(p), { kind: "text", preset: p }, "wide"));
   } else if (assetTab === "sticker") {

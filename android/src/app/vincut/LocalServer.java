@@ -70,16 +70,20 @@ public class LocalServer {
             String req = readLine(in);
             if (req == null) return;
             String range = null, line;
+            boolean bravin = false;
             while ((line = readLine(in)) != null && line.length() > 0) {
                 int k = line.indexOf(':');
                 if (k > 0 && line.substring(0, k).trim().equalsIgnoreCase("range")) range = line.substring(k + 1).trim();
+                if (k > 0 && line.substring(0, k).trim().equalsIgnoreCase("x-bravin")) bravin = true;
             }
             String[] parts = req.split(" ");
             if (parts.length < 2) return;
             String method = parts[0];
             String path = parts[1];
             int q = path.indexOf('?');
+            String rawq = q >= 0 ? path.substring(q + 1) : "";
             if (q >= 0) path = path.substring(0, q);
+            if (path.equals("/dl")) { download(out, rawq, bravin); return; }
             path = URLDecoder.decode(path.replace("+", "%2B"), "UTF-8");
             if (path.equals("/")) path = "/index.html";
 
@@ -153,6 +157,52 @@ public class LocalServer {
         } finally {
             try { if (src != null) src.close(); } catch (Exception ignored) { }
             try { s.close(); } catch (Exception ignored) { }
+        }
+    }
+
+    /** /dl?url=... : tải hộ một link http(s) (WebView bị CORS chặn nhiều trang). Chỉ nhận yêu cầu có header X-Bravin. */
+    void download(OutputStream out, String rawq, boolean bravin) throws Exception {
+        if (!bravin) { status(out, 403, "Forbidden"); return; }
+        String target = null;
+        for (String kv : rawq.split("&")) { if (kv.startsWith("url=")) target = URLDecoder.decode(kv.substring(4).replace("+", "%2B"), "UTF-8"); }
+        if (target == null || !(target.startsWith("http://") || target.startsWith("https://"))) { status(out, 400, "Bad Request"); return; }
+        java.net.HttpURLConnection c = null;
+        InputStream in = null;
+        try {
+            for (int hop = 0; hop < 6; hop++) {
+                c = (java.net.HttpURLConnection) new java.net.URL(target).openConnection();
+                c.setInstanceFollowRedirects(false);
+                c.setConnectTimeout(15000); c.setReadTimeout(30000);
+                c.setRequestProperty("User-Agent", "Mozilla/5.0 (Linux; Android 13) AppleWebKit/537.36 Chrome/120 Mobile Safari/537.36");
+                c.setRequestProperty("Accept", "*/*");
+                int code = c.getResponseCode();
+                if (code >= 300 && code < 400 && c.getHeaderField("Location") != null) {
+                    target = new java.net.URL(new java.net.URL(target), c.getHeaderField("Location")).toString();
+                    c.disconnect(); continue;
+                }
+                break;
+            }
+            int code = c.getResponseCode();
+            if (code >= 400) { out.write(("HTTP/1.1 502 Bad Gateway\r\nX-Dl-Status: " + code + "\r\nContent-Length: 0\r\nConnection: close\r\n\r\n").getBytes("ISO-8859-1")); out.flush(); return; }
+            in = c.getInputStream();
+            long len = -1; try { String cl = c.getHeaderField("Content-Length"); if (cl != null) len = Long.parseLong(cl.trim()); } catch (Exception ignored) { }
+            String ct = c.getContentType(); if (ct == null) ct = "application/octet-stream";
+            String cd = c.getHeaderField("Content-Disposition");
+            StringBuilder h = new StringBuilder("HTTP/1.1 200 OK\r\n");
+            h.append("Content-Type: ").append(ct.replace("\r", "").replace("\n", "")).append("\r\n");
+            if (len >= 0) h.append("Content-Length: ").append(len).append("\r\n");
+            if (cd != null) h.append("X-Dl-Disposition: ").append(java.net.URLEncoder.encode(cd, "UTF-8")).append("\r\n");
+            h.append("X-Dl-Url: ").append(java.net.URLEncoder.encode(target, "UTF-8")).append("\r\n");
+            h.append("Cache-Control: no-store\r\nConnection: close\r\n\r\n");
+            out.write(h.toString().getBytes("ISO-8859-1"));
+            byte[] buf = new byte[1 << 16]; int n;
+            while ((n = in.read(buf)) > 0) out.write(buf, 0, n);
+            out.flush();
+        } catch (java.net.UnknownHostException | java.net.ConnectException | java.net.SocketTimeoutException e) {
+            out.write(("HTTP/1.1 504 Gateway Timeout\r\nContent-Length: 0\r\nConnection: close\r\n\r\n").getBytes("ISO-8859-1")); out.flush();
+        } finally {
+            try { if (in != null) in.close(); } catch (Exception ignored) { }
+            if (c != null) c.disconnect();
         }
     }
 

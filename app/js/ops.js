@@ -82,7 +82,7 @@ function splitV(c, off) { // returns the right half, inserted after c
 }
 function splitC(c, at) {
   const off = at - c.start, b = { ...deep(c), id: nid("c"), start: at }, sp = c.speed || 1;
-  if (isDur(c)) { b.dur = c.dur - off; c.dur = off; } else { b.in = c.in + srcOffset(c, off); c.out = c.in + srcOffset(c, off); }
+  if (isDur(c)) { b.dur = c.dur - off; c.dur = off; if (c.type === "compound") b.off = (c.off || 0) + off; } else { b.in = c.in + srcOffset(c, off); c.out = c.in + srcOffset(c, off); }
   splitParts(c, b, off); C.push(b); return b;
 }
 function vAt(time) { const st = vStarts(); const i = V.findIndex((c, k) => time > st[k] + 0.03 && time < st[k] + vlen(c) - 0.03); return i < 0 ? null : { c: V[i], i, start: st[i] }; }
@@ -106,7 +106,7 @@ function deleteSide(side) {
   if (cur && sel.k === "c" && !isLocked(cur.track) && t > cur.start + 0.03 && t < cend(cur) - 0.03) {
     pushUndo(); const off = t - cur.start;
     const sp = cur.speed || 1;
-    if (side === "left") { if (isDur(cur)) cur.dur -= off; else cur.in += srcOffset(cur, off); cur.start = t; const [, kb] = splitKf(cur.kf, off); if (kb) cur.kf = kb; else delete cur.kf; } else { if (isDur(cur)) cur.dur = off; else cur.out = cur.in + srcOffset(cur, off); }
+    if (side === "left") { if (isDur(cur)) { cur.dur -= off; if (cur.type === "compound") cur.off = (cur.off || 0) + off; } else cur.in += srcOffset(cur, off); cur.start = t; const [, kb] = splitKf(cur.kf, off); if (kb) cur.kf = kb; else delete cur.kf; } else { if (isDur(cur)) cur.dur = off; else cur.out = cur.in + srcOffset(cur, off); }
     renderAll(); return;
   }
   const h = isLocked("v") ? null : vAt(t); if (!h) { toast("Đặt kim lên giữa một clip để xoá một phía."); return; }
@@ -151,8 +151,8 @@ function deleteSel() {
 }
 function duplicateSel() {
   const c = findSel(); if (!c) { toast("Chọn một clip trên timeline trước."); return; } pushUndo();
-  if (sel.k === "v") { const b = { ...deep(c), id: nid("v") }; V.splice(V.indexOf(c) + 1, 0, b); sel = { k: "v", id: b.id }; }
-  else { const b = { ...deep(c), id: nid("c"), start: cend(c) }; C.push(b); sel = { k: "c", id: b.id }; }
+  if (sel.k === "v") { const b = { ...deep(c), id: nid("v") }; delete b.grp; V.splice(V.indexOf(c) + 1, 0, b); sel = { k: "v", id: b.id }; }
+  else { const b = { ...deep(c), id: nid("c"), start: cend(c) }; delete b.grp; C.push(b); sel = { k: "c", id: b.id }; }
   renderAll();
 }
 
