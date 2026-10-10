@@ -43,7 +43,7 @@ function setAspect(v) { const [a, b] = v.split(":").map(Number); const base = 72
 $("#aspect").onchange = e => setAspect(e.target.value);
 $("#exportBtn").onclick = startExport;
 $("#newProj").onclick = () => { pushUndo(); pause(); V = []; C = []; tracks = [{ id: "v", type: "video", name: "Video" }, { id: "t1", type: "text", name: "Chữ" }, { id: "a1", type: "audio", name: "Âm thanh" }]; sel = null; t = 0; $("#projBadge").textContent = "Dự án mới"; renderAll(); toast("Đã xoá timeline. Bấm Hoàn tác để lấy lại bản dựng."); };
-$("#importBtn").onclick = () => $("#file").click(); $("#drop").onclick = e => { if (e.target.closest("#dropLink")) { openLinkDl(); return; } $("#file").click(); }; $("#dlBtn").onclick = () => openLinkDl();
+$("#importBtn").onclick = () => $("#file").click(); $("#drop").onclick = () => $("#file").click(); $("#dropLink").onclick = e => { e.stopPropagation(); openLinkDl(); }; $("#dlBtn").onclick = () => openLinkDl();
 $("#file").onchange = e => { importFiles(e.target.files); e.target.value = ""; };
 const binEl = $("#bin");
 binEl.addEventListener("dragover", e => { if ([...e.dataTransfer.types].includes("Files")) { e.preventDefault(); binEl.classList.add("over"); } });
