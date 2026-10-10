@@ -134,3 +134,8 @@ Kiểm tra: cg1.js, af1.js, pen1.js, mob1.js + toàn bộ regression.
 - render.js: giữ khung (`holdSnap`/`holdFrame`): khi trình phát đang tua hoặc vừa tạo (sau cắt, ghép, đổi clip, chạy qua điểm cắt) thì vẽ trình phát khác cùng file ở gần thời điểm, hoặc ảnh chụp khung gần nhất (≤720 px), hoặc ảnh bìa, thay vì nền đen. Không ảnh hưởng xuất video (đường frameProvider). Đo: 5–29 khung đen mỗi lần cắt → 0; phát qua điểm cắt 10 → 0.
 - project.js: lưu dải ảnh + ảnh bìa của video người dùng trong dự án, mở lại dự án không phải vẽ lại.
 - text.js: mẫu "Kêu gọi cuối" đổi thành câu trung tính.
+
+## 21. Sửa nút Gửi của Trợ lý và bôi đen trên timeline (10/10/2026)
+- ai.js: khi chế độ đã lưu là "flow" (Luồng AI), `renderChainLine` gọi `chainText(AIS.flow)` (là object) → lỗi `list.filter is not a function` ngay lúc tải, phần sau của ai.js không chạy, form #aiForm không có bộ xử lý nên bấm Gửi thì trình duyệt tải lại trang. Đã chặn: chainText chỉ nhận mảng, renderChainLine bỏ qua "flow" (aiflow.js tự vẽ).
+- index.html (app + desktop): `#aiForm` có `action="#" onsubmit="return false"` để dù JS lỗi cũng không bao giờ tải lại trang.
+- app.css: `.tl` và canvas xem trước `user-select:none` (ô nhập trong timeline vẫn chọn chữ được) → kéo chuột không bôi đen thước giờ.

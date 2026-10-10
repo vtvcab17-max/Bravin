@@ -301,10 +301,11 @@ try { const s = JSON.parse(localStorage.getItem("vincut-ai") || "null"); if (s &
 if (!ON_CLAUDE && AIS.mode === "builtin") AIS.mode = AIS.local.some(s => s.on) ? "local" : "api";
 function saveAIS() { try { localStorage.setItem("vincut-ai", JSON.stringify(AIS)); } catch (_) {} renderChainLine(); }
 function setMode(m) { AIS.mode = m; $("#aiMode").value = m; $("#aiEffort").hidden = m !== "builtin"; saveAIS(); }
-function chainText(list) { return list.filter(s => s.on).map(s => s.name || AI_TYPES[s.type].label).join("  +  "); }
+function chainText(list) { return (Array.isArray(list) ? list : []).filter(s => s.on).map(s => s.name || AI_TYPES[s.type].label).join("  +  "); }
 function renderChainLine() {
   const el = $("#chainLine"), m = AIS.mode;
   if (m === "builtin") { el.hidden = true; $("#aiBadge").textContent = "Opus 5.5"; return; }
+  if (!Array.isArray(AIS[m])) return; // "flow": aiflow.js tự vẽ dòng này
   const txt = chainText(AIS[m]); el.hidden = false;
   el.innerHTML = (m === "api" ? "Chuỗi API: " : "Chuỗi local: ") + (txt ? "<b></b>" : "chưa có AI nào được bật. Bấm Cài đặt AI.");
   if (txt) el.querySelector("b").textContent = txt;

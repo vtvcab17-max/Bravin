@@ -409,3 +409,7 @@ body.phone #homeBtn span{display:none}
 .acprog .bar{height:8px;border-radius:5px;background:var(--panel2);overflow:hidden}
 .acprog .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent2),var(--accent));transition:width .3s}
 body.phone .ltabs{flex-wrap:nowrap}
+
+/* không bôi đen chữ khi kéo chuột trên timeline / khung xem trước */
+.tl,.tl *,.stage canvas{-webkit-user-select:none;user-select:none}
+.tl input,.tl textarea,.tl select,.tl [contenteditable]{-webkit-user-select:text;user-select:text}
