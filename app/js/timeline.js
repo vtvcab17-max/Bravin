@@ -76,7 +76,7 @@ function paintStrips(only) {
 }
 function clipEl(c, k, left) {
   const m = c.mediaId ? media.get(c.mediaId) : null; const d = document.createElement("div");
-  const isText = k === "c" && (c.type === "text" || c.type === "sticker"), isFx = k === "c" && c.type === "fx", isSfx = k === "c" && c.type === "audio" && (/^sfx/.test(c.track) || (m && (m.gen || /^SFX/.test(m.name)))), isOv = k === "c" && c.type === "video";
+  const isText = k === "c" && (c.type === "text" || c.type === "sticker" || c.type === "jz"), isFx = k === "c" && c.type === "fx", isSfx = k === "c" && c.type === "audio" && (/^sfx/.test(c.track) || (m && (m.gen || /^SFX/.test(m.name)))), isOv = k === "c" && c.type === "video";
   d.className = "clip" + (k === "c" ? (isText ? (c.type === "sticker" ? " t st" : " t") : isFx ? (c.fxType === "filter" ? " fx flt" : " fx") : isSfx ? " sfx" : isOv ? " ov" : " a") : "") + (sel && sel.id === c.id ? " sel" : "");
   d.dataset.id = c.id; d.dataset.k = k; d.tabIndex = -1;
   const L = k === "v" ? vlen(c) : clen(c);

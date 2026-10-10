@@ -32,7 +32,7 @@ function newTextClip(preset, start, dur, track) {
   if (preset && preset.legacy) return Object.assign(base, { style: preset.legacy, line1: "", line2: "" }, JSON.parse(JSON.stringify(preset.p || {})));
   return Object.assign(base, JSON.parse(JSON.stringify(TEXT_DEFAULTS)), JSON.parse(JSON.stringify((preset && preset.p) || {})));
 }
-const textLabel = c => c.type === "sticker" && c.gfx ? "Hình · " + ((typeof GFX_KINDS !== "undefined" && GFX_KINDS[c.gfx.kind]) || "") : c.type === "sticker" ? "Sticker " + (c.emoji || STICKER_SHAPES[c.shape] || "") : c.style === "custom" ? (c.text || "Chữ") : (c.line1 || c.line2 || "Chữ") + (c.line1 && c.line2 ? " · " + c.line2 : "");
+const textLabel = c => c.type === "jz" ? "JIZURA · " + ((c.jz && c.jz.title) || "Video lời bài hát") : c.type === "sticker" && c.gfx ? "Hình · " + ((typeof GFX_KINDS !== "undefined" && GFX_KINDS[c.gfx.kind]) || "") : c.type === "sticker" ? "Sticker " + (c.emoji || STICKER_SHAPES[c.shape] || "") : c.style === "custom" ? (c.text || "Chữ") : (c.line1 || c.line2 || "Chữ") + (c.line1 && c.line2 ? " · " + c.line2 : "");
 
 /* ---------- layout ---------- */
 function layoutText(ctx, c, W) {
@@ -101,7 +101,7 @@ function drawRichText(ctx, c, lt, len) {
   // pass 2: fill (+ karaoke)
   chars = 0; const base = fill();
   each((w, txt, x, y) => at(x, y, w, wordScale(w), (x2, y2) => {
-    ctx.fillStyle = base; ctx.fillText(txt, x2, y2);
+    ctx.fillStyle = c.hl && c.hl.includes(w.i) ? (c.hlc || GOLD) : base; ctx.fillText(txt, x2, y2);
     if (kt) { const k = kt[w.i]; if (!k) return; const p = c.kara.mode === "fill" ? clamp((lt - k[0]) / Math.max(0.05, k[1] - k[0]), 0, 1) : (lt >= k[0] ? 1 : 0);
       if (p > 0) { ctx.save(); ctx.beginPath(); ctx.rect(x2 - 4, y2 - L.lh, w.w * p + 4, L.lh * 2); ctx.clip(); ctx.fillStyle = c.kara.c || GOLD; ctx.fillText(txt, x2, y2); ctx.restore(); } }
   }));

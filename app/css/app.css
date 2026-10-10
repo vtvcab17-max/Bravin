@@ -429,3 +429,27 @@ body.phone .ltabs{flex-wrap:nowrap}
 .aic-row{display:flex;gap:6px}.aic-row input{flex:1;min-width:0}
 .aic-st{font-size:12px;min-height:1em}.aic-st.err{color:#ff8a7a}
 .aic-alt a{color:var(--accent)}
+
+/* Video lời bài hát */
+.lyrdlg{max-width:760px;width:calc(100vw - 32px)}
+.lyrdlg textarea{width:100%;font:500 13px/1.5 var(--mono,monospace);min-height:150px}
+.lyrdlg .row.wrap{flex-wrap:wrap;gap:8px;align-items:flex-end}
+.lyrdlg .lyrchk label{font-size:12px}
+.lyrdlg .spacer{flex:1}
+.lyrdlg code{font-size:11px;padding:0 3px;border-radius:3px;background:rgba(127,127,127,.18)}
+.lyrtap{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:60;background:var(--panel,#1b1c22);border:1px solid var(--accent,#8b7cff);border-radius:14px;padding:14px 18px;display:flex;flex-direction:column;gap:6px;width:min(640px,calc(100vw - 32px));box-shadow:0 12px 40px rgba(0,0,0,.45)}
+.lyrtap .lt-now{font-size:20px;font-weight:800}
+.lyrtap .lt-next{font-size:13px;opacity:.7}
+.lyrtap .lt-help{font-size:12px;opacity:.75}
+
+/* Khu JIZURA (nguyên bản JIZURA trong iframe, đồng bộ với timeline) */
+.jzframe{position:fixed;left:-20000px;top:0;width:1280px;height:800px;border:0;background:#000;z-index:-1}
+.jzframe.show{z-index:81;border-radius:0 0 12px 12px}
+.jzpanel{position:fixed;inset:0;z-index:80;background:var(--bg,#0f1014);display:flex;flex-direction:column}
+.jzbar{display:flex;align-items:center;gap:10px;padding:8px 14px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.jzbar b{font-size:16px;letter-spacing:.06em}
+.jzbar .jzsub{font-size:12px;opacity:.7}.jzbar .jzsub a{color:var(--accent)}
+.jzbar .jzst{font-size:12px;color:var(--gold,#f2c14e)}
+.jzbar .spacer{flex:1}
+.jzhost{flex:1;min-height:0}
+#jzBtn{gap:6px}

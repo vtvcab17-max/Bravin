@@ -362,7 +362,7 @@ renderChainLine = function () {
   const ok = aiConnected(); $("#aiBadge").textContent = ok ? connLabel(ok).split(" · ")[0] : "Chưa kết nối";
 };
 /* ---------- "Hãy đưa mã API model của bạn": kết nối ngay trong khung Trợ lý ---------- */
-function aiConnected() { return (AIS.flow && AIS.flow.nodes || []).find(n => n.type === "ai" && n.on !== false && (n.src === "embed" || (n.src !== "claude" && n.ctype && n.base))) || null; }
+function aiConnected() { return (AIS.flow && AIS.flow.nodes || []).find(n => n.type === "ai" && n.on !== false && (n.src === "embed" || (n.src !== "claude" && n.ctype && n.base && n.model))) || null; }
 function aiWelcome() {
   const n = aiConnected();
   if (n) addMsg("c", `Đã kết nối **${connLabel(n)}**. Gõ lệnh dựng bằng tiếng Việt, ví dụ "thêm chữ Xin chào ở giây 2", trợ lý sẽ làm trực tiếp trên timeline. Ctrl+Z để hoàn tác.`);
