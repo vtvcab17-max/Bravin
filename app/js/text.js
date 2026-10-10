@@ -13,7 +13,7 @@ const TEXT_PRESETS = [
   { n: "Tiêu đề mở đầu", legacy: "hook", p: { line1: "Tiêu đề lớn", line2: "Từ khoá" } },
   { n: "Chữ nền chạy", legacy: "bgword", p: { line1: "THẦN THÁNH?" } },
   { n: "Nhãn trên cùng", legacy: "tag", p: { line1: "Tên kênh · Thương hiệu" } },
-  { n: "Kêu gọi cuối", legacy: "cta", p: { line1: "Nhắn tin để được tư vấn", line2: "dáng phù hợp gương mặt bạn" } },
+  { n: "Kêu gọi cuối", legacy: "cta", p: { line1: "Theo dõi để xem thêm", line2: "video mới mỗi ngày" } },
   { n: "Trắng viền xanh", p: { text: "Chữ trắng viền xanh" } },
   { n: "Vàng gold in hoa", p: { text: "Từ khoá nổi bật", color: GOLD, weight: 900, upper: true, size: 84, stroke: { c: BLUE, w: 6 } } },
   { n: "Playfair nghiêng", p: { text: "Phong cách sang trọng", font: "Playfair Display", italic: true, weight: 700, stroke: null, shadow: { c: "rgba(0,0,0,.6)", b: 10, x: 0, y: 3 } } },

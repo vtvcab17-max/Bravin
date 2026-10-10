@@ -109,8 +109,9 @@ async function runOp(op) {
       const [x, y] = screenAt(+o.start || 0, trId || "v"); await ghostTo(x, y); await ghostClick();
       const st0 = Math.max(0, +o.start || 0), d0 = Math.max(MINLEN, +o.duration || 2);
       let c;
-      if (o.preset != null || o.text != null || o.style === "custom") { const pr = TEXT_PRESETS[clamp(+o.preset || 5, 0, TEXT_PRESETS.length - 1)]; c = newTextClip(pr, st0, d0, (o.track && trackById(o.track)?.type === "text") ? o.track : freeTrack("text", st0, d0).id); if (c.style === "custom") c.text = String(o.text != null ? o.text : (o.line1 || "Chữ")); else { c.line1 = String(o.line1 || o.text || ""); c.line2 = String(o.line2 || ""); } }
+      if (o.preset != null || o.text != null || o.style === "custom" || o.color != null || o.size != null || o.font != null || o.x != null || o.y != null) { const pr = TEXT_PRESETS[clamp(+o.preset || 5, 0, TEXT_PRESETS.length - 1)]; c = newTextClip(pr, st0, d0, (o.track && trackById(o.track)?.type === "text") ? o.track : freeTrack("text", st0, d0).id); if (c.style === "custom") c.text = String(o.text != null ? o.text : (o.line1 || "Chữ")); else { c.line1 = String(o.line1 || o.text || ""); c.line2 = String(o.line2 || ""); } }
       else c = { id: nid("c"), track: trId || firstTrack("text", "Chữ").id, type: "text", style: o.style || "caption", start: st0, dur: d0, line1: String(o.line1 || ""), line2: String(o.line2 || "") };
+      if (c.style === "custom") { if (o.color) c.color = String(o.color); if (o.size != null) c.size = clamp(+o.size || 72, 12, 300); if (o.font) c.font = String(o.font); if (o.x != null) c.x = clamp(+o.x, -1, 1); if (o.y != null) c.y = clamp(+o.y, -1, 1); if (o.upper != null) c.upper = !!o.upper; }
       C.push(c); renderTimeline(); return `Thêm chữ "${textLabel(c)}" tại ${fmt(c.start)}`;
     }
     case "add": {
@@ -180,7 +181,7 @@ Thao tác ("op"):
 - move {clip, to_index} (video) · move_clip {clip, start?, track?} (chữ/âm)
 - delete {clip} · duplicate {clip}
 - volume {clip, db} · mute {clip, muted} · zoom {clip, value: none|in|out|punch}
-- set_text {clip, line1?, line2?, style?} · add_text {start, duration, line1, line2?, style?, track?}
+- set_text {clip, line1?, line2?, style?} (kiểu chữ cũ) · add_text: xem dòng add_text bên dưới
 - add {media, index?, start?, track?, db?} — thêm từ thư viện (video chèn vị trí index; âm đặt ở start).
 - track {track, off} — ẩn track chữ/video hoặc tắt tiếng track âm.
 - set {clip, props:{flip, rot (0/90/180/270), scale, x, y (-1..1), opacity, crop:{l,r,t,b} (0..0.45), adj:{b,c,s} (-0.5..0.5), reverse, zoom}} — biến đổi, cắt khung, chỉnh màu, đảo ngược clip video hoặc video phủ.
@@ -188,7 +189,7 @@ Thao tác ("op"):
 - add_overlay {media, start, in?, duration?, track?, scale?, x?, y?} — thêm video/ảnh vào track video phủ (picture-in-picture).
 - seek {time} · aspect {value: 9:16|16:9|1:1|4:5}
 - set dùng cho MỌI clip (video chính, video phủ, chữ, sticker, hiệu ứng). props thêm: angle (độ), speed (0.1–10), filter (${Object.keys(FILTERS).join("|")}), filterAmt (0–1), adj:{b,c,s,ex,temp,tint,hue,hi,sh,fade,vig,sharp,grain}, anim:{in:{type,dur},out:{type,dur},loop:{type,speed}} (in: ${Object.keys(ANIM_IN).join("|")}; out: ${Object.keys(ANIM_OUT).join("|")}; loop: ${Object.keys(ANIM_LOOP).join("|")}), mask:{type:${Object.keys(MASKS).join("|")},x,y,w,h,r,feather,invert}, blend (multiply|screen|overlay|soft-light|darken|lighten|difference), chroma:{color,sim,smooth,spill}, bgRemove (true = tách nền người), fit (cover|contain) + bg (black|blur|color), fadeIn/fadeOut (giây), voice (${Object.keys(VOICES).join("|")}), chữ custom: text, font, size, color, grad:[c1,c2], stroke:{c,w}, shadow:{c,b,x,y}, box:{c,o,pad,r,mode}, kara:{c,mode:fill|word|bounce}, upper, weight, italic, align. Gán null để xoá thuộc tính.
-- add_text {start, duration, text?, preset? (số thứ tự mẫu 0–${TEXT_PRESETS.length - 1}), line1?, line2?, style?, track?} — style "custom" dùng text; preset 6 = vàng in hoa, 13 = karaoke.
+- add_text {start, duration, text?, preset? (số thứ tự mẫu 0–${TEXT_PRESETS.length - 1}), line1?, line2?, style?, track?} — style "custom" dùng text; preset 6 = vàng in hoa, 13 = karaoke. Thêm color? ("#RRGGBB", vàng = "#F2C14E"), size? (cỡ chữ, mặc định 72), font?, x?, y? (-1..1, 0 = giữa), upper?. Khi người dùng nói màu, cỡ hay vị trí chữ thì luôn dùng text + color/size/x/y (không dùng line1/style cũ).
 - add_sticker {start, duration?, emoji? | shape? (${Object.keys(STICKER_SHAPES).join("|")}), color?, label?, x?, y?, size?}
 - add_effect {effect: ${Object.keys(EFFECTS).join("|")}, start, duration?, amt?} · add_filter_layer {filter, start, duration}
 - transition {after_clip | index | time, type: ${Object.keys(TRANSITIONS).join("|")}|none, duration?} · transition_all {type, duration}
@@ -413,7 +414,7 @@ async function callAI(s, sys, user, signal) {
       const m = j.choices && j.choices[0] && j.choices[0].message; return (m && (typeof m.content === "string" ? m.content : (m.content || []).map(x => x.text || "").join(""))) || "";
     }
     case "gemini": {
-      const j = await httpJSON(s, `${base}/v1beta/models/${encodeURIComponent(s.model)}:generateContent?key=${encodeURIComponent(s.key)}`, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ systemInstruction: { parts: [{ text: sys }] }, contents: [{ role: "user", parts: [{ text: user }] }], generationConfig: { temperature: 0.3 } }) }, signal);
+      const j = await httpJSON(s, `${base}/v1beta/models/${encodeURIComponent(s.model)}:generateContent`, { method: "POST", headers: { "content-type": "application/json", "x-goog-api-key": s.key }, body: JSON.stringify({ systemInstruction: { parts: [{ text: sys }] }, contents: [{ role: "user", parts: [{ text: user }] }], generationConfig: { temperature: 0.3 } }) }, signal);
       const c = j.candidates && j.candidates[0]; return c && c.content ? (c.content.parts || []).map(p => p.text || "").join("") : "";
     }
     case "ollama": {
@@ -426,7 +427,7 @@ async function callAI(s, sys, user, signal) {
 async function listModels(s) {
   const base = (s.base || AI_TYPES[s.type].base).replace(/\/+$/, "");
   if (s.type === "ollama") { const j = await httpJSON(s, base + "/api/tags", {}); return (j.models || []).map(m => m.name); }
-  if (s.type === "gemini") { const j = await httpJSON(s, `${base}/v1beta/models?key=${encodeURIComponent(s.key)}`, {}); return (j.models || []).filter(m => (m.supportedGenerationMethods || []).includes("generateContent")).map(m => m.name.replace(/^models\//, "")); }
+  if (s.type === "gemini") { const j = await httpJSON(s, `${base}/v1beta/models?pageSize=1000`, { headers: { "x-goog-api-key": s.key } }); return (j.models || []).filter(m => (m.supportedGenerationMethods || []).includes("generateContent")).map(m => m.name.replace(/^models\//, "")); }
   const h = {}; if (s.key) h.authorization = "Bearer " + s.key; const j = await httpJSON(s, base + "/models", { headers: h }); return (j.data || []).map(m => m.id);
 }
 

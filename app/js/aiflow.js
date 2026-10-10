@@ -22,6 +22,7 @@ const KEY_RULES = [
   [/^sk-ant-/, { type: "anthropic", base: "https://api.anthropic.com", label: "Anthropic (Claude)" }],
   [/^sk-or-/, { type: "openai", base: "https://openrouter.ai/api/v1", label: "OpenRouter" }],
   [/^AIza[0-9A-Za-z_-]{20,}/, { type: "gemini", base: "https://generativelanguage.googleapis.com", label: "Google Gemini" }],
+  [/^AQ\.[0-9A-Za-z_-]{20,}/, { type: "gemini", base: "https://generativelanguage.googleapis.com", label: "Google Gemini" }],
   [/^gsk_/, { type: "openai", base: "https://api.groq.com/openai/v1", label: "Groq" }],
   [/^xai-/, { type: "openai", base: "https://api.x.ai/v1", label: "xAI (Grok)" }],
   [/^pplx-/, { type: "openai", base: "https://api.perplexity.ai", label: "Perplexity" }],
@@ -36,8 +37,26 @@ const KEY_GUESS = [ // keys without a distinctive prefix: try these in order
 ];
 const LOCAL_PORTS = [["http://localhost:11434", "ollama", "Ollama"], ["http://localhost:1234/v1", "lmstudio", "LM Studio"], ["http://localhost:8080/v1", "lmstudio", "llama.cpp"], ["http://localhost:1337/v1", "lmstudio", "Jan"], ["http://localhost:8000/v1", "lmstudio", "vLLM"], ["http://localhost:5001/v1", "lmstudio", "KoboldCpp"], ["http://localhost:4891/v1", "lmstudio", "GPT4All"]];
 const MODEL_PREF = [/claude-opus/, /claude-sonnet/, /gpt-5(?!.*(mini|nano))/, /gemini-[\d.]+-pro/, /grok-4/, /deepseek-(chat|v3)/, /gpt-4\.1(?!-(mini|nano))/, /gpt-4o(?!-mini)/, /qwen3|qwen2\.5/, /llama-?3/, /mistral-large/, /claude-haiku/, /gemini-[\d.]+-flash(?!-lite)/, /mini/, /./];
-const MODEL_SKIP = /embed|whisper|tts|audio|image|dall|moderation|search|realtime|transcribe|vision-preview|guard/i;
+const MODEL_SKIP = /embed|whisper|tts|audio|image|dall|moderation|search|realtime|transcribe|vision-preview|guard|computer-use|robotics|lyria|banana|antigravity|customtools|omni|gemma|veo|imagen|aqa|learnlm/i;
 function bestModel(list) { const L = list.filter(m => !MODEL_SKIP.test(m)); for (const re of MODEL_PREF) { const hits = L.filter(m => re.test(m.toLowerCase())).sort((a, b) => b.localeCompare(a, undefined, { numeric: true })); if (hits.length) return hits[0]; } return list[0] || ""; }
+function rankModels(list) { const L = list.filter(m => !MODEL_SKIP.test(m)), out = []; for (const re of MODEL_PREF) L.filter(m => re.test(m.toLowerCase()) && !out.includes(m)).sort((a, b) => b.localeCompare(a, undefined, { numeric: true })).forEach(m => out.push(m)); return out; }
+/* model bị khoá (404), hết hạn mức gói miễn phí (429) hoặc quá tải (503) → thử model kế tiếp và nhớ model chạy được */
+const MODEL_RETRY = /^(404|429|503)\b/;
+async function callWithFallback(call, s, sys, user, signal) {
+  try { return await call(s, sys, user, signal); }
+  catch (e) {
+    if (!e || e.name === "AbortError" || !MODEL_RETRY.test(e.message || "") || !s.base || s.type === "embed" || s.type === "claude") throw e;
+    let list = s.models && s.models.length ? s.models : null; if (!list) { try { list = await listModels(s); } catch (_) { throw e; } }
+    const tried = new Set([s.model]); let last = e, lastM = s.model;
+    for (const m of rankModels(list)) {
+      if (tried.has(m)) continue; if (tried.size >= 6) break; tried.add(m);
+      s._prog && s._prog(`Model ${lastM} không dùng được (lỗi ${(last.message || "").slice(0, 3)}), thử ${m}…`);
+      try { const out = await call(Object.assign({}, s, { model: m }), sys, user, signal); s.model = m; s._onModel && s._onModel(m); return out; }
+      catch (e2) { if (e2 && e2.name === "AbortError") throw e2; if (!MODEL_RETRY.test(e2.message || "")) throw e2; last = e2; lastM = m; }
+    }
+    throw new Error((e.message || e) + " · Đã thử thêm " + (tried.size - 1) + " model khác nhưng đều lỗi. Với gói miễn phí, hãy chọn model dòng Flash.");
+  }
+}
 async function probeLocal(url, type) {
   const base = url.replace(/\/+$/, ""), tries = type ? [[type, base]] : /11434/.test(base) ? [["ollama", base.replace(/\/v1$/, "")]] : [["ollama", base.replace(/\/v1$/, "")], ["lmstudio", /\/v1$/.test(base) ? base : base + "/v1"], ["lmstudio", base]];
   for (const [ty, b] of tries) { try { const ms = await listModels({ type: ty, base: b, key: "" }); return { type: ty, base: b, models: ms }; } catch (_) {} }
@@ -97,7 +116,7 @@ async function embedChat(s, sys, user, signal, onProgress) {
   const g0 = out && out[0] && out[0].generated_text; if (Array.isArray(g0)) { const last = g0[g0.length - 1]; return (last && last.content) || ""; } return String(g0 || "");
 }
 const _callAI0 = callAI;
-callAI = async function (s, sys, user, signal) { if (s.type === "embed") return embedChat(s, sys, user, signal, s._prog); return _callAI0(s, sys, user, signal); };
+callAI = async function (s, sys, user, signal) { if (s.type === "embed") return embedChat(s, sys, user, signal, s._prog); return callWithFallback(_callAI0, s, sys, user, signal); };
 
 /* ---------- node types ---------- */
 const FLOW_TESTS = { contains: "Có chứa", notcontains: "Không chứa", regex: "Khớp biểu thức (regex)", json: "Là JSON thao tác hợp lệ", hasops: "Có ít nhất 1 thao tác", empty: "Rỗng", longer: "Dài hơn N ký tự", error: "Bắt đầu bằng \"Lỗi\"" };
@@ -138,7 +157,7 @@ function stepOf(n) {
   if (n.src === "claude") return { name: n.name, type: "claude", model: n.model || "claude-opus-5-5" };
   if (n.src === "embed") return { name: n.name, type: "embed", model: n.model && EMBED_MODELS[n.model] ? n.model : "qwen2.5-0.5b", maxTokens: n.fmt === "ops" ? 1200 : 700 };
   if (!n.ctype || !n.base) throw new Error(`"${n.name}" chưa kết nối: dán mã API hoặc đường link rồi bấm Kết nối.`);
-  return { name: n.name, type: n.ctype, base: n.base, key: n.key, model: n.model };
+  return { name: n.name, type: n.ctype, base: n.base, key: n.key, model: n.model, models: n.models, _onModel: m => { n.model = m; saveAIS(); try { flowUI.api && flowUI.api.render(); } catch (_) {} } };
 }
 async function connectNode(n, status) {
   const r = await resolveConn(n.conn, status); n.ctype = r.type; n.base = r.base; n.key = r.key || ""; n.models = (r.models || []).slice(0, 400); n.provider = r.label;

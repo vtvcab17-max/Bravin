@@ -121,3 +121,16 @@ Kiểm tra: fix1–fix4.js (sync khớp đúng lệch 1,37 s; slow 50% ra clip 1
 - js/aiflow.js: Cài đặt AI thành canvas "Luồng AI" (AIS.flow trong localStorage vincut-ai). Node: Lệnh người dùng, AI, Thao tác timeline, Trả lời, Điều kiện, Gộp, Lặp lại, Mẫu văn bản, Trạng thái timeline, Ghi chú. 5 mẫu luồng. Kết nối: chỉ dán mã API (nhận theo tiền tố sk-ant-/sk-or-/AIza/gsk_/xai-/pplx-/nvapi-/hf_/fw_, mã không tiền tố thử OpenAI → DeepSeek → Mistral → Together → Qwen → Kimi), tự lấy danh sách và chọn model tốt nhất; AI local dán link hoặc "Dò AI local" (cổng 11434, 1234, 8080, 1337, 8000, 5001, 4891); "Nhúng trong Bravin" chạy Qwen2.5 / Llama 3.2 / Phi-3.5 bằng transformers.js (WebGPU hoặc WASM). Bản trên máy có sẵn vendor/transformers/ (bộ chạy) và models/ (đặt model để chạy không mạng).
 - js/pen.js: công cụ Bút (P). Khung xem: bấm = điểm góc, kéo = điểm cong, Shift 45°, bấm điểm đầu/Enter đóng, Esc kết thúc đường hở, Backspace xoá điểm cuối; sửa: kéo điểm/tay cầm (Alt tách cặp tay cầm), bấm lên đường thêm điểm, Alt+bấm đổi góc/cong, Ctrl+bấm xoá điểm. Tạo lớp hình (sticker gfx.kind "path") hoặc mask bút cho clip video đang chọn (menu công cụ chọn chế độ). Timeline: đường key độ mờ/âm lượng trên clip, bấm thêm key, kéo key, Ctrl+bấm xoá, Alt+kéo đường khi chưa có key = đổi mức chung.
 Kiểm tra: cg1.js, af1.js, pen1.js, mob1.js + toàn bộ regression.
+
+## 19. Sửa kết nối Google Gemini (10/10/2026)
+- aiflow.js: nhận mã Google dạng mới `AQ.…` (cùng `AIza…`) là Google Gemini. MODEL_SKIP bỏ thêm model không dùng để chat (computer-use, robotics, lyria, nano-banana, customtools, omni, gemma…).
+- `callWithFallback` (bọc callAI): model báo 404 (đã khoá với người dùng mới, ví dụ gemini-2.5-*), 429 (gói miễn phí hết hạn mức, ví dụ dòng Pro) hoặc 503 → tự thử tối đa 5 model kế tiếp theo `rankModels`, nhớ model chạy được vào node (n.model). Chạy cho cả Luồng AI, nút "Thử kết nối" và chuỗi cũ.
+- ai.js: gửi mã Gemini qua header `x-goog-api-key` thay vì `?key=` trên URL. `add_text` nhận `color, size, font, x, y, upper` (tự chuyển sang chữ tuỳ chỉnh); hướng dẫn cho AI yêu cầu dùng các trường này khi người dùng nói màu/cỡ/vị trí.
+- Đã thử với mã thật (gói miễn phí): gemini-3.8-flash, 3.5-flash, flash-latest chạy; dòng Pro báo 429; 2.5 báo 404.
+
+## 20. Nhập file nhanh và hết đen màn hình khi cắt/ghép (10/10/2026)
+- media.js: `addMediaFile` cho clip vào thư viện ngay sau khi đọc thông tin file; `makeStrip` chạy nền (tối đa 24 ảnh, ảnh bìa có sau khung đầu, dải hiện dần, `m._stripJob`). Đo với video 60 s 1080×1920: 4 s → 0,03 s.
+- media.js: `releaseIdleVideos` không giải phóng trình phát của clip đang nằm dưới kim (`liveVideoEls`); trước đây khi dừng 10–12 s app xoá trình phát đang hiển thị nên lần cắt sau bị đen. Trình phát mới dùng `preload="auto"`.
+- render.js: giữ khung (`holdSnap`/`holdFrame`): khi trình phát đang tua hoặc vừa tạo (sau cắt, ghép, đổi clip, chạy qua điểm cắt) thì vẽ trình phát khác cùng file ở gần thời điểm, hoặc ảnh chụp khung gần nhất (≤720 px), hoặc ảnh bìa, thay vì nền đen. Không ảnh hưởng xuất video (đường frameProvider). Đo: 5–29 khung đen mỗi lần cắt → 0; phát qua điểm cắt 10 → 0.
+- project.js: lưu dải ảnh + ảnh bìa của video người dùng trong dự án, mở lại dự án không phải vẽ lại.
+- text.js: mẫu "Kêu gọi cuối" đổi thành câu trung tính.

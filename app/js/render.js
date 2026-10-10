@@ -75,7 +75,23 @@ function frameFor(c, lt, slot) {
   if (renderMode === "export" && frameProvider) return frameProvider(c, want, slot);
   const el = getEl(m, slot);
   if ((!playing || c.reverse || c.freeze || lt < 0) && Math.abs(el.currentTime - want) > 1 / FPS / 2 && !el.seeking) { el.currentTime = want; el.onseeked = () => { el.onseeked = null; if (!playing) drawFrame(); }; }
-  return el.readyState >= 2 && el.videoWidth ? { img: el, w: el.videoWidth, h: el.videoHeight } : null;
+  if (el.readyState >= 2 && el.videoWidth && !el.seeking) { holdSnap(m, el, want); return { img: el, w: el.videoWidth, h: el.videoHeight }; }
+  return holdFrame(m, el, want);
+}
+/* Giữ khung: khi trình phát đang tua hoặc vừa tạo (sau khi cắt/ghép, đổi clip), vẽ khung gần nhất thay vì màn hình đen. */
+function holdSnap(m, el, want) {
+  const now = performance.now(); if (m._hold && m._hold.t === want && now - m._hold.at < 1000) return; if (playing && m._hold && now - m._hold.at < 90) return;
+  const s = Math.min(1, 720 / Math.max(el.videoWidth, el.videoHeight)), w = Math.max(2, Math.round(el.videoWidth * s)), h = Math.max(2, Math.round(el.videoHeight * s));
+  let hc = m._hold && m._hold.cv; if (!hc) { hc = document.createElement("canvas"); }
+  if (hc.width !== w || hc.height !== h) { hc.width = w; hc.height = h; }
+  try { hc.getContext("2d").drawImage(el, 0, 0, w, h); m._hold = { cv: hc, t: want, at: now, w: el.videoWidth, h: el.videoHeight }; } catch (_) {}
+}
+function holdFrame(m, el, want) {
+  for (const o of (m.els || [])) if (o && o !== el && o.readyState >= 2 && o.videoWidth && !o.seeking && Math.abs(o.currentTime - want) < 0.25) return { img: o, w: o.videoWidth, h: o.videoHeight };
+  if (el.readyState >= 2 && el.videoWidth && !m._hold) return { img: el, w: el.videoWidth, h: el.videoHeight }; // đang tua, chưa có ảnh giữ: dùng khung cũ của chính trình phát
+  if (m._hold) return { img: m._hold.cv, w: m._hold.cv.width, h: m._hold.cv.height, held: true }; // kích thước theo ảnh giữ (crop tính theo tỉ lệ nên vẫn đúng)
+  if (m.thumb && m.kind === "video") { if (!m._thumbImg) { m._thumbImg = new Image(); m._thumbImg.src = m.thumb; } if (m._thumbImg.complete && m._thumbImg.naturalWidth) return { img: m._thumbImg, w: m._thumbImg.naturalWidth, h: m._thumbImg.naturalHeight, held: true }; }
+  return null;
 }
 
 /* ---------- one media layer (main clip or overlay) ---------- */

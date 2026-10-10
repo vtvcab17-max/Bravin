@@ -6,7 +6,7 @@
 let projName = "Bravin", curProjectId = null, lastSavedJSON = "";
 function projectJSON() {
   const used = new Set([...V.map(c => c.mediaId), ...C.map(c => c.mediaId)].filter(Boolean));
-  const med = [...media.values()].map(m => ({ id: m.id, name: m.name, kind: m.kind, duration: Math.round((m.duration || 0) * 1000) / 1000, file: m.user ? (m.persist || null) : (m.url || null), strip: m.user ? undefined : m.strip, thumb: m.user ? undefined : m.thumb, user: !!m.user, used: used.has(m.id), stored: m.stored || undefined, gen: m.gen, fromVideo: m.fromVideo, hasAudio: m.hasAudio || undefined }));
+  const med = [...media.values()].map(m => ({ id: m.id, name: m.name, kind: m.kind, duration: Math.round((m.duration || 0) * 1000) / 1000, file: m.user ? (m.persist || null) : (m.url || null), strip: m.user && m.kind === "audio" ? undefined : m.strip, thumb: m.user && m.kind === "audio" ? undefined : m.thumb, user: !!m.user, used: used.has(m.id), stored: m.stored || undefined, gen: m.gen, fromVideo: m.fromVideo, hasAudio: m.hasAudio || undefined }));
   return JSON.stringify({ format: "vincut", version: 3, saved: new Date().toISOString(), name: projName, aspect: $("#aspect").value, tracks, media: med, V, C, markers, markerNotes: typeof markerNotes !== "undefined" ? markerNotes : undefined, coverT }, null, 1);
 }
 $("#saveProj").onclick = async () => {
@@ -41,7 +41,7 @@ async function loadProjectObj(o, opts = {}) {
     if (e2.file && !e2.user) { media.set(e2.id, Object.assign(base, { url: e2.file, strip: e2.strip, thumb: e2.thumb })); if (e2.kind === "audio") later.push(() => fetch(e2.file).then(r => r.arrayBuffer()).then(ab => decodeAudio(media.get(e2.id), ab)).then(() => makeWave(media.get(e2.id))).catch(() => {})); continue; }
     if (e2.gen) { media.set(e2.id, Object.assign(base, { url: "", gen: e2.gen })); later.push(async () => { const m = media.get(e2.id); m.buf = await genSfx(e2.gen); await makeWave(m); }); continue; }
     if (e2.fromVideo) { media.set(e2.id, Object.assign(base, { url: "", fromVideo: e2.fromVideo, user: true })); later.push(async () => { const vm = media.get(e2.fromVideo), m = media.get(e2.id); if (!vm || !vm.url) return; try { m.buf = await actx.decodeAudioData(await (await fetch(vm.url)).arrayBuffer()); await makeWave(m); } catch (_) {} }); continue; }
-    media.set(e2.id, Object.assign(base, { url: "", missing: true, user: true }));
+    media.set(e2.id, Object.assign(base, { url: "", missing: true, user: true }, e2.kind === "video" && e2.strip ? { strip: e2.strip, thumb: e2.thumb } : {}));
     if (e2.file) later.unshift(async () => { const m = await addMediaFile(null, e2.name, e2.file, e2.id); if (!m) missing++; });
     else if (e2.stored && curProjectId) later.unshift(async () => { const b = await STORE.getBlob(curProjectId + ":" + e2.id).catch(() => null); if (b) { const m = await addMediaFile(b, e2.name, null, e2.id, true); if (!m) missing++; } else if (e2.used) missing++; });
     else if (e2.used) missing++;
