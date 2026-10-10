@@ -144,7 +144,7 @@ async function runOp(op) {
     case "add_sticker": { const c = addSticker(Object.assign({}, o.emoji ? { emoji: o.emoji } : { shape: o.shape || "star", color: o.color || GOLD, label: o.label || "" }, o.x != null ? { x: +o.x } : {}, o.y != null ? { y: +o.y } : {}, o.size ? { size: +o.size } : {}), o.start != null ? +o.start : t); if (o.duration) c.dur = +o.duration; renderAll(); await pointAtClip(c.id, "m"); return "Thêm sticker " + (o.emoji || o.shape); }
     case "add_effect": { if (!EFFECTS[o.effect]) throw new Error("Hiệu ứng phải là: " + Object.keys(EFFECTS).join(", ")); const c = addEffect(o.effect, o.start != null ? +o.start : t); if (o.duration) c.dur = +o.duration; if (o.amt != null) c.amt = +o.amt; renderAll(); await pointAtClip(c.id, "m"); return "Thêm hiệu ứng " + EFFECTS[o.effect]; }
     case "add_filter_layer": { if (!FILTERS[o.filter]) throw new Error("Bộ lọc phải là: " + Object.keys(FILTERS).join(", ")); const c = addFilterLayer(o.filter, o.start != null ? +o.start : t); if (o.duration) c.dur = +o.duration; renderAll(); return "Thêm lớp bộ lọc " + FILTERS[o.filter].n; }
-    case "transition": { const i = o.after_clip ? V.findIndex(c => c.id === o.after_clip) : o.index != null ? +o.index - 1 : cutIndexNear(o.time != null ? +o.time : t); if (i < 0 || i >= V.length - 1) throw new Error("Không có điểm cắt phù hợp"); if (!o.type || o.type === "none") { pushUndo(); delete V[i].tr; renderAll(); return "Xoá chuyển cảnh"; } if (!TRANSITIONS[o.type]) throw new Error("Chuyển cảnh phải là: " + Object.keys(TRANSITIONS).join(", ")); applyTransition(o.type, i); if (o.duration) V[i].tr.dur = +o.duration; renderAll(); const tb = grid.querySelector(`.trb[data-i="${i}"]`); if (tb) { await ghostTo(...centerOf(tb)); await ghostClick(); } return "Chuyển cảnh " + TRANSITIONS[o.type]; }
+    case "transition": { const i = o.after_clip ? V.findIndex(c => c.id === o.after_clip) : o.index != null ? Math.max(0, +o.index - 1) : cutIndexNear(o.time != null ? +o.time : t); if (i < 0 || i >= V.length - 1) throw new Error("Không có điểm cắt phù hợp"); if (!o.type || o.type === "none") { pushUndo(); delete V[i].tr; renderAll(); return "Xoá chuyển cảnh"; } if (!TRANSITIONS[o.type]) throw new Error("Chuyển cảnh phải là: " + Object.keys(TRANSITIONS).join(", ")); applyTransition(o.type, i); if (o.duration) V[i].tr.dur = +o.duration; renderAll(); const tb = grid.querySelector(`.trb[data-i="${i}"]`); if (tb) { await ghostTo(...centerOf(tb)); await ghostClick(); } return "Chuyển cảnh " + TRANSITIONS[o.type]; }
     case "transition_all": { if (!TRANSITIONS[o.type]) throw new Error("Chuyển cảnh phải là: " + Object.keys(TRANSITIONS).join(", ")); applyTransitionAll(o.type, +o.duration || 0.4); return "Chuyển cảnh cho mọi điểm cắt"; }
     case "motion_preset": { const f = need(o.clip); if (!MOTION_PRESETS[o.preset]) throw new Error("preset?"); sel = { k: f.k, id: f.c.id }; renderTimeline(); await pointAtClip(f.c.id, "m"); await ghostClick(); applyMotionPreset(f.c, o.preset); return "Đã thêm chuyển động " + MOTION_PRESETS[o.preset].n + "."; }
     case "speed_curve": { const f = need(o.clip); pushUndo(); const before = f.k === "v" ? vMap() : null; applySpeedCurve(f.c, o.curve); if (o.curve === "none") delete f.c._curve; else f.c._curve = o.curve; if (before) linkShift(before); sel = { k: f.k, id: f.c.id }; renderAll(); return "Đã đặt đường cong tốc độ."; }
@@ -192,7 +192,7 @@ Thao tác ("op"):
 - add_text {start, duration, text?, preset? (số thứ tự mẫu 0–${TEXT_PRESETS.length - 1}), line1?, line2?, style?, track?} — style "custom" dùng text; preset 6 = vàng in hoa, 13 = karaoke. Thêm color? ("#RRGGBB", vàng = "#F2C14E"), size? (cỡ chữ, mặc định 72), font?, x?, y? (-1..1, 0 = giữa), upper?. Khi người dùng nói màu, cỡ hay vị trí chữ thì luôn dùng text + color/size/x/y (không dùng line1/style cũ).
 - add_sticker {start, duration?, emoji? | shape? (${Object.keys(STICKER_SHAPES).join("|")}), color?, label?, x?, y?, size?}
 - add_effect {effect: ${Object.keys(EFFECTS).join("|")}, start, duration?, amt?} · add_filter_layer {filter, start, duration}
-- transition {after_clip | index | time, type: ${Object.keys(TRANSITIONS).join("|")}|none, duration?} · transition_all {type, duration}
+- transition {after_clip | index (1 = điểm cắt sau cảnh 1) | time, type: ${Object.keys(TRANSITIONS).join("|")}|none, duration?} · transition_all {type, duration}
 - motion_preset {clip, preset: ${Object.keys(MOTION_PRESETS).join("|")}} — tạo nhanh keyframe chuyển động.
 - speed_curve {clip, curve: none|${Object.keys(SPEED_CURVES).join("|")}} — đường cong tốc độ cho clip video/âm thanh.
 - keyframe {clip, time (giây trên timeline), props:{x,y,scale,angle,opacity,vol, flipH/flipV (0 thường → 1 lật; giữa là lật 3D), blur (0..60), blend (tên chế độ, nhảy bậc), speed (0.1..10, nhiều điểm = speed ramp), amt (hiệu ứng 0..2)}, ease?: ${Object.keys(EASE_NAMES).join("|")}} — gọi 2 lần ở 2 thời điểm để tạo chuyển động.
@@ -222,6 +222,7 @@ function mdHTML(src) {
 function setMsg(el, text) { if (!el) return; if (el.closest && el.closest(".msg.u")) { el.textContent = text; return; } el.classList.add("md"); el.innerHTML = mdHTML(text); }
 function addMsg(cls, text) { const d = document.createElement("div"); d.className = "msg " + cls; if (cls === "u") d.textContent = text; else setMsg(d, text); if (cls === "u") { const ch = $("#chips"); if (ch) ch.hidden = true; } msgsEl.appendChild(d); msgsEl.scrollTop = msgsEl.scrollHeight; return d; }
 async function initAI() {
+  if (!ON_CLAUDE) { if (typeof aiWelcome === "function") aiWelcome(); return; }
   addMsg("c", "Chào bạn. Mình là Claude Opus 5.5 trong Bravin. Gõ lệnh dựng bằng tiếng Việt, ví dụ \"thêm chữ Xin chào ở giây 2\", mình sẽ làm trực tiếp để bạn xem từng bước. Ctrl+Z để hoàn tác.");
   try { sampleFn = window.claude && window.claude.use ? await window.claude.use("sample") : null; } catch (e) { sampleFn = null; }
   if (!sampleFn) { aiOff("Chế độ Claude Opus 5.5 chỉ chạy khi mở trang trên claude.ai. Ở bản trên máy, chọn Luồng AI rồi bấm nút bánh răng để mở canvas và dán mã API, đường link AI local hoặc chọn model nhúng."); return; }
@@ -278,7 +279,10 @@ async function applyOps(opsIn, box, signal) {
 }
 
 /* ---------- AI settings: two chains (API + local) ---------- */
-const ON_CLAUDE = !!(window.claude && window.claude.use);
+/* Bravin không có model AI tích hợp sẵn: trợ lý luôn chạy bằng mã API / AI local / model nhúng do người dùng đưa vào.
+   IN_CLAUDE_PAGE chỉ dùng để giải thích giới hạn khi trang được mở bên trong claude.ai (trang chặn kết nối ra ngoài). */
+const IN_CLAUDE_PAGE = !!(window.claude && window.claude.use);
+const ON_CLAUDE = false;
 const AI_TYPES = {
   claude:   { label: "Claude trong claude.ai (không cần key)", base: "", key: false, models: ["claude-opus-5-5", "claude-sonnet-5-5", "claude-haiku-5-5"], where: "api" },
   anthropic:{ label: "Anthropic API (Claude)", base: "https://api.anthropic.com", key: true, models: ["claude-opus-5-5", "claude-sonnet-5-5", "claude-haiku-5-5"], where: "api" },
@@ -386,7 +390,7 @@ function stepCard(which, s, i) {
 /* ---------- provider calls ---------- */
 function netError(s, e) {
   const host = (() => { try { return new URL(s.base).host; } catch (_) { return s.base; } })();
-  if (ON_CLAUDE) return new Error(`Trang trên claude.ai chặn kết nối tới ${host}. Dùng Bravin bản trên máy cho AI này.`);
+  if (IN_CLAUDE_PAGE) return new Error(`Trang xem thử trên claude.ai chặn kết nối tới ${host}. Mở Bravin bản web (bravin.vtvcab17.workers.dev), bản Windows hoặc Android để dùng mã API này.`);
   if (AI_TYPES[s.type].where === "local") return new Error(`Không kết nối được ${s.base}. Kiểm tra ${AI_TYPES[s.type].label.split(" (")[0]} đang chạy và đã cho phép CORS (Ollama: đặt biến OLLAMA_ORIGINS=* rồi mở lại; LM Studio: bật Enable CORS trong Developer).`);
   return new Error(`Không kết nối được ${host}: ${e && e.message || e}`);
 }

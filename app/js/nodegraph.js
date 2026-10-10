@@ -152,7 +152,7 @@ function NodeGraph(host, o) {
     addMenu({ currentTarget: host, clientX: at[0], clientY: at[1] }, toWorld(...at));
   });
   host.addEventListener("keydown", e => {
-    if (e.target.matches("input,select,textarea")) return;
+    if (tmatch(e, "input,select,textarea")) return;
     if (e.key === "Delete" || e.key === "Backspace") { if (o.beforeChange) o.beforeChange(); if (deleteSel()) { e.preventDefault(); e.stopPropagation(); } }
     else if (e.key === "f" || e.key === "F") { e.preventDefault(); e.stopPropagation(); fit(); }
     else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "a") { e.preventDefault(); e.stopPropagation(); select(G.nodes.map(n => n.id)); }

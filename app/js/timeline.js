@@ -46,7 +46,33 @@ function renderTimeline() {
   playheadEl = document.createElement("div"); playheadEl.className = "playhead"; grid.appendChild(playheadEl);
   grid.style.width = (headW() + cw) + "px";
   placePlayhead();
+  paintStrips();
   if (typeof decorateTimeline === "function") decorateTimeline();
+}
+/* nhiều track phủ/chữ/hiệu ứng đẩy track video chính xuống dưới: cuộn để nó luôn nằm trong khung nhìn */
+function showMainTrack() {
+  const row = grid.querySelector('.trow[data-track="v"]'); if (!row) return;
+  const r = row.getBoundingClientRect(), s = scroller.getBoundingClientRect();
+  if (r.bottom > s.bottom - 4) scroller.scrollTop += r.bottom - s.bottom + 12; else if (r.top < s.top + 30) scroller.scrollTop -= s.top + 30 - r.top;
+}
+/* Dải ảnh kiểu CapCut: các ô giữ đúng tỉ lệ khung hình, xếp liền nhau, mỗi ô lấy khung gần thời điểm của nó (không kéo giãn ảnh). */
+function paintStrips(only) {
+  const st = vStarts(), pos = new Map(); V.forEach((c, i) => pos.set(c.id, c)); C.forEach(c => pos.set(c.id, c));
+  (only ? [only] : grid.querySelectorAll(".clip.tiled")).forEach(d => {
+    const c = pos.get(d.dataset.id), m = c && c.mediaId ? media.get(c.mediaId) : null; if (!m || !m.strip || !m.stripN) return;
+    const H = Math.max(20, d.clientHeight || 60), W = parseFloat(d.style.width) || d.clientWidth, n = m.stripN, ar = m.stripAR || 0.5625;
+    let tw = Math.max(16, Math.round(H * ar)), k = Math.ceil(W / tw); if (k > 240) { k = 240; tw = Math.ceil(W / k); }
+    const L = d.dataset.k === "v" ? vlen(c) : clen(c), D = Math.max(0.01, m.duration || 1);
+    let box = d.querySelector(".tiles"); if (!box) { box = document.createElement("div"); box.className = "tiles"; d.insertBefore(box, d.firstChild); }
+    while (box.children.length > k) box.lastChild.remove();
+    while (box.children.length < k) box.appendChild(document.createElement("i"));
+    const url = `url(${m.strip})`, size = `${n * tw}px ${H}px`;
+    for (let j = 0; j < k; j++) {
+      const el = box.children[j], lt = Math.min(L, (j + 0.5) * tw / pps), src = typeof srcTime === "function" ? srcTime(c, lt) : (c.in || 0) + lt;
+      const idx = Math.max(0, Math.min(n - 1, Math.floor(src / D * n)));
+      el.style.cssText = `left:${j * tw}px;width:${tw}px;background-image:${url};background-size:${size};background-position:${-idx * tw}px 0`;
+    }
+  });
 }
 function clipEl(c, k, left) {
   const m = c.mediaId ? media.get(c.mediaId) : null; const d = document.createElement("div");
@@ -58,6 +84,7 @@ function clipEl(c, k, left) {
   if (m && m.strip) {
     if (m.kind === "image") { d.style.backgroundImage = `url(${m.strip})`; d.style.backgroundSize = "auto 100%"; d.style.backgroundRepeat = "repeat-x"; }
     else if (c.freeze) { d.style.backgroundImage = `url(${m.strip})`; d.style.backgroundSize = `${m.duration * pps}px 100%`; d.style.backgroundPosition = `${-c.in * pps}px 0`; d.style.backgroundRepeat = "repeat-x"; }
+    else if (m.stripN && m.kind === "video") { d.classList.add("tiled"); }
     else { d.style.backgroundImage = `url(${m.strip})`; d.style.backgroundSize = `${m.duration * pps}px 100%`; d.style.backgroundPosition = `${-c.in * pps}px 0`; }
   }
   const label = isText ? textLabel(c) : isFx ? (c.fxType === "filter" ? "Bộ lọc · " + (FILTERS[c.filter] || FILTERS.none).n : "Hiệu ứng · " + (EFFECTS[c.effect] || "")) : (m ? m.name : "?");
@@ -70,7 +97,7 @@ function layoutClips() {
   const st = vStarts(), pos = new Map(); V.forEach((c, i) => pos.set(c.id, [c, st[i], vlen(c)])); C.forEach(c => pos.set(c.id, [c, c.start, clen(c)]));
   grid.querySelectorAll(".clip").forEach(d => { const p = pos.get(d.dataset.id); if (!p) return; const [c, s, L] = p, m = c.mediaId ? media.get(c.mediaId) : null;
     d.style.left = s * pps + "px"; d.style.width = Math.max(3, L * pps) + "px";
-    if (m && m.strip && m.kind !== "image") { d.style.backgroundPosition = `${-c.in * pps}px 0`; d.style.backgroundSize = `${m.duration * pps}px 100%`; }
+    if (m && m.strip && m.kind !== "image") { if (d.classList.contains("tiled")) paintStrips(d); else { d.style.backgroundPosition = `${-c.in * pps}px 0`; d.style.backgroundSize = `${m.duration * pps}px 100%`; } }
     const cd = d.querySelector(".cd"); if (cd) cd.textContent = fmt(L); });
   placePlayhead();
 }

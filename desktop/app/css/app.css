@@ -413,3 +413,19 @@ body.phone .ltabs{flex-wrap:nowrap}
 /* không bôi đen chữ khi kéo chuột trên timeline / khung xem trước */
 .tl,.tl *,.stage canvas{-webkit-user-select:none;user-select:none}
 .tl input,.tl textarea,.tl select,.tl [contenteditable]{-webkit-user-select:text;user-select:text}
+/* dải ảnh dạng ô trên clip video */
+.clip.tiled{background-image:none!important}
+.clip .tiles{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.clip .tiles i{position:absolute;top:0;bottom:0;background-repeat:no-repeat;box-shadow:inset -1px 0 0 rgba(0,0,0,.35)}
+
+/* tab Thuộc tính: xuống dòng thay vì bị khuất bên phải (8 tab trên cột hẹp) */
+.itabs{flex-wrap:wrap;overflow-x:visible}
+/* clip thấp (chữ, sticker, hiệu ứng): bỏ dòng thời lượng và nhãn phụ để không chồng lên tên clip */
+.clip.t .cd,.clip.fx .cd,.clip.t .tag2,.clip.fx .tag2{display:none}
+
+/* thẻ "Hãy đưa mã API model AI của bạn" */
+.msg.aiconn{display:flex;flex-direction:column;gap:8px;white-space:normal;border-color:var(--accent)}
+.msg.aiconn p{margin:0;font-size:12px;color:var(--muted,#9aa)}
+.aic-row{display:flex;gap:6px}.aic-row input{flex:1;min-width:0}
+.aic-st{font-size:12px;min-height:1em}.aic-st.err{color:#ff8a7a}
+.aic-alt a{color:var(--accent)}

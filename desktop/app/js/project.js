@@ -6,7 +6,7 @@
 let projName = "Bravin", curProjectId = null, lastSavedJSON = "";
 function projectJSON() {
   const used = new Set([...V.map(c => c.mediaId), ...C.map(c => c.mediaId)].filter(Boolean));
-  const med = [...media.values()].map(m => ({ id: m.id, name: m.name, kind: m.kind, duration: Math.round((m.duration || 0) * 1000) / 1000, file: m.user ? (m.persist || null) : (m.url || null), strip: m.user && m.kind === "audio" ? undefined : m.strip, thumb: m.user && m.kind === "audio" ? undefined : m.thumb, user: !!m.user, used: used.has(m.id), stored: m.stored || undefined, gen: m.gen, fromVideo: m.fromVideo, hasAudio: m.hasAudio || undefined }));
+  const med = [...media.values()].map(m => ({ id: m.id, name: m.name, kind: m.kind, duration: Math.round((m.duration || 0) * 1000) / 1000, file: m.user ? (m.persist || null) : (m.url || null), strip: m.user && (m.kind === "audio" || /^blob:/.test(m.strip || "")) ? undefined : m.strip, thumb: m.user && /^blob:/.test(m.thumb || "") ? undefined : m.thumb, stripN: m.stripN, stripAR: m.stripAR, user: !!m.user, used: used.has(m.id), stored: m.stored || undefined, gen: m.gen, fromVideo: m.fromVideo, hasAudio: m.hasAudio || undefined }));
   return JSON.stringify({ format: "vincut", version: 3, saved: new Date().toISOString(), name: projName, aspect: $("#aspect").value, tracks, media: med, V, C, markers, markerNotes: typeof markerNotes !== "undefined" ? markerNotes : undefined, coverT }, null, 1);
 }
 $("#saveProj").onclick = async () => {
@@ -38,10 +38,12 @@ async function loadProjectObj(o, opts = {}) {
   const later = []; let missing = 0;
   for (const e2 of o.media || []) {
     const base = { id: e2.id, name: e2.name, kind: e2.kind, duration: e2.duration, hasAudio: !!e2.hasAudio };
-    if (e2.file && !e2.user) { media.set(e2.id, Object.assign(base, { url: e2.file, strip: e2.strip, thumb: e2.thumb })); if (e2.kind === "audio") later.push(() => fetch(e2.file).then(r => r.arrayBuffer()).then(ab => decodeAudio(media.get(e2.id), ab)).then(() => makeWave(media.get(e2.id))).catch(() => {})); continue; }
+    if (e2.file && !e2.user) { media.set(e2.id, Object.assign(base, { url: e2.file, strip: e2.strip, thumb: e2.thumb, stripN: e2.stripN, stripAR: e2.stripAR })); if (e2.kind === "audio") later.push(() => fetch(e2.file).then(r => r.arrayBuffer()).then(ab => decodeAudio(media.get(e2.id), ab)).then(() => makeWave(media.get(e2.id))).catch(() => {}));
+      else if (e2.kind === "image") later.unshift(async () => { const m = media.get(e2.id), img = new Image(); img.src = e2.file; try { await img.decode(); m.img = img; if (!m.thumb) m.thumb = e2.file; if (!m.strip) m.strip = e2.file; } catch (_) {} });
+      continue; }
     if (e2.gen) { media.set(e2.id, Object.assign(base, { url: "", gen: e2.gen })); later.push(async () => { const m = media.get(e2.id); m.buf = await genSfx(e2.gen); await makeWave(m); }); continue; }
     if (e2.fromVideo) { media.set(e2.id, Object.assign(base, { url: "", fromVideo: e2.fromVideo, user: true })); later.push(async () => { const vm = media.get(e2.fromVideo), m = media.get(e2.id); if (!vm || !vm.url) return; try { m.buf = await actx.decodeAudioData(await (await fetch(vm.url)).arrayBuffer()); await makeWave(m); } catch (_) {} }); continue; }
-    media.set(e2.id, Object.assign(base, { url: "", missing: true, user: true }, e2.kind === "video" && e2.strip ? { strip: e2.strip, thumb: e2.thumb } : {}));
+    media.set(e2.id, Object.assign(base, { url: "", missing: true, user: true }, e2.kind === "video" && e2.strip ? { strip: e2.strip, thumb: e2.thumb, stripN: e2.stripN, stripAR: e2.stripAR } : {}));
     if (e2.file) later.unshift(async () => { const m = await addMediaFile(null, e2.name, e2.file, e2.id); if (!m) missing++; });
     else if (e2.stored && curProjectId) later.unshift(async () => { const b = await STORE.getBlob(curProjectId + ":" + e2.id).catch(() => null); if (b) { const m = await addMediaFile(b, e2.name, null, e2.id, true); if (!m) missing++; } else if (e2.used) missing++; });
     else if (e2.used) missing++;
@@ -79,7 +81,7 @@ async function openProjectById(id, obj) {
   const rec = await STORE.get(id); if (!rec) { toast("Không tìm thấy dự án."); return false; }
   curProjectId = id; projName = rec.name;
   const o = obj || (rec.data ? JSON.parse(rec.data) : null);
-  if (o) { o.name = rec.name; await loadProjectObj(o, {}); }
+  if (o) { o.name = rec.name; await loadProjectObj(o, {}); setTimeout(() => typeof showMainTrack === "function" && showMainTrack(), 80); }
   else { resetEditor(); tracks = [{ id: "v", type: "video", name: "Video" }, { id: "t1", type: "text", name: "Chữ" }, { id: "a1", type: "audio", name: "Âm thanh" }]; setAspect(rec.aspect || "9:16"); $("#projBadge").textContent = projName; renderBin(); renderAll(); lastSavedJSON = ""; }
   await saveCurrent(true); return true;
 }
@@ -92,7 +94,11 @@ async function saveCurrent(force) {
   try { const rec = (await STORE.get(curProjectId)) || { id: curProjectId, created: Date.now() }; Object.assign(rec, { name: projName, aspect: $("#aspect").value, updated: Date.now(), duration: total(), data: j }); if (V.length || C.length) { const th = thumbNow(); if (th && th.length > 1200) rec.thumb = th; } await STORE.put(rec); lastSavedJSON = j; }
   catch (e) { console.warn("save failed", e); } finally { saving = false; }
 }
-async function storeMediaBlob(m, blob) { if (!curProjectId || !blob) return; try { await STORE.putBlob(curProjectId + ":" + m.id, blob); m.stored = true; } catch (e) { toast("Bộ nhớ trình duyệt đầy: file " + m.name + " chỉ dùng được trong phiên này."); } }
+let _persistAsked = false;
+async function storeMediaBlob(m, blob) { if (!curProjectId || !blob) return;
+  // xin trình duyệt giữ dữ liệu lâu dài (không tự xoá video đã nhập khi máy thiếu dung lượng)
+  if (!_persistAsked && navigator.storage && navigator.storage.persist) { _persistAsked = true; try { if (!(await navigator.storage.persisted())) await navigator.storage.persist(); } catch (_) {} }
+  try { await STORE.putBlob(curProjectId + ":" + m.id, blob); m.stored = true; } catch (e) { toast("Bộ nhớ trình duyệt đầy: file " + m.name + " chỉ dùng được trong phiên này."); } }
 window.vincutAutosave = () => saveCurrent();
 setInterval(() => { if (!playing) saveCurrent(); }, 5000);
 document.addEventListener("visibilitychange", () => { if (document.hidden) saveCurrent(); });

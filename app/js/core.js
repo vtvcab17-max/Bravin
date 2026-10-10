@@ -1,4 +1,6 @@
 "use strict";
+/* nơi nhận sự kiện có thể là document/window (không có .matches) */
+const tmatch = (e, sel) => !!(e && e.target && typeof e.target.matches === "function" && e.target.matches(sel));
 const $ = s => document.querySelector(s);
 const FPS = 30, MINLEN = 0.2;
 const BLUE = "#027fa5", BLUE2 = "#0097cc", GOLD = "#F2C14E";

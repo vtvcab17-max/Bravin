@@ -22,7 +22,7 @@ homeEl.innerHTML = `
   <button class="hero" id="hNew"><span class="plus">+</span><span><b>Tạo dự án mới</b><small>Chọn khung hình, sau đó thêm video, ảnh và nhạc</small></span></button>
   <div class="hrow">
     <form class="hai" id="hAiForm"><label for="hAi"><svg class="i" viewBox="0 0 24 24"><path d="M12 3l2.5 5.5L20 11l-5.5 2.5L12 19l-2.5-5.5L4 11l5.5-2.5z"/></svg>Bạn muốn dựng gì hôm nay?</label>
-      <div class="hai-in"><textarea id="hAi" rows="2" placeholder="Ví dụ: dựng video 30 giây giới thiệu dịch vụ nâng mũi, nhịp nhanh, phụ đề vàng"></textarea><button class="primary" type="submit" aria-label="Gửi cho trợ lý">➤</button></div></form>
+      <div class="hai-in"><textarea id="hAi" rows="2" placeholder="Ví dụ: dựng video 30 giây giới thiệu quán cà phê, nhịp nhanh, phụ đề vàng"></textarea><button class="primary" type="submit" aria-label="Gửi cho trợ lý">➤</button></div></form>
     <div class="htools" id="hTools"></div>
   </div>
   <h2 class="hh" id="tplH">Mẫu</h2><div class="hgrid tpl" id="hTpl"></div>
@@ -71,7 +71,7 @@ function aspectMenu(anchor, fn) { openMenu(anchor, [{ h: "Khung hình" }, ...ASP
 async function newProject(aspect, name) { await saveCurrent(true); const id = await createProjectRecord(name || "Dự án " + new Date().toLocaleDateString("vi-VN"), aspect); await openProjectById(id); hideHome(); return id; }
 async function templateObj() {
   const r = await fetch("project.json"); if (!r.ok) throw new Error("no template"); const p = await r.json();
-  return { format: "vincut", name: p.name, aspect: p.aspect || "9:16", tracks: p.tracks, media: p.media.map(e => ({ id: e.id, name: e.name, kind: e.kind, duration: e.duration, file: e.file, strip: e.strip, thumb: e.thumb, user: false })), V: p.V, C: p.C, markers: [], coverT: null };
+  return { format: "vincut", name: p.name, aspect: p.aspect || "9:16", tracks: p.tracks, media: p.media.map(e => ({ id: e.id, name: e.name, kind: e.kind, duration: e.duration, file: e.file, strip: e.strip, thumb: e.thumb, stripN: e.stripN, stripAR: e.stripAR, user: false })), V: p.V, C: p.C, markers: [], coverT: null };
 }
 async function newFromTemplate() { await saveCurrent(true); const o = await templateObj(); const id = await createProjectRecord(o.name, o.aspect); toast("Đang mở mẫu…"); await openProjectById(id, o); hideHome(); }
 function runTool(k) {
@@ -88,7 +88,10 @@ $("#hNew").onclick = e => aspectMenu(e.currentTarget, a => newProject(a));
 $("#hImport").onclick = () => $("#projFile").click();
 $("#newProj").onclick = e => aspectMenu(e.currentTarget, a => newProject(a));
 $("#newProj").title = "Tạo dự án mới (dự án hiện tại đã tự lưu)";
-$("#hAiForm").onsubmit = async e => { e.preventDefault(); const v = $("#hAi").value.trim(); if (!v) return; $("#hAi").value = ""; await newProject("9:16", v.slice(0, 40)); showTab("ai"); if (typeof openSheet === "function") openSheet("ai"); setTimeout(() => askAI(v), 300); };
+$("#hAiForm").onsubmit = async e => { e.preventDefault(); const v = $("#hAi").value.trim(); if (!v) return; $("#hAi").value = ""; await newProject("9:16", v.slice(0, 40)); showTab("ai"); if (typeof openSheet === "function") openSheet("ai");
+  // dự án vừa tạo còn trống: chưa gửi lệnh ngay, để người dùng nhập tư liệu (và kết nối AI nếu cần) trước
+  const aiOk = typeof aiConnected === "function" && !!aiConnected();
+  setTimeout(() => { $("#aiIn").value = v; addMsg("c", "Đã tạo dự án mới. Hãy **nhập video, ảnh hoặc nhạc** trước (nút **+** ở Thư viện) để trợ lý có tư liệu, rồi bấm **Gửi**. Lệnh của bạn đã nằm sẵn trong ô." + (aiOk ? "" : "\n\nTrợ lý chưa có AI: dán mã API model của bạn vào ô bên dưới.")); if (!aiOk && typeof aiConnectCard === "function") aiConnectCard(); }, 300); };
 homeEl.querySelector(".hnav").onclick = e => { const b = e.target.closest("button"); if (!b) return; homeEl.querySelectorAll(".hnav button").forEach(x => x.removeAttribute("aria-current")); b.setAttribute("aria-current", "page"); const go = b.dataset.go; if (go === "ai") { hideHome(); showTab("ai"); if (typeof openSheet === "function") openSheet("ai"); setTimeout(() => $("#aiCfgBtn")?.click(), 200); return; } const tgt = { top: ".hero", tpl: "#tplH", proj: "#projH" }[go]; homeEl.querySelector(tgt)?.scrollIntoView({ behavior: "smooth", block: "start" }); };
 // editor → home button + rename by double-click on the project badge
 (function () { const hb = document.createElement("button"); hb.id = "homeBtn"; hb.className = "icon"; hb.title = "Về màn hình dự án"; hb.setAttribute("aria-label", "Về màn hình dự án"); hb.innerHTML = '<svg class="i" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg><span>Dự án</span>'; hb.onclick = showHome; const top = $(".top"); top.insertBefore(hb, top.firstChild);

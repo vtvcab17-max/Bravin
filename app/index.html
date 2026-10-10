@@ -54,7 +54,7 @@
       <div class="ph"><div class="tabs" role="tablist">
         <button role="tab" id="tabAi" aria-selected="true" aria-controls="aiPane"><span class="dot"></span> Trợ lý</button>
         <button role="tab" id="tabInsp" aria-selected="false" aria-controls="insp">Thuộc tính</button>
-      </div><span class="tc" style="font-size:10.5px" id="aiBadge">Opus 5.5</span></div>
+      </div><span class="tc" style="font-size:10.5px" id="aiBadge">Chưa kết nối</span></div>
       <div class="ai" id="aiPane" role="tabpanel">
         <div class="aibar">
           <label for="aiMode" class="tc" style="font-size:11px">Dùng</label>
@@ -65,14 +65,14 @@
         <div class="aicfg" id="aiCfg" hidden></div>
         <div class="msgs" id="msgs" aria-live="polite"></div>
         <div class="chips" id="chips">
-          <button>Thay cảnh ở giây 30 bằng clip thứ hai trong thư viện</button>
-          <button>Sửa phụ đề đang hiện tại kim thành chữ in đậm hơn ý</button>
-          <button>Nhạc nền nhỏ thêm 4 dB</button>
-          <button>Xoá SFX whoosh ở 10 giây đầu</button>
+          <button>Thêm chữ tiêu đề màu vàng ở 3 giây đầu</button>
+          <button>Thêm chuyển cảnh Hoà tan cho mọi điểm cắt</button>
+          <button>Zoom chậm vào cảnh đầu tiên</button>
+          <button>Nhạc nền nhỏ đi 4 dB</button>
         </div>
         <form class="aiform" id="aiForm" action="#" onsubmit="return false">
           <label for="aiIn" class="tc" style="font-size:11px">Nhập lệnh dựng</label>
-          <textarea id="aiIn" placeholder="Ví dụ: thay đoạn 45–47s bằng clip khác trong thư viện, lấy đoạn người đứng giữa khung"></textarea>
+          <textarea id="aiIn" placeholder="Ví dụ: cắt ở giây 5, thêm chuyển cảnh Hoà tan và chữ &quot;Giảm 30%&quot; màu vàng ở phía trên"></textarea>
           <div class="row">
             <select id="aiEffort" aria-label="Mức suy nghĩ"><option value="low">Nhanh</option><option value="medium">Cân bằng</option><option value="high">Kỹ</option></select>
             <div class="spacer"></div>
@@ -90,7 +90,7 @@
     <div class="tlbar">
       <div class="grp">
         <button class="icon" id="addBtn" title="Thêm media, chữ hoặc track"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
-        <button class="icon" id="toolBtn" title="Công cụ: Chọn (A) / Dao cắt (B)"><span id="toolIco"><svg class="i" viewBox="0 0 24 24"><path d="M5 3l14 8-6 2-2 6z"/></svg></span><svg class="i" viewBox="0 0 24 24" style="width:10px"><path d="M6 9l6 6 6-6"/></svg></button>
+        <button class="icon" id="toolBtn" title="Công cụ: Chọn (V) / Dao cắt (C)"><span id="toolIco"><svg class="i" viewBox="0 0 24 24"><path d="M5 3l14 8-6 2-2 6z"/></svg></span><svg class="i" viewBox="0 0 24 24" style="width:10px"><path d="M6 9l6 6 6-6"/></svg></button>
       </div><span class="sep"></span>
       <div class="grp">
         <button class="icon" id="undoBtn" title="Hoàn tác (Ctrl+Z)"><svg class="i" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></svg></button>

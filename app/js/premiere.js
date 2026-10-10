@@ -205,7 +205,7 @@ trackMenu = function (tr, anchor) { _trackMenu(tr, anchor); if (menuEl && (tr.ty
 
 /* ---------- keyboard (Premiere layout) ---------- */
 document.addEventListener("keydown", e => {
-  if (trimOpen || e.target.matches("input,select,textarea,[contenteditable]") || document.querySelector(".overlay")) return;
+  if (trimOpen || tmatch(e, "input,select,textarea,[contenteditable]") || document.querySelector(".overlay")) return;
   if (document.querySelector(".ecw")?.contains(document.activeElement) && /^(Delete|Backspace)$/.test(e.key)) return;
   const k = e.key.toLowerCase(), ctrl = e.ctrlKey || e.metaKey, sh = e.shiftKey, alt = e.altKey, code = e.code;
   const take = () => { e.preventDefault(); e.stopImmediatePropagation(); };

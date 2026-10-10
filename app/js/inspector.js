@@ -130,7 +130,7 @@ function keyGroup(box, c) {
     slider(b, { label: "Khử ám màu", min: 0, max: 1, step: 0.01, get: () => K.spill, set: v => K.spill = v });
   }
   b = section(box, "Tách nền người (AI trên máy)");
-  note(b, ON_CLAUDE ? "Trên claude.ai không tải được model tách nền. Dùng tính năng này ở app Android Bravin." : "Dùng model MediaPipe chạy ngay trên thiết bị. Lần đầu cần mạng để tải model (khoảng 10 MB). Hợp với cảnh có người ở gần máy quay.");
+  note(b, IN_CLAUDE_PAGE ? "Trên claude.ai không tải được model tách nền. Dùng tính năng này ở app Android Bravin." : "Dùng model MediaPipe chạy ngay trên thiết bị. Lần đầu cần mạng để tải model (khoảng 10 MB). Hợp với cảnh có người ở gần máy quay.");
   toggle(b, c.bgRemove ? "Đang tách nền" : "Bật tách nền", () => !!c.bgRemove, v => { if (v) { c.bgRemove = true; if (window.SEG) SEG.ensure(); } else delete c.bgRemove; });
   if (c.bgRemove) { toggle(b, "Giữ nền, xoá người", () => c.bgRemove === "invert", v => c.bgRemove = v ? "invert" : true); const st = el("p", "note segstat"); st.textContent = window.SEG ? SEG.status() : "Đang chuẩn bị…"; b.appendChild(st); }
 }

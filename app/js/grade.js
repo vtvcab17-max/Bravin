@@ -267,7 +267,7 @@ drawFrame = function (Tin) {
 };
 window.addEventListener("resize", () => { if (cp.open) cpView(); });
 document.addEventListener("keydown", e => {
-  if (!cp.open || e.target.matches("input,select,textarea")) { if (!cp.open && e.shiftKey && e.code === "Digit6" && !e.target.matches("input,select,textarea")) { e.preventDefault(); openColorPage(); } return; }
+  if (!cp.open || tmatch(e, "input,select,textarea")) { if (!cp.open && e.shiftKey && e.code === "Digit6" && !tmatch(e, "input,select,textarea")) { e.preventDefault(); openColorPage(); } return; }
   const n = cpNodeOf(), c = cp.clip, take = () => { e.preventDefault(); e.stopImmediatePropagation(); };
   if (e.key === "Escape") { take(); if (cpPickCb) { cpPickCb = null; cp.el.classList.remove("picking"); } else closeColorPage(); }
   else if (e.altKey && e.code === "KeyS") { take(); pushUndo(); c.nodes.splice(cp.node + 1, 0, NODE_DEF()); cp.node++; renderCP(); }

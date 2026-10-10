@@ -187,7 +187,7 @@ renderCP = function () {
   root.querySelectorAll(".cp-tabs button").forEach(b => b.addEventListener("click", () => setTimeout(() => {}, 0)));
 };
 window.addEventListener("keydown", e => {
-  if (!cp.open || !cp.clip || e.target.matches("input,select,textarea")) return; const c = cp.clip;
+  if (!cp.open || !cp.clip || tmatch(e, "input,select,textarea")) return; const c = cp.clip;
   const act = fn => { e.preventDefault(); e.stopImmediatePropagation(); pushUndo(); const r = fn(); if (r !== false) { renderCP(); drawFrame(); } };
   if (e.altKey && e.code === "KeyS") act(() => cgAddSerial(c));
   else if (e.altKey && e.code === "KeyP") act(() => cgAddBranch(c, "par"));

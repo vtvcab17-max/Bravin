@@ -221,7 +221,7 @@ function utilMenu(anchor) {
   b.innerHTML = '<svg class="i" viewBox="0 0 24 24"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/></svg>'; b.onclick = e => utilMenu(e.currentTarget); add.after(b);
 })();
 document.addEventListener("keydown", e => {
-  if (e.target.matches("input,select,textarea") || document.querySelector(".overlay")) return;
+  if (tmatch(e, "input,select,textarea") || document.querySelector(".overlay")) return;
   if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.code === "KeyE") { e.preventDefault(); e.stopImmediatePropagation(); exportFrame(); }
   if ((e.ctrlKey || e.metaKey) && e.code === "KeyH" && e.shiftKey) { e.preventDefault(); e.stopImmediatePropagation(); openHistory(); }
 }, true);

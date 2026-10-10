@@ -365,7 +365,7 @@ function ecDelete(c) {
   if (!Object.keys(c.kf).length) delete c.kf; ecState.sel.clear(); renderAll(); return true;
 }
 document.addEventListener("keydown", e => {
-  const w = document.querySelector(".ecw"); if (!w || !w.contains(document.activeElement) || e.target.matches("input,select,textarea,.ec-v")) return;
+  const w = document.querySelector(".ecw"); if (!w || !w.contains(document.activeElement) || tmatch(e, "input,select,textarea,.ec-v")) return;
   if ((e.key === "Delete" || e.key === "Backspace") && ecState.sel.size) { e.preventDefault(); e.stopImmediatePropagation(); ecDelete(findSel()); }
   else if (e.key === "Escape" && ecState.sel.size) { ecState.sel.clear(); renderInspector(); }
   else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "a") { const c = findSel(); if (!c || !c.kf) return; e.preventDefault(); e.stopImmediatePropagation(); for (const p in c.kf) c.kf[p].forEach(k => ecState.sel.add(k)); renderInspector(); }

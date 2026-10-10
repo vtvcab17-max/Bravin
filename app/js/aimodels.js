@@ -87,7 +87,7 @@ function chunksToWords(res, offset) {
   return words;
 }
 function openAutoCaptions() {
-  if (typeof ON_CLAUDE !== "undefined" && ON_CLAUDE) { toast("Phụ đề tự động và tách nền chạy bằng model AI tải từ internet; trang trên claude.ai chặn việc tải này. Dùng hai tính năng này ở app Android Bravin."); return; }
+  if (typeof IN_CLAUDE_PAGE !== "undefined" && IN_CLAUDE_PAGE) { toast("Phụ đề tự động và tách nền chạy bằng model AI tải từ internet; trang trên claude.ai chặn việc tải này. Dùng hai tính năng này ở app Android Bravin."); return; }
   const audTracks = tracksOf("audio").filter(tr => C.some(c => c.track === tr.id && c.type === "audio"));
   const selC = findSel();
   const srcOpts = [["main", "Âm thanh của video trên track chính"], ...audTracks.map(tr => [tr.id, "Track " + tr.name]), ...(selC && (selC.type === "audio" || selC.type === "video" || sel.k === "v") ? [["clip:" + selC.id, "Clip đang chọn"]] : [])];
@@ -149,7 +149,7 @@ function openAutoCaptions() {
 const SEG = (() => {
   let seg = null, state = "off", err = "", tsc = 0; const cache = new Map();
   async function ensure() {
-    if (typeof ON_CLAUDE !== "undefined" && ON_CLAUDE) { state = "error"; err = "claude.ai chặn tải model"; status2(); return; }
+    if (typeof IN_CLAUDE_PAGE !== "undefined" && IN_CLAUDE_PAGE) { state = "error"; err = "claude.ai chặn tải model"; status2(); return; }
     if (seg || state === "loading") return; state = "loading"; status2();
     try {
       const vis = await import(AI_CDN.vision + "/vision_bundle.mjs");

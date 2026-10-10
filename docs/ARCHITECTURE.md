@@ -139,3 +139,25 @@ Kiểm tra: cg1.js, af1.js, pen1.js, mob1.js + toàn bộ regression.
 - ai.js: khi chế độ đã lưu là "flow" (Luồng AI), `renderChainLine` gọi `chainText(AIS.flow)` (là object) → lỗi `list.filter is not a function` ngay lúc tải, phần sau của ai.js không chạy, form #aiForm không có bộ xử lý nên bấm Gửi thì trình duyệt tải lại trang. Đã chặn: chainText chỉ nhận mảng, renderChainLine bỏ qua "flow" (aiflow.js tự vẽ).
 - index.html (app + desktop): `#aiForm` có `action="#" onsubmit="return false"` để dù JS lỗi cũng không bao giờ tải lại trang.
 - app.css: `.tl` và canvas xem trước `user-select:none` (ô nhập trong timeline vẫn chọn chữ được) → kéo chuột không bôi đen thước giờ.
+
+## 22. Dải ảnh trên timeline không còn vỡ/méo (10/10/2026)
+- Trước: cả dải N khung (cao 64 px) bị kéo giãn theo `duration × pps` → mỗi khung rộng hàng trăm px, méo và nhoè.
+- Nay (timeline.js `paintStrips`): clip video có `m.stripN` được vẽ thành các ô `.tiles i` rộng = chiều cao clip × tỉ lệ khung (`m.stripAR`), mỗi ô lấy khung gần nhất với thời điểm nguồn ở giữa ô (`srcTime`, nên đúng cả khi đổi tốc độ/đảo ngược). Phóng to = thêm ô, không giãn ảnh; tối đa 240 ô/clip. `layoutClips` vẽ lại ô khi kéo/trim.
+- media.js: dải ảnh cao 112 px, 6–40 khung (khoảng 0,8 s/khung), lưu `stripN, stripAR` (project.js, home.js). Video trong dự án cũ (chưa có `stripN`) tự vẽ lại dải ảnh ở chế độ nền khi mở dự án.
+
+## 23. Kiểm thử toàn bộ bằng TVC mẫu "Mây Coffee" (10/10/2026)
+- Bộ dựng TVC tự động (28 hạng mục: 4 cảnh + cắt/ghép + đứng hình, speed ramp, 4 chuyển cảnh, keyframe scale/góc/blur/x/lật 3D/âm lượng/blend, Ken Burns, Lumetri + LUT + HSL, node màu nối tiếp/song song/ngoài vùng, giả lập phim/làm mịn da/khử nhiễu, phông xanh có keyframe + mask elip động, PiP mask sao + mask bút có keyframe đường + blend Screen, logo PNG preset + vòng lặp, chữ tuỳ chỉnh/karaoke/kiểu cũ, sticker, hình khối, hình vẽ Bút, 8 hiệu ứng, lớp bộ lọc, nhạc + giọng + ducking/EQ/nén/reverb/khử ồn, SFX, LUFS, marker, In/Out, thao tác AI): 28/28 đạt.
+- Dựng 112 khung toàn TVC: 0 khung đen, 0 lỗi. 40 bảng giao diện, lưu → tải lại trang → mở dự án: giữ nguyên 7 cảnh, 25 clip, 61 keyframe, 3 mask, 5 node. SRT đúng. Xuất WebCodecs ra MP4 hợp lệ.
+- Sửa thêm: `tmatch()` (core.js) thay 14 chỗ `e.target.matches` (lỗi khi nơi nhận phím là document); `bitrateFor` mặc định 0,1 bpp; lệnh AI `transition` nhận `index: 0`; dự án mẫu (không phải file người dùng) có ảnh PNG giờ tải ảnh; không lưu ảnh xem trước dạng `blob:` cho ảnh người dùng.
+
+## 24. Rà soát chỗ chưa hợp lý (10/10/2026)
+- Trợ lý trên web (không phải claude.ai): không còn chào "Mình là Claude Opus 5.5" rồi báo "chỉ chạy trên claude.ai"; chào chung và hướng dẫn Cài đặt AI. Luồng AI mặc định là mẫu "Một AI thao tác" chờ dán mã (trước đây là node Ollama, phần lớn người dùng web không có).
+- Câu ví dụ: bỏ "dịch vụ nâng mũi" (trang chủ), "Tư vấn miễn phí" (Luồng AI), 4 nút gợi ý của dự án mẫu cũ (giây 30, SFX whoosh…) → gợi ý dùng được với mọi dự án. Ô mã API nhắc cả dạng AQ.…
+- Mở dự án: tự cuộn timeline để track video chính luôn hiện (nhiều track phủ/chữ/hiệu ứng từng đẩy nó khuất dưới đáy trên màn hình 768 px).
+- Tab Thuộc tính (8 tab) xuống dòng thay vì bị khuất bên phải cột hẹp.
+- Clip thấp (chữ, sticker, hiệu ứng) không hiện dòng thời lượng và nhãn phụ chồng lên tên clip.
+- (rà soát tính năng) Ô "Bạn muốn dựng gì" ở trang chủ không gửi lệnh ngay vào dự án trống nữa: tạo dự án, đặt sẵn lệnh vào ô, nhắc nhập tư liệu và (nếu chưa có) kết nối AI. `storeMediaBlob` xin `navigator.storage.persist()` một lần để trình duyệt không tự xoá video đã nhập. Chú thích nút công cụ đúng phím thật (V chọn, C dao cắt; B là Ripple theo bố cục Premiere).
+
+## 25. Bỏ chế độ "Claude Opus 5.5" tích hợp: trợ lý chạy bằng mã API của người dùng (10/10/2026)
+- Bravin không có model AI tích hợp sẵn. ai.js: `ON_CLAUDE = false` (chế độ builtin/sample không còn), `IN_CLAUDE_PAGE` chỉ dùng để giải thích khi trang mở trong claude.ai (trang chặn kết nối ra ngoài, tải model, micro). Ô chọn chế độ ẩn; nguồn "Claude trong claude.ai" bị bỏ khỏi node AI.
+- aiflow.js: `aiConnected()`, `aiWelcome()`, `aiConnectCard()`: khung Trợ lý hiện thẻ "Hãy đưa mã API model AI của bạn" có ô dán mã + Kết nối. Bấm Kết nối: `resolveConn` nhận nhà cung cấp → `connectNode` lấy danh sách và chọn model → gọi thử thật ("OK", có tự đổi model khi 404/429) → gán cho mọi node AI dán mã trong Luồng AI → lưu. Gửi lệnh khi chưa kết nối thì hiện lại thẻ (lệnh giữ trong ô). Mã sai báo rõ "Mã <nhà cung cấp> không hợp lệ…". Nhãn góc phải: "Chưa kết nối" hoặc tên nhà cung cấp.

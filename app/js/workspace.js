@@ -97,7 +97,7 @@ function pasteMany() {
   renderAll(); toast("Đã dán " + groupClip.length + " clip tại " + fmt(t) + "."); return true;
 }
 window.addEventListener("keydown", e => {
-  if (e.target.matches("input,select,textarea,[contenteditable]") || document.querySelector(".overlay") || (typeof cp !== "undefined" && cp.open)) return;
+  if (tmatch(e, "input,select,textarea,[contenteditable]") || document.querySelector(".overlay") || (typeof cp !== "undefined" && cp.open)) return;
   const ctrl = e.ctrlKey || e.metaKey, take = () => { e.preventDefault(); e.stopImmediatePropagation(); };
   if (document.querySelector(".ecw")?.contains(document.activeElement)) return;
   if (ctrl && !e.shiftKey && e.code === "KeyA") { take(); selectAllClips(); return; }
@@ -291,7 +291,7 @@ async function openScreens() {
   document.body.appendChild(ov); const a = ov.querySelector("#scAuto"); a.checked = layout.auto; a.onchange = () => { layout.auto = a.checked; saveLayout(); autoLayout(); };
   ov.querySelector("#scFull").onclick = () => { ov.remove(); toggleFullscreen(); }; ov.querySelector("#scMon").onclick = () => { ov.remove(); openMonitor(); }; ov.querySelector("#scOk").onclick = () => ov.remove();
 }
-document.addEventListener("keydown", e => { if (e.target.matches("input,select,textarea") || document.querySelector(".overlay") || e.ctrlKey || e.metaKey || e.altKey) return; if (e.code === "KeyF" && !e.shiftKey) { e.preventDefault(); e.stopImmediatePropagation(); toggleFullscreen(); } }, true);
+document.addEventListener("keydown", e => { if (tmatch(e, "input,select,textarea") || document.querySelector(".overlay") || e.ctrlKey || e.metaKey || e.altKey) return; if (e.code === "KeyF" && !e.shiftKey) { e.preventDefault(); e.stopImmediatePropagation(); toggleFullscreen(); } }, true);
 document.addEventListener("fullscreenchange", () => setTimeout(() => { autoLayout(); placeSplitters(); }, 150));
 window.addEventListener("resize", () => { clearTimeout(window.__wsT); window.__wsT = setTimeout(() => { if (layout.auto) autoLayout(); else placeSplitters(); }, 120); });
 (function addScreenButton() { const top = $(".top"), more = $("#moreBtn"); if (!top || $("#wsBtn")) return; const b = document.createElement("button"); b.className = "icon"; b.id = "wsBtn"; b.title = "Bố cục và màn hình (toàn màn hình, màn phụ)"; b.setAttribute("aria-label", b.title); b.innerHTML = '<svg class="i" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8M12 17v4M9 4v13"/></svg>'; b.onclick = e => openMenu(e.currentTarget, [{ h: "Bố cục" }, ...layoutItems()]); top.insertBefore(b, more); })();

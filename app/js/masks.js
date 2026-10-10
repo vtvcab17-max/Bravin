@@ -165,7 +165,7 @@ selCv.addEventListener("pointerdown", e => {
   selCv.addEventListener("pointermove", move); selCv.addEventListener("pointerup", up); selCv.addEventListener("pointercancel", up);
 }, true);
 document.addEventListener("keydown", e => {
-  const ME = maskEdit; if (!ME || e.target.matches("input,select,textarea")) return; const m = ME.list()[ME.idx]; if (!m || m.type !== "pen") return;
+  const ME = maskEdit; if (!ME || tmatch(e, "input,select,textarea")) return; const m = ME.list()[ME.idx]; if (!m || m.type !== "pen") return;
   if (e.key === "Enter" && m.closed === false && (m.pts || []).length > 2) { e.preventDefault(); e.stopImmediatePropagation(); pushUndo(); m.closed = true; ME.after(); toast("Đã đóng đường mask."); }
 }, true);
 

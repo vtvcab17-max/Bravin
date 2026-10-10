@@ -76,7 +76,9 @@ async function resolveConn(input, onStep) {
     try { const ms = c.type === "anthropic" ? AI_TYPES.anthropic.models.slice() : await listModels({ type: c.type, base: c.base, key: v }); return Object.assign({}, c, { key: v, models: ms }); }
     catch (e) { lastErr = e; if (rule) break; }
   }
-  throw new Error("Không nhận ra mã này" + (lastErr ? ": " + (lastErr.message || lastErr) : "") + ". Bạn có thể mở Nâng cao để tự điền địa chỉ.");
+  const em = lastErr ? String(lastErr.message || lastErr) : "";
+  if (rule) throw new Error(/^(400|401|403)\b/.test(em) ? `Mã ${rule[1].label} không hợp lệ, đã bị thu hồi hoặc chưa được cấp quyền (${em.slice(0, 160)}). Kiểm tra lại mã rồi dán lần nữa.` : `Không kết nối được ${rule[1].label}: ${em.slice(0, 200)}`);
+  throw new Error("Không nhận ra mã này" + (em ? ": " + em.slice(0, 200) : "") + ". Bạn có thể mở Luồng AI → Nâng cao để tự điền địa chỉ.");
 }
 async function scanLocal(onStep) { const found = []; await Promise.all(LOCAL_PORTS.map(async ([u, ty, name]) => { const r = await Promise.race([probeLocal(u, ty), sleep(1500).then(() => null)]); if (r) found.push(Object.assign(r, { label: name + " · " + new URL(r.base).host })); })); onStep && onStep(found.length ? "Tìm thấy " + found.map(f => f.label).join(", ") : "Không thấy AI local nào đang chạy."); return found; }
 
@@ -148,13 +150,17 @@ function flowFromChain(list) {
   on.forEach((s, i) => { const isAct = s.role === "act" || (!hasAct && i === on.length - 1); const n = flowNode("ai", 250 + i * 260, 100, { name: s.name, src: s.type === "claude" ? "claude" : "paste", ctype: s.type === "claude" ? "" : s.type, base: s.base, key: s.key, model: s.model, conn: s.key || (AI_TYPES[s.type] && AI_TYPES[s.type].where === "local" ? s.base : ""), skill: s.skill, fmt: isAct ? "ops" : "text" }); nodes.push(n); links.push(flk(s0, 0, n, 0)); if (prev) links.push(flk(prev, 0, n, 0)); prev = n; });
   const ap = flowNode("apply", 250 + on.length * 260, 120), r = flowNode("reply", 500 + on.length * 260, 110); nodes.push(ap, r); links.push(flk(prev, 0, ap, 0), flk(ap, 0, r, 0), flk(ap, 1, r, 0)); return { nodes, links };
 }
-if (!AIS.flow || !Array.isArray(AIS.flow.nodes)) { AIS.flow = (AIS.mode === "local" ? flowFromChain(AIS.local) : flowFromChain(AIS.api)) || FLOW_TEMPLATES.plan[1](); AIS.flow.view = { x: 30, y: 30, k: 0.9 }; }
+if (!AIS.flow || !Array.isArray(AIS.flow.nodes)) {
+  const used = list => (list || []).some(s => s.on && (s.key || s.model) && s.type !== "claude"); // chuỗi cũ người dùng đã tự cài
+  AIS.flow = (AIS.mode === "local" && used(AIS.local) ? flowFromChain(AIS.local) : used(AIS.api) ? flowFromChain(AIS.api) : null) || (ON_CLAUDE ? FLOW_TEMPLATES.plan[1]() : FLOW_TEMPLATES.single[1]());
+  AIS.flow.view = { x: 30, y: 30, k: 0.9 };
+}
 if (AIS.mode === "api" || AIS.mode === "local") AIS.mode = "flow";
 if (!ON_CLAUDE && AIS.mode === "builtin") AIS.mode = "flow";
 
 /* ---------- connection of one AI node → callAI step ---------- */
 function stepOf(n) {
-  if (n.src === "claude") return { name: n.name, type: "claude", model: n.model || "claude-opus-5-5" };
+  if (n.src === "claude") throw new Error(`"${n.name}" chưa kết nối: dán mã API của bạn (Bravin không có AI tích hợp sẵn).`);
   if (n.src === "embed") return { name: n.name, type: "embed", model: n.model && EMBED_MODELS[n.model] ? n.model : "qwen2.5-0.5b", maxTokens: n.fmt === "ops" ? 1200 : 700 };
   if (!n.ctype || !n.base) throw new Error(`"${n.name}" chưa kết nối: dán mã API hoặc đường link rồi bấm Kết nối.`);
   return { name: n.name, type: n.ctype, base: n.base, key: n.key, model: n.model, models: n.models, _onModel: m => { n.model = m; saveAIS(); try { flowUI.api && flowUI.api.render(); } catch (_) {} } };
@@ -263,7 +269,7 @@ function openFlow() {
   ov.hidden = false; document.body.classList.add("flowopen");
   ov.innerHTML = `<div class="af-head"><b>Luồng AI</b><span class="af-sub">Nối dây từ ● ra sang ● vào · chuột phải để thêm node · bấm đúp node để đổi tên</span><div class="af-acts"></div><button type="button" class="primary af-done">Xong</button></div>
   <div class="af-main"><div class="af-canvas"></div><aside class="af-side"></aside></div>
-  <form class="af-run"><input type="text" placeholder="Thử chạy luồng với một lệnh, ví dụ: thêm chữ 'Tư vấn miễn phí' ở giây 5" aria-label="Lệnh thử"><button class="primary" type="submit">Chạy thử</button><button type="button" class="af-stop" hidden>Dừng</button></form>`;
+  <form class="af-run"><input type="text" placeholder="Thử chạy luồng với một lệnh, ví dụ: thêm chữ 'Xin chào' ở giây 5" aria-label="Lệnh thử"><button class="primary" type="submit">Chạy thử</button><button type="button" class="af-stop" hidden>Dừng</button></form>`;
   const acts = ov.querySelector(".af-acts");
   const mk = (lbl, fn, tip) => { const b = el("button", "", lbl); b.type = "button"; if (tip) b.title = tip; b.onclick = fn; acts.appendChild(b); return b; };
   mk("Mẫu luồng", e => openMenu(e.currentTarget, Object.entries(FLOW_TEMPLATES).map(([k, [n, f]]) => ({ label: n, run: async () => { if (!(await confirm2("Thay luồng hiện tại bằng mẫu \"" + n + "\"?", "Thay"))) return; const keep = AIS.flow.nodes.find(x => x.type === "ai" && (x.ctype || x.src === "embed")); const nf = f(); if (keep) nf.nodes.filter(x => x.type === "ai").forEach(x => Object.assign(x, { src: keep.src, conn: keep.conn, ctype: keep.ctype, base: keep.base, key: keep.key, model: keep.model, provider: keep.provider, models: keep.models })); nf.view = AIS.flow.view; AIS.flow = nf; saveAIS(); openFlow(); setTimeout(() => flowUI.api.fit(), 50); } }))), "Bắt đầu từ một luồng làm sẵn");
@@ -297,9 +303,9 @@ function flowSide() {
   const sel = (label, opts, get, set) => { const s = el("select"); for (const [k, v] of Object.entries(opts)) { const o = document.createElement("option"); o.value = k; o.textContent = v; s.appendChild(o); } s.value = get(); s.onchange = () => { set(s.value); saveAIS(); flowUI.api.render(); flowSide(); }; return fld(label, s); };
   const res = el("div", "res");
   if (n.type === "ai") {
-    sel("Nguồn AI", { paste: "Dán mã API hoặc đường link", claude: "Claude trong claude.ai (không cần mã)" + (ON_CLAUDE ? "" : " · chỉ trên claude.ai"), embed: "Nhúng trong Bravin (chạy trên máy)" }, () => n.src, v => { n.src = v; if (v === "embed" && !EMBED_MODELS[n.model]) n.model = "qwen2.5-0.5b"; if (v === "claude" && !/^claude/.test(n.model)) n.model = "claude-opus-5-5"; });
+    sel("Nguồn AI", { paste: "Dán mã API hoặc đường link", embed: "Nhúng trong Bravin (chạy trên máy)" }, () => n.src, v => { n.src = v; if (v === "embed" && !EMBED_MODELS[n.model]) n.model = "qwen2.5-0.5b"; if (v === "claude" && !/^claude/.test(n.model)) n.model = "claude-opus-5-5"; });
     if (n.src === "paste") {
-      const inp = el("input"); inp.type = "password"; inp.autocomplete = "off"; inp.spellcheck = false; inp.placeholder = "sk-…, AIza…, gsk_… hoặc http://localhost:11434"; inp.value = n.conn || ""; inp.onchange = () => { n.conn = inp.value.trim(); saveAIS(); };
+      const inp = el("input"); inp.type = "password"; inp.autocomplete = "off"; inp.spellcheck = false; inp.placeholder = "sk-…, AIza…, AQ.…, gsk_… hoặc http://localhost:11434"; inp.value = n.conn || ""; inp.onchange = () => { n.conn = inp.value.trim(); saveAIS(); };
       fld("Mã API hoặc đường link local", inp);
       const show = el("label", "chk"); const cb = el("input"); cb.type = "checkbox"; cb.onchange = () => inp.type = cb.checked ? "text" : "password"; show.append(cb, document.createTextNode(" Hiện mã")); side.appendChild(show);
       const row = el("div", "row"); const go = el("button", "primary", "Kết nối"); go.type = "button"; go.onclick = async () => { n.conn = inp.value.trim(); res.className = "res"; res.textContent = "Đang nhận diện…"; try { const r = await connectNode(n, m => res.textContent = m); res.className = "res ok"; res.textContent = `Đã kết nối ${r.label} · ${(r.models || []).length} model · chọn ${n.model}`; flowUI.api.render(); flowSide(); } catch (e) { res.className = "res err"; res.textContent = e.message || String(e); } };
@@ -344,8 +350,8 @@ function flowSide() {
 
 /* ---------- hook into the assistant panel ---------- */
 (function hookAssistant() {
-  const mode = $("#aiMode"); mode.innerHTML = ""; for (const [k, v] of [["builtin", ON_CLAUDE ? "Claude Opus 5.5 (claude.ai)" : "Claude Opus 5.5 (chỉ trên claude.ai)"], ["flow", "Luồng AI (canvas)"]]) { const o = document.createElement("option"); o.value = k; o.textContent = v; if (k === "builtin" && !ON_CLAUDE) o.disabled = true; mode.appendChild(o); }
-  mode.value = AIS.mode; $("#aiEffort").hidden = AIS.mode !== "builtin";
+  const mode = $("#aiMode"); mode.innerHTML = '<option value="flow">Luồng AI</option>'; mode.value = "flow"; mode.hidden = true; const ml = document.querySelector('label[for="aiMode"]'); if (ml) ml.hidden = true; $("#aiEffort").hidden = true;
+  if (AIS.mode !== "flow") { AIS.mode = "flow"; }
   $("#aiCfgBtn").title = "Mở canvas Luồng AI"; $("#aiCfgBtn").onclick = openFlow;
 })();
 setMode = function (m) { if (m === "api" || m === "local") m = "flow"; AIS.mode = m; $("#aiMode").value = m; $("#aiEffort").hidden = m !== "builtin"; saveAIS(); };
@@ -353,9 +359,48 @@ renderChainLine = function () {
   const elx = $("#chainLine"); if (!elx) return; if (AIS.mode === "builtin") { elx.hidden = true; $("#aiBadge").textContent = "Opus 5.5"; return; }
   const ais = (AIS.flow.nodes || []).filter(n => n.type === "ai" && n.on !== false); elx.hidden = false; elx.innerHTML = "Luồng AI: <b></b> · <a href='#' class='af-open'>mở canvas</a>";
   elx.querySelector("b").textContent = ais.length ? ais.map(n => n.name + " (" + connLabel(n).split(" · ")[0] + ")").join(" → ") : "chưa có node AI"; elx.querySelector(".af-open").onclick = e => { e.preventDefault(); openFlow(); };
-  $("#aiBadge").textContent = "Luồng AI";
+  const ok = aiConnected(); $("#aiBadge").textContent = ok ? connLabel(ok).split(" · ")[0] : "Chưa kết nối";
 };
+/* ---------- "Hãy đưa mã API model của bạn": kết nối ngay trong khung Trợ lý ---------- */
+function aiConnected() { return (AIS.flow && AIS.flow.nodes || []).find(n => n.type === "ai" && n.on !== false && (n.src === "embed" || (n.src !== "claude" && n.ctype && n.base))) || null; }
+function aiWelcome() {
+  const n = aiConnected();
+  if (n) addMsg("c", `Đã kết nối **${connLabel(n)}**. Gõ lệnh dựng bằng tiếng Việt, ví dụ "thêm chữ Xin chào ở giây 2", trợ lý sẽ làm trực tiếp trên timeline. Ctrl+Z để hoàn tác.`);
+  else aiConnectCard();
+}
+function aiConnectCard(focus) {
+  document.querySelectorAll("#msgs .aiconn").forEach(x => x.remove());
+  const d = document.createElement("div"); d.className = "msg c aiconn";
+  d.innerHTML = `<b>Hãy đưa mã API model AI của bạn</b>
+    <p>Bravin không có sẵn AI. Dán mã API của bạn (Google Gemini, OpenAI, Anthropic Claude, Groq, DeepSeek, OpenRouter, xAI…), Bravin tự nhận nhà cung cấp, chọn model và thử kết nối. Mã chỉ lưu trên máy này.</p>
+    <div class="aic-row"><input type="password" id="aiKeyIn" autocomplete="off" spellcheck="false" placeholder="AIza…, AQ.…, sk-…, sk-ant-…, gsk_… hoặc http://localhost:11434" aria-label="Mã API hoặc đường link AI"><button type="button" class="primary" id="aiKeyGo">Kết nối</button></div>
+    <div class="aic-st" role="status"></div>
+    <p class="aic-alt">Không có mã? Dùng AI chạy trên máy (Ollama, LM Studio) bằng cách dán đường link ở trên, hoặc <a href="#" class="aic-flow">mở Luồng AI</a> để chọn model nhúng.</p>`;
+  msgsEl.appendChild(d); const ch = $("#chips"); if (ch) ch.hidden = true; // gợi ý lệnh chưa dùng được khi chưa có AI: nhường chỗ cho ô dán mã
+  requestAnimationFrame(() => { const inpEl = d.querySelector("#aiKeyIn"); msgsEl.scrollTop = Math.max(0, d.offsetTop - msgsEl.offsetTop - 4); if (msgsEl.scrollTop + msgsEl.clientHeight < inpEl.offsetTop - msgsEl.offsetTop + inpEl.offsetHeight) inpEl.scrollIntoView({ block: "nearest" }); });
+  const inp = d.querySelector("#aiKeyIn"), go = d.querySelector("#aiKeyGo"), st = d.querySelector(".aic-st");
+  d.querySelector(".aic-flow").onclick = e => { e.preventDefault(); openFlow(); };
+  const run = async () => {
+    const v = inp.value.trim(); if (!v) { st.textContent = "Chưa dán mã."; inp.focus(); return; }
+    go.disabled = true; inp.disabled = true; st.className = "aic-st"; st.textContent = "Đang nhận dạng mã…";
+    try {
+      if (!AIS.flow || !(AIS.flow.nodes || []).some(n => n.type === "ai")) { AIS.flow = FLOW_TEMPLATES.single[1](); AIS.flow.view = { x: 30, y: 30, k: 0.9 }; }
+      const targets = AIS.flow.nodes.filter(n => n.type === "ai" && n.src !== "embed");
+      const first = targets[0]; first.src = "paste"; first.conn = v;
+      await connectNode(first, m => st.textContent = m);
+      const s = stepOf(first); s._prog = m => st.textContent = m; st.textContent = "Đang thử model " + first.model + "…";
+      const out = await callAI(s, "Bạn là trợ lý kiểm tra kết nối.", "Trả lời đúng một từ: OK", null);
+      for (const n of targets.slice(1)) Object.assign(n, { src: "paste", conn: v, ctype: first.ctype, base: first.base, key: first.key, models: first.models, provider: first.provider, model: first.model });
+      AIS.mode = "flow"; saveAIS(); renderChainLine();
+      d.remove(); { const ch = $("#chips"); if (ch && !msgsEl.querySelector(".msg.u")) ch.hidden = false; } addMsg("c", `Đã kết nối **${connLabel(first)}** (AI trả lời: "${String(out).trim().slice(0, 40)}"). Gõ lệnh dựng bằng tiếng Việt, ví dụ "thêm chữ Xin chào ở giây 2". Đổi AI bất cứ lúc nào ở **Cài đặt AI**.`);
+    } catch (e) {
+      st.className = "aic-st err"; st.textContent = (e && e.message) || String(e); go.disabled = false; inp.disabled = false; inp.focus();
+    }
+  };
+  go.onclick = run; inp.onkeydown = e => { if (e.key === "Enter") { e.preventDefault(); run(); } };
+  if (focus) setTimeout(() => inp.focus(), 50);
+}
 const _askAI_flow = askAI;
-askAI = function (text) { if (!String(text || "").trim() || aiCtl) return; if (AIS.mode === "flow") return runFlow(text); return _askAI_flow(text); };
+askAI = function (text) { if (!String(text || "").trim() || aiCtl) return; if (!aiConnected()) { $("#aiIn").value = text; aiConnectCard(true); return; } if (AIS.mode === "flow") return runFlow(text); return _askAI_flow(text); };
 document.addEventListener("keydown", e => { if (e.key === "Escape" && document.body.classList.contains("flowopen") && !document.querySelector(".overlay,.menu")) { e.preventDefault(); e.stopImmediatePropagation(); closeFlow(); } }, true);
 saveAIS();

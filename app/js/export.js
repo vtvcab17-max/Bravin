@@ -15,7 +15,7 @@ async function getSaver() {
   } };
   const dl = window.claude && window.claude.use ? await window.claude.use("downloads").catch(() => null) : null;
   if (dl) return dl;
-  if (ON_CLAUDE) return null;
+  if (IN_CLAUDE_PAGE) return null;
   return { save: async ({ filename, data }) => { const blob = data instanceof Blob ? data : new Blob([data], { type: filename.endsWith(".json") ? "application/json" : "application/octet-stream" }); const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = filename; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 4000); return { status: "saved" }; } };
 }
 const blobB64 = b => new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(String(fr.result).split(",")[1] || ""); fr.onerror = rej; fr.readAsDataURL(b); });
@@ -57,7 +57,7 @@ function startExport() {
   };
 }
 function outSize(short) { const k = short / Math.min(cv.width, cv.height); const ev = x => Math.max(2, Math.round(x * k / 2) * 2); return [ev(cv.width), ev(cv.height)]; }
-function bitrateFor(w, h, fps, bpp) { return clamp(Math.round(w * h * fps * bpp), 1.5e6, 80e6); }
+function bitrateFor(w, h, fps, bpp) { return clamp(Math.round(w * h * fps * (+bpp || 0.1)), 1.5e6, 80e6); }
 
 /* ---------- progress UI ---------- */
 function exportUI(title, sub) {
@@ -218,7 +218,7 @@ async function pickVideoCodec(w, h, fps, br) {
 async function pickAudioCodec(sr) { for (const [mux, codec] of [["aac", "mp4a.40.2"], ["opus", "opus"]]) { const cfg = { codec, sampleRate: sr, numberOfChannels: 2, bitrate: 192000 }; try { const s = await AudioEncoder.isConfigSupported(cfg); if (s.supported) return { mux, cfg }; } catch (_) {} } return null; }
 async function exportTarget(name) {
   if (window.VINCutAndroid && VINCutAndroid.beginRandom) { const id = VINCutAndroid.beginRandom(name, "video/mp4"); return { target: new Mp4Muxer.StreamTarget({ onData: (data, pos) => { if (!VINCutAndroid.writeAt(id, pos, u8B64(data))) throw new Error("write"); }, chunked: true, chunkSize: 4 << 20 }), fastStart: false, done: async () => VINCutAndroid.finish(id), abort: () => { try { VINCutAndroid.finish(id + ":abort"); } catch (_) {} } }; }
-  if (window.showSaveFilePicker && window.top === window && !ON_CLAUDE) { try { const h = await showSaveFilePicker({ suggestedName: name, types: [{ description: "Video MP4", accept: { "video/mp4": [".mp4"] } }] }); const ws = await h.createWritable(); return { target: new Mp4Muxer.FileSystemWritableFileStreamTarget(ws), fastStart: false, done: async () => { await ws.close(); return name; }, abort: () => ws.abort && ws.abort() }; } catch (e) { if (e && e.name === "AbortError") throw new Error("Bạn đã huỷ chọn nơi lưu."); } }
+  if (window.showSaveFilePicker && window.top === window && !IN_CLAUDE_PAGE) { try { const h = await showSaveFilePicker({ suggestedName: name, types: [{ description: "Video MP4", accept: { "video/mp4": [".mp4"] } }] }); const ws = await h.createWritable(); return { target: new Mp4Muxer.FileSystemWritableFileStreamTarget(ws), fastStart: false, done: async () => { await ws.close(); return name; }, abort: () => ws.abort && ws.abort() }; } catch (e) { if (e && e.name === "AbortError") throw new Error("Bạn đã huỷ chọn nơi lưu."); } }
   const target = new Mp4Muxer.ArrayBufferTarget(); return { target, fastStart: "in-memory", done: async () => { const s = await getSaver(); if (!s) throw new Error("không lưu được ở đây"); await s.save({ filename: name, data: new Blob([target.buffer], { type: "video/mp4" }) }); return name; }, abort: () => {} };
 }
 async function exportWebCodecs(short, fps, bpp, name, range) {

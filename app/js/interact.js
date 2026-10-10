@@ -274,7 +274,7 @@ function openTrim(c, opts = {}) {
     if (!ok && startSnap) { restore(startSnap); undoStack.pop(); syncButtons(); }
     else { sel = { k: "v", id: c.id }; const st = vStarts(); const i = V.indexOf(c); if (i >= 0) seek(st[i]); renderAll(); toast("Đã cập nhật đoạn " + m.name); }
   };
-  const esc = e => { if (e.key === "Escape") { e.stopPropagation(); close(false); } if (e.key === "Enter" && !e.target.matches("textarea")) { e.preventDefault(); e.stopPropagation(); close(true); } };
+  const esc = e => { if (e.key === "Escape") { e.stopPropagation(); close(false); } if (e.key === "Enter" && !tmatch(e, "textarea")) { e.preventDefault(); e.stopPropagation(); close(true); } };
   window.addEventListener("keydown", esc, true);
   $("#trCancel").onclick = () => close(false); $("#trOk").onclick = () => close(true);
   trimOpen = { close, c };

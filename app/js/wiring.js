@@ -27,7 +27,7 @@ let recState = null;
 $("#recBtn").onclick = async () => {
   if (recState) { recState.rec.stop(); return; }
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { toast("Trình duyệt này không thu âm được."); return; }
-  let stream; try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch (e) { toast(ON_CLAUDE ? "Trang trên claude.ai không được dùng micro. Thu âm ở Bravin bản trên máy." : "Không mở được micro. Kiểm tra quyền micro của trình duyệt."); return; }
+  let stream; try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch (e) { toast(IN_CLAUDE_PAGE ? "Trang trên claude.ai không được dùng micro. Thu âm ở Bravin bản trên máy." : "Không mở được micro. Kiểm tra quyền micro của trình duyệt."); return; }
   const rec = new MediaRecorder(stream), chunks = [], t0 = t; recState = { rec };
   rec.ondataavailable = e => e.data.size && chunks.push(e.data);
   rec.onstop = async () => { stream.getTracks().forEach(x => x.stop()); pause(); $("#recBtn").classList.remove("rec"); recState = null; const blob = new Blob(chunks, { type: rec.mimeType || "audio/webm" }); const n = [...media.values()].filter(m => /^Thu âm/.test(m.name)).length + 1; const m = await addMediaFile(new File([blob], `Thu âm ${n}.webm`, { type: blob.type.startsWith("audio") ? blob.type : "audio/webm" }), `Thu âm ${n}`); if (m) { const tr = tracksOf("audio").find(x => /voice|thu âm/i.test(x.name)) || addTrack("audio"); appendMedia(m, null, { track: tr.id, start: t0 }); toast("Đã thêm bản thu vào " + tr.name); } };
@@ -50,7 +50,7 @@ binEl.addEventListener("dragover", e => { if ([...e.dataTransfer.types].includes
 binEl.addEventListener("dragleave", e => { if (!binEl.contains(e.relatedTarget)) binEl.classList.remove("over"); });
 binEl.addEventListener("drop", e => { e.preventDefault(); binEl.classList.remove("over"); importFiles(e.dataTransfer.files); });
 document.addEventListener("keydown", e => {
-  if (trimOpen || e.target.matches("input,select,textarea")) return;
+  if (trimOpen || tmatch(e, "input,select,textarea")) return;
   const k = e.key.toLowerCase();
   if (k === " ") { e.preventDefault(); playing ? pause() : play(); }
   else if ((k === "s" && !e.ctrlKey && !e.metaKey) || (k === "b" && (e.ctrlKey || e.metaKey))) { e.preventDefault(); splitAtPlayhead(); }

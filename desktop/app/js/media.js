@@ -20,7 +20,7 @@ async function addMediaFile(blob, name, srcUrl, wantId, fromStore) {
   try {
     if (kind === "image") { const img = new Image(); img.src = url; await img.decode(); m.img = img; m.duration = 600; m.thumb = url; m.strip = url; }
     else if (kind === "audio") { const el = document.createElement("audio"); el.src = url; await loadMeta(el); m.duration = el.duration; await decodeAudio(m, await (srcUrl ? (await fetch(srcUrl)).arrayBuffer() : blob.arrayBuffer())); await makeWave(m); }
-    else { m.hasAudio = true; const el = getEl(m, 0); await loadMeta(el); m.duration = el.duration || 0; if (!m.strip) m._stripJob = makeStrip(m).catch(() => {}).then(() => { m._stripJob = null; if (media.get(m.id) === m) { renderBin(); if (typeof renderTimeline === "function") renderTimeline(); } }); }
+    else { m.hasAudio = true; const el = getEl(m, 0); await loadMeta(el); m.duration = el.duration || 0; if (!m.strip || !m.stripN) m._stripJob = makeStrip(m).catch(() => {}).then(() => { m._stripJob = null; if (media.get(m.id) === m) { renderBin(); if (typeof renderTimeline === "function") renderTimeline(); } }); }
   } catch (e) { toast("Không mở được " + name + ". Thử MP4, MOV, MP3, M4A, JPG hoặc PNG."); if (!srcUrl) URL.revokeObjectURL(url); return null; }
   if (srcUrl) m.persist = srcUrl; else if (window.VINCutAndroid) { try { const pu = VINCutAndroid.persistUrl(name); if (pu) m.persist = pu; } catch (_) {} }
   media.set(m.id, m);
@@ -30,7 +30,8 @@ async function addMediaFile(blob, name, srcUrl, wantId, fromStore) {
 /* dải ảnh trên timeline: chạy nền (không chặn nhập file), ảnh bìa có ngay sau khung đầu, dải hiện dần */
 async function makeStrip(m) {
   const v = document.createElement("video"); v.muted = true; v.playsInline = true; v.preload = "auto"; v.src = m.url; await loadMeta(v);
-  const n = clamp(Math.ceil(m.duration / 2), 2, 24), h = 64, w = Math.round(h * (v.videoWidth / v.videoHeight || 0.5625));
+  const n = clamp(Math.ceil(m.duration / 0.8), 6, 40), h = 112, ar = (v.videoWidth / v.videoHeight) || 0.5625, w = Math.round(h * ar);
+  m.stripN = n; m.stripAR = ar;
   const c = document.createElement("canvas"); c.width = w * n; c.height = h; const g = c.getContext("2d"); g.fillStyle = "#1b1c22"; g.fillRect(0, 0, c.width, c.height);
   const th = document.createElement("canvas"); th.width = 180; th.height = Math.round(180 * (v.videoHeight / v.videoWidth || 1.78));
   let lastPush = performance.now();
@@ -38,9 +39,9 @@ async function makeStrip(m) {
     if (media.get(m.id) !== m || m.url !== v.src) break; // file đã bị thay/xoá
     await seekTo(v, Math.min(m.duration - 0.05, (i + 0.5) * m.duration / n)); g.drawImage(v, i * w, 0, w, h);
     if (i === 0) { th.getContext("2d").drawImage(v, 0, 0, th.width, th.height); m.thumb = th.toDataURL("image/jpeg", 0.75); renderBin(); }
-    if (performance.now() - lastPush > 700) { lastPush = performance.now(); m.strip = c.toDataURL("image/jpeg", 0.7); if (typeof renderTimeline === "function") renderTimeline(); }
+    if (performance.now() - lastPush > 700) { lastPush = performance.now(); m.strip = c.toDataURL("image/jpeg", 0.72); if (typeof renderTimeline === "function") renderTimeline(); }
   }
-  m.strip = c.toDataURL("image/jpeg", 0.7); v.removeAttribute("src"); v.load();
+  m.strip = c.toDataURL("image/jpeg", 0.72); v.removeAttribute("src"); v.load();
 }
 async function makeWave(m) {
   if (!m.buf) return; const d = m.buf.getChannelData(0), W = clamp(Math.round(m.duration * 30), 120, 6000), H = 60, step = Math.max(1, Math.floor(d.length / W));

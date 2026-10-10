@@ -144,7 +144,7 @@ cv.parentElement.addEventListener("pointerdown", e => {
 }, true);
 selCv.addEventListener("pointermove", e => { if (tool !== "pen" || !penEd || penEd.mode !== "draw" || e.buttons) return; penEd.hover = toCv(e); drawSelection(); });
 window.addEventListener("keydown", e => {
-  if (e.target.matches("input,select,textarea") || document.querySelector(".overlay") || document.body.classList.contains("cpopen") || document.body.classList.contains("flowopen")) return;
+  if (tmatch(e, "input,select,textarea") || document.querySelector(".overlay") || document.body.classList.contains("cpopen") || document.body.classList.contains("flowopen")) return;
   const ctrl = e.ctrlKey || e.metaKey;
   if (!ctrl && !e.altKey && !e.shiftKey && e.code === "KeyP") { e.preventDefault(); e.stopImmediatePropagation(); setTool("pen"); return; }
   if (!penEd) return; const c = penEd.c; if (!C.includes(c)) { penEd = null; return; }
