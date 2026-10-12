@@ -42,10 +42,14 @@ Mỗi bản mới phải tăng `CODE`. Công cụ cần có (đặt biến môi 
 | App Bundle (AAB) | `bundletool build-bundle`, assets không nén để video tua nhanh |
 | Tràn viền (Android 15+) | `MainActivity`: WebView nằm trong `FrameLayout`, đệm theo `systemBars + displayCutout + ime` |
 | Cử chỉ quay lại dự đoán (target 36) | `enableOnBackInvokedCallback`, `OnBackInvokedCallback` trên Android 13+, `onBackPressed` cho máy cũ |
-| Không cho phép http toàn cục | `res/xml/network_security_config.xml`: http chỉ tới 127.0.0.1 / localhost. Link tải `http://` (không mã hoá) sẽ bị chặn, phải dùng https |
+| Cấu hình mạng tường minh | `res/xml/network_security_config.xml`: cho phép http vì máy chủ nội bộ 127.0.0.1 và Phim AI (LocalMiniDrama trên máy tính trong cùng Wi-Fi, `http://192.168.x.x:5679`) không có https; chỉ tin chứng chỉ hệ thống. Dịch vụ ngoài Bravin tự gọi đều https |
 | Không bật gỡ lỗi WebView ở bản phát hành | `setWebContentsDebuggingEnabled` chỉ bật khi app debuggable |
 | Ký v2 + v3 | bundletool ký APK; AAB ký bằng jarsigner (SHA-256) |
 | Danh mục app | `android:appCategory="video"` |
+
+## Hồ sơ cửa hàng đã soạn sẵn
+
+Thư mục `play/`: tiêu đề và mô tả vi-VN/en-US (`play/listing`), ảnh điện thoại và máy tính bảng, ảnh bìa 1024×500, icon 512 (`play/graphics`), ghi chú phát hành, gợi ý mục An toàn dữ liệu (`play/DATA_SAFETY.md`), các bước trên Play Console (`play/README.md`). Chính sách quyền riêng tư: https://bravin.vtvcab17.workers.dev/chinh-sach-rieng-tu.html. Làm mới ảnh: `node tools/play/screenshots.mjs`.
 
 ## Việc phải làm trên store (người dùng)
 

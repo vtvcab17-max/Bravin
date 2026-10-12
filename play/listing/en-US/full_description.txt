@@ -1,0 +1,31 @@
+Bravin is a full-featured video editor for Android phones and tablets, built for vertical TikTok, Reels and Shorts as well as landscape YouTube video.
+
+DESKTOP-CLASS EDITING
+• Multi-track timeline: overlays, text, stickers, audio; ripple, roll, slip, slide, speed ramps
+• Keyframes for position, scale, rotation, opacity and volume with smooth easing
+• Ellipse, rectangle and bezier masks with motion tracking; chroma key and on-device AI person cut-out
+• Clip groups, compound clips, markers, Premiere-style shortcuts with a keyboard
+
+COLOR, EFFECTS, TEXT
+• Lumetri-style color, .cube LUTs, DaVinci-style node color graph, scopes
+• A large library of effects and transitions, denoise, stabilization, smooth slow motion
+• Titles, captions and lyrics; nearly 2,000 Google Fonts installable in one tap
+
+AUDIO AND AI
+• On-device speech-to-text captions, text-to-speech
+• −14 LUFS normalization, noise reduction, ducking, waveform audio sync
+• AI assistant edits your timeline from plain-language commands using your own API key (OpenAI, Claude, Gemini, DeepSeek, Groq…)
+
+S PEN AND LARGE SCREENS
+• Pressure-sensitive pen drawing with eraser and palm rejection
+• Hover the pen to preview frames, side button opens menus
+• Galaxy Tab, Fold, Samsung DeX and TV casting switch to the full desktop layout with mouse and keyboard
+
+EXPORT
+• MP4 up to 4K, 24–60 fps, loudness normalized for social media
+• SRT and FCP XML export; projects auto-save on device
+
+PRIVACY
+No account, no ads, no tracking. Your projects and videos stay on your device.
+
+Plugins and the Micron add-on store are available in Bravin for desktop (Windows and web).

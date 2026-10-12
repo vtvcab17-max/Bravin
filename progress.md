@@ -17,6 +17,8 @@
 
 - [x] 4.11 Bravin cho Samsung (feat-011): APK `app.bravin.samsung`, vẽ tay S Pen theo lực nhấn, Air View, Air actions, DeX; plugin trên mọi APK yêu cầu bản PC; trang `app/huong-dan/samsung.html`.
 
+- [x] feat-014 hồ sơ Google Play (`play/`), chính sách quyền riêng tư, sửa tràn ngang điện thoại 360–412 dp, cho phép http LAN cho Phim AI.
+
 ### What's In Progress
 - [ ] feat-013: AAB/APK target 36 đã dựng và kiểm tra tĩnh; chưa chạy trên Android 15/16 thật. Xem `docs/STORE.md`.
 - [ ] feat-006/007: bộ cài Phim AI chưa được cài thử trên Windows thật.
@@ -34,6 +36,8 @@
 - [ ] Bộ cài chưa ký số: Windows SmartScreen cảnh báo, người dùng phải bấm More info → Run anyway.
 
 ## Decisions Made
+- **Gói Play là `app.bravin`** (người dùng xác nhận 12/10/2026 khi hai phiên làm song song; nhánh `play-com-bravinall` với gói com.bravinall.bravin bị bỏ, chỉ lấy hồ sơ cửa hàng).
+- **Cho phép http trong network_security_config**: Phim AI trên điện thoại cần `http://<IP máy tính>:5679`.
 - **Đổi gói cài đặt `app.vincut` → `app.bravin` (người dùng chọn 12/10/2026)**, khoá ký mới `bravin-release.jks` (alias `bravin`) do người dùng giữ. Lớp Java giữ `app.vincut.*`. Google Play nhận `Bravin.aab`, Galaxy Store nhận `Bravin_Samsung.apk`.
 - **Bỏ Gradle vẫn giữ nguyên**: aapt2 + android.jar 36 + dx + bundletool (phiên agent không tải được SDK từ Google).
 - **Bản Samsung là gói riêng `app.bravin.samsung`** (cài song song, dữ liệu riêng) thay vì chỉ một cờ trong APK thường: Air actions và cửa sổ DeX khai báo trong manifest, biểu tượng riêng để phân biệt.

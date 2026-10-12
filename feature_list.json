@@ -135,6 +135,17 @@
       "version": "4.11 (19)",
       "evidence": "build.sh: aapt2 2.20 + android.jar 36 + dx + bundletool 1.17.2 → Bravin.aab 7,6 MB, Bravin.apk 28,7 MB, Bravin_Samsung.aab/.apk. aapt2 dump badging: app.bravin / app.bravin.samsung versionCode 19, targetSdk 36, compileSdk 36; manifest có networkSecurityConfig, enableOnBackInvokedCallback=true, appCategory=video, không còn usesCleartextTraffic; bản Samsung giữ REMOTE_ACTION + dex.launchwidth/height. apksigner verify: v2+v3 hợp lệ, CN=Bravin, O=Bravinall, C=VN. 78/78 tệp assets không nén. classes.dex có handleBack/registerBack. Chưa chạy trên thiết bị (không có máy ảo Android trong phiên).",
       "blocked_by": "Cần thử trên máy Android 15/16 thật hoặc Samsung Remote Test Lab"
+    },
+    {
+      "id": "feat-014",
+      "name": "Hồ sơ Google Play + chính sách quyền riêng tư",
+      "description": "play/: tiêu đề, mô tả vi-VN/en-US, ảnh điện thoại/máy tính bảng, ảnh bìa, icon, An toàn dữ liệu, ghi chú phát hành, các bước Play Console; app/chinh-sach-rieng-tu.html; sửa thanh trên tràn ngang trên điện thoại 360–412 dp; network_security_config cho phép http LAN để Phim AI chạy trên điện thoại.",
+      "dependencies": [
+        "feat-013"
+      ],
+      "status": "done",
+      "version": "4.11",
+      "evidence": "static.mjs kiểm giới hạn ký tự (tiêu đề ≤30, mô tả ngắn ≤80, dài ≤4000, ghi chú ≤500), ≥2 ảnh điện thoại, trang chính sách có email. Kiểm thử khói: chinh-sach-rieng-tu.html tải đạt; 360 và 412 dp không tràn ngang, Phim AI/JIZURA có trong menu ⋯. Ảnh: 4 điện thoại 1080×1919, 2 máy tính bảng 2560×1600 (node tools/play/screenshots.mjs), ảnh bìa 1024×500, icon 512."
     }
   ]
 }

@@ -99,10 +99,10 @@ try {
     assert(r.mgr && !r.pc, JSON.stringify(r)); return "không bị chặn";
   });
 
-  for (const guide of ["phim-ai", "samsung"]) await step(`Trang hướng dẫn ${guide}.html tải đủ ảnh, không tràn`, async () => {
+  for (const guide of ["huong-dan/phim-ai", "huong-dan/samsung", "chinh-sach-rieng-tu"]) await step(`Trang ${guide}.html tải đủ ảnh, không tràn`, async () => {
     const g = await ctx.newPage(); const errs = [];
     g.on("pageerror", (e) => errs.push(e.message));
-    const resp = await g.goto(`${BASE}/huong-dan/${guide}.html`, { waitUntil: "load" });
+    const resp = await g.goto(`${BASE}/${guide}.html`, { waitUntil: "load" });
     assert(resp && resp.ok(), "HTTP " + (resp && resp.status()));
     await g.evaluate(async () => { for (const i of document.images) { i.loading = "eager"; } window.scrollTo(0, document.body.scrollHeight); await new Promise((r) => setTimeout(r, 800)); });
     const bad = await g.evaluate(() => [...document.images].filter((i) => !i.complete || !i.naturalWidth).map((i) => i.getAttribute("src")));
@@ -119,6 +119,20 @@ try {
     await m.goto(`${BASE}/index.html`, { waitUntil: "load" }); await m.waitForTimeout(2000);
     await m.close();
     assert(!errs.length, errs.join(" | "));
+  });
+
+  for (const w of [360, 412]) await step(`Điện thoại ${w} dp: trình dựng không tràn ngang, Phim AI/JIZURA trong menu ⋯`, async () => {
+    const m = await browser.newPage({ viewport: { width: w, height: 760 }, isMobile: true, hasTouch: true });
+    await m.route(/^https?:\/\/(?!127\.0\.0\.1)/, (r) => r.abort());
+    await m.goto(`${BASE}/index.html`, { waitUntil: "load" }); await m.waitForTimeout(1500);
+    await m.evaluate(() => newProject("9:16", "Hẹp")); await m.waitForTimeout(400);
+    const r = await m.evaluate(() => ({ sw: document.documentElement.scrollWidth, iw: innerWidth }));
+    await m.evaluate(() => document.querySelector("#moreBtn").click()); await m.waitForTimeout(200);
+    const items = await m.evaluate(() => [...document.querySelectorAll(".menu button")].map((b) => b.textContent));
+    await m.close();
+    assert(r.iw <= w + 1 && r.sw <= w + 1, `rộng ${r.sw}px trên màn ${w}px`);
+    assert(items.some((t) => t.startsWith("Phim AI")) && items.some((t) => t.startsWith("JIZURA")), "menu ⋯ thiếu Phim AI/JIZURA");
+    return "vừa màn hình";
   });
 
   await step("Không có lỗi JavaScript trong cả phiên", async () => { assert(!pageErrors.length, pageErrors.join(" | ")); });

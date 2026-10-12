@@ -95,6 +95,20 @@ for (const g of walk("app").filter((f) => f.startsWith("app/huong-dan/") && f.en
   miss.length ? err(`${g}: liên kết hỏng ${miss.join(", ")}`) : ok(`${g}: ${refs.length} liên kết nội bộ đều có`);
 }
 
+// 9. Hồ sơ Google Play: giới hạn ký tự, ảnh đủ kích thước, trang chính sách có email
+if (existsSync(join(ROOT, "play/listing"))) {
+  const lim = { "title.txt": 30, "short_description.txt": 80, "full_description.txt": 4000 }, bad = [];
+  for (const lang of readdirSync(join(ROOT, "play/listing"))) for (const [f, n] of Object.entries(lim)) {
+    const p = `play/listing/${lang}/${f}`; if (!existsSync(join(ROOT, p))) { bad.push(`thiếu ${p}`); continue; }
+    const len = [...read(p).trim()].length; if (len > n) bad.push(`${p}: ${len}/${n} ký tự`);
+  }
+  for (const f of readdirSync(join(ROOT, "play/release-notes"))) { const len = [...read("play/release-notes/" + f).trim()].length; if (len > 500) bad.push(`play/release-notes/${f}: ${len}/500`); }
+  if (!existsSync(join(ROOT, "app/chinh-sach-rieng-tu.html")) || !/mailto:/.test(read("app/chinh-sach-rieng-tu.html"))) bad.push("app/chinh-sach-rieng-tu.html thiếu hoặc không có email liên hệ");
+  const shots = existsSync(join(ROOT, "play/graphics/screenshots")) ? readdirSync(join(ROOT, "play/graphics/screenshots")).filter((f) => f.startsWith("phone-")) : [];
+  if (shots.length < 2) bad.push("cần ít nhất 2 ảnh điện thoại trong play/graphics/screenshots");
+  bad.length ? err("Hồ sơ Google Play: " + bad.join("; ")) : ok(`Hồ sơ Google Play: ${readdirSync(join(ROOT, "play/listing")).length} ngôn ngữ, ${shots.length} ảnh điện thoại, có trang chính sách`);
+}
+
 // Kết quả
 for (const m of oks) console.log("  ✓ " + m);
 for (const m of warns) console.log("  ! " + m);

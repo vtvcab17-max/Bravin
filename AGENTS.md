@@ -22,6 +22,7 @@ Before writing code (trước khi sửa bất cứ gì):
 | Định dạng `bravin-project` (Antifact → Bravin) | `docs/BRAVIN_PROJECT_FORMAT.md` |
 | Khu Phim AI (LocalMiniDrama) | `docs/PHIM_AI_LOCALMINIDRAMA.md`, `tools/phimai-installer/README.md` |
 | Bản Samsung (S Pen, DeX, Air actions), plugin trên APK | `docs/SAMSUNG.md` |
+| Nộp Google Play / Galaxy Store: dựng `docs/STORE.md`; hồ sơ cửa hàng `play/` | `docs/STORE.md`, `play/README.md`, `play/DATA_SAFETY.md` |
 
 ## Working Rules (quy tắc làm việc)
 
@@ -75,6 +76,8 @@ Dựng sản phẩm (chỉ khi người dùng cần tệp cài):
 
 - Trong shell của agent, `pkill -f "<mẫu>"` hay `pgrep -f` có thể khớp chính lệnh đang chạy và giết shell. Ghi PID ra tệp rồi `kill $(cat pid)`.
 - Chromium của Playwright không giải mã H.264: video kiểm thử dùng VP9/WebM.
+- Điện thoại 360–412 dp: thanh trên không được tràn ngang (kiểm thử khói đo). Nút mới trên thanh trên phải ẩn ở `body.phone` và đưa vào menu ⋯ (`phone.js`).
+- Phim AI trên Android gọi `http://<IP máy tính>:5679`: `network_security_config.xml` phải cho phép http.
 - `makensis` gặp tên tệp không phải ASCII thì cần `LANG=C.UTF-8 LC_ALL=C.UTF-8`, nếu không sẽ segfault.
 - Tệp `.ps1` có tiếng Việt phải lưu UTF-8 có BOM (Windows PowerShell 5.1).
 - Bản Windows chạy không cần mạng: không dùng CDN hay Google Fonts trong `desktop/app`.

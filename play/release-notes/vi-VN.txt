@@ -1,0 +1,5 @@
+Bravin 4.11
+• Vẽ tay bằng S Pen theo lực nhấn, chú thích khi rê bút
+• Tự nhận Samsung DeX: giao diện máy tính, chuột, phím tắt
+• Khu Phim AI: nối LocalMiniDrama trên máy tính, tệp tự vào thư viện
+• Hỗ trợ Android 16, cử chỉ quay lại mới
