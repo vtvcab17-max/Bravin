@@ -597,3 +597,5 @@ body.spen #samDrawBtn{color:var(--acc-hi,#8e81f8)}
 /* DeX: chuột chính xác, nút gọn hơn bản cảm ứng */
 body.dex .menu button{min-height:30px}
 .samdlg{max-height:calc(100dvh - 32px);overflow:auto}
+/* Điện thoại: Phim AI, JIZURA vào menu ⋯ để thanh trên không tràn ngang (360–412 dp) */
+body.phone #lmdBtn,body.phone #jzBtn{display:none}

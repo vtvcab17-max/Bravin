@@ -1,0 +1,5 @@
+Bravin 4.11
+• Pressure-sensitive S Pen drawing, hover tooltips
+• Samsung DeX detection: desktop layout, mouse, shortcuts
+• Phim AI: connect LocalMiniDrama on your computer, results land in your library
+• Android 16 support with predictive back

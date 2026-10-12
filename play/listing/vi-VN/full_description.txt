@@ -1,0 +1,32 @@
+Bravin là trình dựng video đầy đủ tính năng chạy ngay trên điện thoại và máy tính bảng Android, tối ưu cho video dọc TikTok, Reels, Shorts và video ngang YouTube.
+
+DỰNG NHƯ TRÊN MÁY TÍNH
+• Timeline nhiều track: video phủ, chữ, sticker, âm thanh; cắt, ripple, roll, slip, slide, đổi tốc độ
+• Keyframe cho vị trí, cỡ, xoay, độ mờ, âm lượng; đường cong mượt
+• Mask elip, chữ nhật, bút bezier, theo dõi chuyển động; tách nền xanh, tách người bằng AI trên máy
+• Nhóm clip, compound clip, đánh dấu, phím tắt kiểu Premiere khi dùng bàn phím
+
+MÀU, HIỆU ỨNG, CHỮ
+• Chỉnh màu Lumetri, LUT .cube, bảng node màu kiểu DaVinci, biểu đồ màu
+• Nhiều hiệu ứng và chuyển cảnh, khử nhiễu, ổn định hình, slow-motion mượt
+• Chữ, phụ đề, lời bài hát; gần 2.000 phông chữ Google cài một chạm, hỗ trợ tiếng Việt đầy đủ
+
+ÂM THANH VÀ AI
+• Phụ đề tự động từ giọng nói (chạy trên máy), chữ thành giọng nói
+• Chuẩn hoá −14 LUFS, khử ồn, ducking, đồng bộ âm thanh theo sóng
+• Trợ lý AI sửa timeline bằng câu lệnh: dùng khoá API của bạn (OpenAI, Claude, Gemini, DeepSeek, Groq…)
+• Phim AI: nối với LocalMiniDrama trên máy tính để AI viết kịch bản, tạo phân cảnh, ảnh và video
+
+S PEN VÀ MÀN HÌNH LỚN
+• Vẽ tay theo lực nhấn của bút, đầu tẩy, tự bỏ qua lòng bàn tay
+• Rê bút xem trước khung hình, nút bên bút mở menu
+• Galaxy Tab, Fold, Samsung DeX, chiếu TV: tự chuyển giao diện máy tính, dùng chuột và bàn phím
+
+XUẤT VIDEO
+• MP4 đến 4K, 24–60 khung hình/giây, chuẩn âm lượng cho mạng xã hội
+• Xuất phụ đề SRT, FCP XML; dự án tự lưu trên máy
+
+RIÊNG TƯ
+Không cần tài khoản, không quảng cáo, không theo dõi. Dự án và video nằm trên máy của bạn.
+
+Plugin và chợ tiện ích Micron có trên Bravin cho máy tính (Windows, bản web).

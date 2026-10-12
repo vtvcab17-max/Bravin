@@ -84,10 +84,15 @@ public class MainActivity extends Activity {
         int port;
         try { port = server.start(); } catch (Exception e) { Toast.makeText(this, "Không mở được máy chủ nội bộ: " + e, Toast.LENGTH_LONG).show(); finish(); return; }
 
-        WebView.setWebContentsDebuggingEnabled(true);
+        WebView.setWebContentsDebuggingEnabled(!isPlayBuild());
         web = new WebView(this);
         web.setBackgroundColor(Color.parseColor("#131417"));
-        setContentView(web);
+        android.widget.FrameLayout rootView = new android.widget.FrameLayout(this);
+        rootView.setBackgroundColor(Color.parseColor("#131417"));
+        rootView.addView(web, new android.widget.FrameLayout.LayoutParams(-1, -1));
+        setContentView(rootView);
+        applyInsets(rootView);
+        registerBackCallback();
         WebSettings s = web.getSettings();
         s.setJavaScriptEnabled(true);
         s.setDomStorageEnabled(true);
@@ -209,10 +214,12 @@ public class MainActivity extends Activity {
     }
 
     void immersive() {
-        if (isDex() || inMultiWindow()) return; // DeX / cửa sổ: giữ thanh tác vụ
+        if (isDex() || inMultiWindow()) { immersiveActive = false; getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_VISIBLE); getWindow().getDecorView().requestApplyInsets(); return; } // DeX / cửa sổ: giữ thanh tác vụ
+        immersiveActive = true;
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN);
+        getWindow().getDecorView().requestApplyInsets();
     }
 
     @Override
@@ -230,8 +237,65 @@ public class MainActivity extends Activity {
     }
 
     @Override
-    public void onBackPressed() {
-        if (web == null) { super.onBackPressed(); return; }
+    public void onBackPressed() { handleBack(); }
+
+    /** Bản Google Play (com.bravinall.bravin): tắt gỡ lỗi WebView */
+    boolean isPlayBuild() { return "com.bravinall.bravin".equals(getPackageName()); }
+
+    /** Android 13+: nút/cử chỉ Back qua OnBackInvokedDispatcher. Với targetSdk 36 (Android 16)
+     *  hệ thống không gọi onBackPressed nữa. Dựng với android-23.jar nên dùng reflection + Proxy. */
+    void registerBackCallback() {
+        if (Build.VERSION.SDK_INT < 33) return;
+        try {
+            Object disp = Activity.class.getMethod("getOnBackInvokedDispatcher").invoke(this);
+            Class<?> cbI = Class.forName("android.window.OnBackInvokedCallback");
+            Object cb = java.lang.reflect.Proxy.newProxyInstance(cbI.getClassLoader(), new Class<?>[]{cbI}, new java.lang.reflect.InvocationHandler() {
+                public Object invoke(Object p, java.lang.reflect.Method m, Object[] a) {
+                    if ("onBackInvoked".equals(m.getName())) runOnUiThread(new Runnable() { public void run() { handleBack(); } });
+                    else if ("hashCode".equals(m.getName())) return System.identityHashCode(p);
+                    else if ("equals".equals(m.getName())) return p == a[0];
+                    else if ("toString".equals(m.getName())) return "BravinBack";
+                    return null;
+                }
+            });
+            Class<?> dI = Class.forName("android.window.OnBackInvokedDispatcher");
+            dI.getMethod("registerOnBackInvokedCallback", int.class, cbI).invoke(disp, 0, cb); // PRIORITY_DEFAULT
+        } catch (Throwable ignored) { }
+    }
+
+    /** Android 15+ (targetSdk 35+) luôn tràn viền: chừa chỗ cho thanh hệ thống và bàn phím khi không toàn màn hình */
+    void applyInsets(View root) {
+        root.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
+            public android.view.WindowInsets onApplyWindowInsets(View v, android.view.WindowInsets in) {
+                int[] bars = insetsOf(in, "systemBars"), ime = insetsOf(in, "ime");
+                if (bars == null) { // Android < 11: chỉ có API cũ
+                    if (immersiveActive) v.setPadding(0, 0, 0, 0);
+                    else v.setPadding(in.getSystemWindowInsetLeft(), in.getSystemWindowInsetTop(), in.getSystemWindowInsetRight(), in.getSystemWindowInsetBottom());
+                    return in;
+                }
+                int imeB = ime != null ? ime[3] : 0;
+                if (immersiveActive) v.setPadding(0, 0, 0, imeB); // toàn màn hình: chỉ chừa bàn phím
+                else v.setPadding(bars[0], bars[1], bars[2], Math.max(bars[3], imeB));
+                return in;
+            }
+        });
+    }
+
+    boolean immersiveActive = false;
+    /** WindowInsets.getInsets(Type.x()) có từ API 30, gọi qua reflection; trả {trái, trên, phải, dưới} hoặc null */
+    static int[] insetsOf(android.view.WindowInsets in, String type) {
+        if (Build.VERSION.SDK_INT < 30) return null;
+        try {
+            Class<?> T = Class.forName("android.view.WindowInsets$Type");
+            int mask = (Integer) T.getMethod(type).invoke(null);
+            Object ins = android.view.WindowInsets.class.getMethod("getInsets", int.class).invoke(in, mask);
+            Class<?> I = ins.getClass();
+            return new int[]{ I.getField("left").getInt(ins), I.getField("top").getInt(ins), I.getField("right").getInt(ins), I.getField("bottom").getInt(ins) };
+        } catch (Throwable e) { return null; }
+    }
+
+    void handleBack() {
+        if (web == null) { finish(); return; }
         // close an open dialog / menu first (same as pressing Esc)
         web.evaluateJavascript("(function(){try{return window.vincutBack?vincutBack():0}catch(e){return 0}})()", new ValueCallback<String>() {
             @Override

@@ -20,6 +20,9 @@
   $("#moreBtn").onclick = e => openMenu(e.currentTarget, [
     { h: "Khung hình" },
     ...[["9:16", "9:16 · TikTok/Reels"], ["16:9", "16:9 · YouTube"], ["1:1", "1:1 · Vuông"], ["4:5", "4:5 · Instagram"]].map(([v, l]) => ({ label: ($("#aspect").value === v ? "✓ " : "") + l, run: () => { const a = $("#aspect"); a.value = v; a.dispatchEvent(new Event("change")); } })),
+    ...((typeof openLMD === "function" || typeof openJizura === "function") ? [{ h: "Khu làm việc" }] : []),
+    ...(typeof openLMD === "function" ? [{ label: "Phim AI (LocalMiniDrama)", run: () => openLMD() }] : []),
+    ...(typeof openJizura === "function" ? [{ label: "JIZURA (lời bài hát)", run: () => openJizura() }] : []),
     { h: "Dự án" },
     { label: "Về màn hình dự án", run: () => showHome() }, { label: "Xuất file dự án (.json)", run: () => $("#saveProj").click() }, { label: "Nhập file dự án (.json)", run: () => $("#openProj").click() }, { label: "Dự án mới", run: () => newProject($("#aspect").value) } ]);
   // pinch on the timeline to zoom

@@ -39,5 +39,6 @@
 4. Run `./init.sh` before editing.
 
 ## Recommended Next Step
+- Bản Google Play: `play/README.md`. Lần nộp sau tăng CODE ≥ 19, chạy lại `node tools/play/screenshots.mjs` nếu giao diện đổi.
 - Hỏi người dùng kết quả thử Bravin Samsung trên Galaxy (feat-012) và PhimAI_Setup trên Windows (feat-007).
 - Khi dựng lại bản Samsung: xem `docs/SAMSUNG.md`, nhớ chép APK vào `downloads/` và bộ cài Windows vào `app/downloads/Bravin_Setup_Windows.exe`.

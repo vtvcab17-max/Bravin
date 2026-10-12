@@ -22,6 +22,7 @@ Before writing code (trước khi sửa bất cứ gì):
 | Định dạng `bravin-project` (Antifact → Bravin) | `docs/BRAVIN_PROJECT_FORMAT.md` |
 | Khu Phim AI (LocalMiniDrama) | `docs/PHIM_AI_LOCALMINIDRAMA.md`, `tools/phimai-installer/README.md` |
 | Bản Samsung (S Pen, DeX, Air actions), plugin trên APK | `docs/SAMSUNG.md` |
+| Bản Google Play (AAB, targetSdk 36, hồ sơ cửa hàng) | `play/README.md`, `play/DATA_SAFETY.md` |
 
 ## Working Rules (quy tắc làm việc)
 
@@ -64,6 +65,7 @@ CI (`.github/workflows/verify.yml`) chạy `init.sh` cho mỗi lần đẩy và 
 
 Dựng sản phẩm (chỉ khi người dùng cần tệp cài):
 - APK: `cd android && KS_PASS=<mật khẩu> VER=<x.y> CODE=<n> [FLAVOR=samsung] bash build.sh <đường dẫn app>` (khoá `vincut-release.jks` không có trong repo: chép vào `android/` lúc dựng rồi xoá). Bản Samsung công khai ở `downloads/Bravin_Samsung_<ver>.apk`.
+- Google Play: `FLAVOR=play` → `android/build/Bravin_Play.aab` (gói `com.bravinall.bravin`, targetSdk 36, qua `android/build_play.sh`). Mỗi lần nộp tăng `CODE`. Ảnh cửa hàng: `node tools/play/screenshots.mjs`.
 - Windows: theo `desktop/installer/README.txt` (payload lấy từ `desktop/app`). Dựng xong chép bộ cài vào `app/downloads/Bravin_Setup_Windows.exe` (link trong hộp thoại "Cần Bravin trên máy tính" của APK).
 - Bộ cài Phim AI: `tools/phimai-installer/README.md`.
 
@@ -79,6 +81,8 @@ Dựng sản phẩm (chỉ khi người dùng cần tệp cài):
 - Tệp `.ps1` có tiếng Việt phải lưu UTF-8 có BOM (Windows PowerShell 5.1).
 - Bản Windows chạy không cần mạng: không dùng CDN hay Google Fonts trong `desktop/app`.
 - `*.apk` bị `.gitignore` chặn, trừ `downloads/*.apk`.
+- Mã Java chung cho cả 3 bản APK/AAB: thay đổi `MainActivity` phải chạy được với targetSdk 34 (APK) và 36 (Play): tràn viền, quay lại bằng OnBackInvokedCallback.
+- Điện thoại 360–412 dp: thanh trên không được tràn ngang (kiểm thử khói đo). Nút mới trên thanh trên phải ẩn ở `body.phone` và vào menu ⋯ (`phone.js`).
 - Dựng Android với `android-23.jar`: API mới hơn (vd. `isInMultiWindowMode`) phải gọi qua reflection, thuộc tính manifest API 24+ làm aapt lỗi.
 
 ## End of Session (trước khi kết thúc)

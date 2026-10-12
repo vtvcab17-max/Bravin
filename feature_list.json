@@ -123,6 +123,28 @@
       "status": "blocked",
       "blocked_by": "Cần máy Galaxy thật",
       "evidence": ""
+    },
+    {
+      "id": "feat-013",
+      "name": "Bản Google Play (com.bravinall.bravin, AAB, targetSdk 36)",
+      "description": "Gói Android App Bundle ký bằng upload key, targetSdk 36 (bắt buộc từ 31/8/2026), xử lý edge-to-edge và predictive back của Android 15/16, tắt gỡ lỗi WebView, trang chính sách quyền riêng tư, bộ hồ sơ cửa hàng (mô tả, ảnh, Data safety) và hướng dẫn nộp Play Console",
+      "dependencies": [
+        "feat-011"
+      ],
+      "status": "done",
+      "version": "4.11",
+      "evidence": "FLAVOR=play: bundletool validate đạt, jarsigner 'jar verified' (upload key vincut-release.jks). APK universal sinh từ AAB: com.bravinall.bravin v18 '4.11' targetSdk 36 minSdk 24, assets lưu không nén, meta bravin-edition=play. Hồ sơ play/: tiêu đề/mô tả vi-VN + en-US trong giới hạn ký tự (static.mjs kiểm), 4 ảnh điện thoại 1080×1919, 2 ảnh máy tính bảng 2560×1600, feature graphic 1024×500, icon 512, DATA_SAFETY.md, release notes. Trang chính sách app/chinh-sach-rieng-tu.html (kiểm thử khói tải đạt). Sửa thêm: thanh trên tràn ngang ở 360/412 dp do nút Phim AI/JIZURA → chuyển vào menu ⋯ (kiểm thử khói 360/412 đạt)."
+    },
+    {
+      "id": "feat-014",
+      "name": "Thử bản Google Play trên Android 15/16 thật",
+      "description": "Cài Bravin_Play_4.11_universal.apk (hoặc qua kênh thử nghiệm nội bộ): tràn viền không che nội dung khi chia màn hình/DeX, bàn phím không che ô nhập, cử chỉ quay lại (predictive back) đóng hộp thoại rồi hỏi thoát, nhập/xuất video, xoay màn hình trên máy tính bảng (Android 16 bỏ khoá xoay).",
+      "dependencies": [
+        "feat-013"
+      ],
+      "status": "blocked",
+      "blocked_by": "Cần máy Android 15/16 thật hoặc kênh thử nghiệm nội bộ trên Play",
+      "evidence": ""
     }
   ]
 }

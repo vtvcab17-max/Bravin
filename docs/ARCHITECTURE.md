@@ -217,3 +217,6 @@ Antifact 1.1 → Xuất → "Gửi sang Bravin" tạo `.bravin.json` (`format:"b
 
 ## Bravin cho Samsung (4.11)
 APK thứ hai `app.bravin.samsung` dựng bằng `FLAVOR=samsung` (Air actions, cửa sổ DeX, biểu tượng riêng). `js/samsung.js`: vẽ tay S Pen theo lực nhấn thành lớp PNG trên track phủ, Air View, nhận DeX qua `VINCutAndroid.device()` + sự kiện `bravin-config`. `plugins.js`: trên mọi APK, Tiện ích/cài plugin hiện hộp thoại "Cần Bravin trên máy tính". Chi tiết: `docs/SAMSUNG.md`.
+
+## Bản Google Play (4.11)
+`android/build_play.sh` (gọi qua `FLAVOR=play bash build.sh`): aapt2 compile/link `--proto-format` → module base (manifest, resources.pb, res, assets, dex) → bundletool build-bundle (assets không nén) → ký upload key bằng jarsigner → `bundletool validate` + APK universal để thử. Gói `com.bravinall.bravin`, targetSdk 36, minSdk 24, tắt gỡ lỗi WebView. `MainActivity` (chung): `applyInsets` chừa thanh hệ thống/bàn phím khi tràn viền (Android 15+), `registerBackCallback` dùng OnBackInvokedCallback qua reflection + Proxy (Android 16 không gọi onBackPressed), immersive tắt khi DeX/chia màn hình. Hồ sơ cửa hàng trong `play/`, chính sách `app/chinh-sach-rieng-tu.html`.

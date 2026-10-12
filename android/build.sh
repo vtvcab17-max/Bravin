@@ -6,12 +6,14 @@ SDK=/usr/lib/android-sdk; JAR=$SDK/platforms/android-23/android.jar; BT=$SDK/bui
 APP=${1:-/home/claude/out/bravin/app}
 VER=${VER:-1.0}; CODE=${CODE:-1}
 # FLAVOR=samsung: bản Bravin Samsung (gói app.bravin.samsung, Air actions S Pen, cửa sổ DeX, biểu tượng có chữ S)
+# FLAVOR=play: bản Google Play (gói com.bravinall.bravin, Android App Bundle .aab, targetSdk 36) → build/Bravin_Play.aab
 FLAVOR=${FLAVOR:-standard}
-case "$FLAVOR" in standard|samsung) ;; *) echo "FLAVOR phải là standard hoặc samsung"; exit 1;; esac
+case "$FLAVOR" in standard|samsung|play) ;; *) echo "FLAVOR phải là standard, samsung hoặc play"; exit 1;; esac
 rm -rf build www && mkdir -p build/classes www/fonts
 # 1) web app → assets/www
 for f in "$APP"/*; do b=$(basename "$f"); case "$b" in index.html|index.before*|durs.txt|nm|node_modules|*.tflite|rot_vp9.mp4|downloads) ;; *) cp -r "$f" www/ ;; esac; done
-cp /home/claude/fonts_var/mont.ttf /home/claude/fonts_var/mont_i.ttf /home/claude/fonts_var/play_i.ttf www/fonts/
+FONTS=/home/claude/fonts_var; [ -f "$FONTS/mont.ttf" ] || FONTS=../desktop/app/fonts
+cp "$FONTS/mont.ttf" "$FONTS/mont_i.ttf" "$FONTS/play_i.ttf" www/fonts/
 python3 - "$APP/index.html" www/index.html "$FLAVOR" <<'PY'
 import sys,re
 s=open(sys.argv[1],encoding='utf-8').read()
@@ -27,9 +29,10 @@ head='''<!doctype html><html lang="vi"><head><meta charset="utf-8">
 html,body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent}
 </style>
 '''
-if sys.argv[3]=='samsung': head+='<meta name="bravin-edition" content="samsung">\n'
+if sys.argv[3] in ('samsung','play'): head+='<meta name="bravin-edition" content="%s">\n' % sys.argv[3]
 open(sys.argv[2],'w',encoding='utf-8').write(head+s+'\n</html>\n')
 PY
+if [ "$FLAVOR" = play ]; then exec env VER="$VER" CODE="$CODE" bash ./build_play.sh; fi
 # 2) resources + manifest (+ all assets stored uncompressed so video can seek)
 sed -e "s/android:versionCode=\"[0-9]*\"/android:versionCode=\"$CODE\"/" -e "s/android:versionName=\"[^\"]*\"/android:versionName=\"$VER\"/" AndroidManifest.xml > build/AndroidManifest.xml
 RES="-S res"; PKG=""

@@ -2,9 +2,9 @@
 
 ## Current State
 
-**Last Updated:** 2026-10-12 14:10 (UTC+7)
-**Phiên bản:** 4.11 trên web (https://bravin.vtvcab17.workers.dev). APK versionCode gần nhất: **18** (cả `app.vincut` và `app.bravin.samsung`)
-**Active Feature:** không có. Chờ người dùng thử trên thiết bị thật: feat-007 (Windows), feat-012 (Galaxy)
+**Last Updated:** 2026-10-12 14:30 (UTC+7)
+**Phiên bản:** 4.11 trên web (https://bravin.vtvcab17.workers.dev). versionCode gần nhất: **18** cho cả `app.vincut`, `app.bravin.samsung` và `com.bravinall.bravin` (Play; lần nộp sau phải ≥ 19)
+**Active Feature:** không có. Chờ người dùng: feat-007 (Windows), feat-012 (Galaxy), feat-014 (Android 15/16 / Play)
 
 ## Status
 
@@ -17,10 +17,13 @@
 
 - [x] 4.11 Bravin cho Samsung (feat-011): APK `app.bravin.samsung`, vẽ tay S Pen theo lực nhấn, Air View, Air actions, DeX; plugin trên mọi APK yêu cầu bản PC; trang `app/huong-dan/samsung.html`.
 
+- [x] 4.11 bản Google Play (feat-013): AAB `com.bravinall.bravin` targetSdk 36, hồ sơ `play/`, chính sách quyền riêng tư; sửa thanh trên tràn ngang trên điện thoại 360–412 dp.
+
 ### What's In Progress
 - [ ] feat-006/007: bộ cài Phim AI chưa được cài thử trên Windows thật.
 
 ### What's Next
+1. Người dùng nộp `Bravin_Play_4.11.aab` lên kênh thử nghiệm nội bộ theo `play/README.md`; tài khoản cá nhân mới cần thử nghiệm kín 12 người × 14 ngày trước khi phát hành chính thức (feat-014).
 1. Người dùng cài `downloads/Bravin_Samsung_4.11.apk` trên Galaxy có S Pen, thử Air actions + DeX (feat-012).
 1. Người dùng cài thử PhimAI_Setup_1.2.8.exe trên Windows (feat-007), gửi `server-error.log` nếu lỗi.
 2. Đổi mật khẩu keystore (feat-008) ở máy giữ khoá.
@@ -33,6 +36,8 @@
 - [ ] Bộ cài chưa ký số: Windows SmartScreen cảnh báo, người dùng phải bấm More info → Run anyway.
 
 ## Decisions Made
+- **Gói Play `com.bravinall.bravin`** (người dùng chọn): cài song song bản APK; upload key = `vincut-release.jks`; Google Play App Signing giữ khoá phát hành.
+- **Chỉ bản Play targetSdk 36**; APK tự phát hành vẫn 34. Mã Java chung đã xử lý tràn viền và predictive back nên nâng APK lên 36 sau này không cần sửa thêm.
 - **Bản Samsung là gói riêng `app.bravin.samsung`** (cài song song, dữ liệu riêng) thay vì chỉ một cờ trong APK thường: Air actions và cửa sổ DeX khai báo trong manifest, biểu tượng riêng để phân biệt.
 - **Plugin bị chặn trên mọi APK** (kể cả DeX) theo yêu cầu người dùng; bản web/Windows giữ nguyên.
 - **APK Samsung để ở `downloads/`** (28 MB > giới hạn 25 MiB của Cloudflare); `.gitignore` mở ngoại lệ `!downloads/*.apk`.
