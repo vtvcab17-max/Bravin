@@ -84,8 +84,31 @@
   }
   function permList(m) { return m.permissions.length ? "<ul class='plperms'>" + m.permissions.map(p => `<li>${esc(PERMS[p])}${p === "network" ? ": <b>" + esc(m.network.join(", ")) + "</b>" : ""}</li>`).join("") + "</ul>" : "<p class='note'>Plugin này không xin quyền nào.</p>"; }
 
+  /* ===== bản Android (APK): plugin chỉ có trên Bravin cho máy tính ===== */
+  const ON_APK = !!window.VINCutAndroid;
+  const PC_SETUP = "https://bravin.vtvcab17.workers.dev/downloads/Bravin_Setup_Windows.exe", PC_WEB = "https://bravin.vtvcab17.workers.dev/";
+  function pcOnly(what) {
+    if (document.querySelector(".pconly")) return null;
+    const dex = window.BravinSamsung && BravinSamsung.dex;
+    const ov = document.createElement("div"); ov.className = "overlay"; ov.style.zIndex = 85;
+    ov.innerHTML = `<div class="dialog pconly" role="dialog" aria-modal="true" aria-labelledby="pcoT" style="max-width:500px">
+      <h2 id="pcoT">Cần Bravin trên máy tính</h2>
+      <p>${esc(what || "Cài và dùng plugin")} chỉ có trên <b>Bravin cho máy tính</b> (Windows, hoặc bản web mở bằng Chrome/Edge trên máy tính)${dex ? ", kể cả khi đang dùng Samsung DeX" : ""}.</p>
+      <p class="note">Trên điện thoại và máy tính bảng, Bravin tắt plugin để máy nhẹ và an toàn: plugin chạy mã của bên thứ ba và cần quyền mạng, tệp.</p>
+      <ol class="pcsteps"><li>Trên máy tính, tải <b>Bravin cho Windows</b> hoặc mở bản web <b>bravin.vtvcab17.workers.dev</b>.</li><li>Mở <b>Tiện ích</b> (biểu tượng ổ cắm ở Thư viện) để cài plugin, chợ Micron.</li><li>Xuất dự án (.json) để chuyển qua lại giữa máy tính và điện thoại.</li></ol>
+      <div class="dlact" style="flex-wrap:wrap"><a class="btn primary" href="${PC_SETUP}" target="_blank" rel="noopener">⬇ Tải Bravin cho Windows</a><button type="button" class="pccopy">Chép link bản web</button><button type="button" class="pcclose">Đóng</button></div></div>`;
+    document.body.appendChild(ov);
+    const close = () => ov.remove();
+    ov.querySelector(".pcclose").onclick = close;
+    ov.querySelector(".pccopy").onclick = async () => { try { await navigator.clipboard.writeText(PC_WEB); toast("Đã chép " + PC_WEB); } catch (_) { toast(PC_WEB); } };
+    ov.addEventListener("pointerdown", e => { if (e.target === ov) close(); });
+    ov.addEventListener("keydown", e => { if (e.key === "Escape") close(); });
+    return null;
+  }
+
   /* ===== cài / gỡ ===== */
   async function install(parsed, opts = {}) {
+    if (ON_APK) return pcOnly("Cài plugin");
     const old = recs.find(r => r.id === parsed.id), m = parsed.manifest;
     if (!opts.silent) {
       const ok = await ask(old ? "Cập nhật plugin?" : "Cài plugin?",
@@ -98,11 +121,12 @@
     refreshUi(); toast((old ? "Đã cập nhật " : "Đã cài ") + m.name); return rec;
   }
   async function installFromUrl(u) {
+    if (ON_APK) return pcOnly("Cài plugin");
     let url; try { url = new URL(String(u).trim()); } catch (_) { throw perr("bad_url", "Link không hợp lệ."); }
     if (!(url.protocol === "https:" || (url.protocol === "http:" && /^(localhost|127\.0\.0\.1)$/.test(url.hostname)))) throw perr("bad_url", "Chỉ cài từ link https (hoặc http://localhost khi phát triển).");
     return install(await parseSource(await plFetchText(url.href), url.href));
   }
-  async function installFromFile(f) { return install(await parseSource(await f.text(), null)); }
+  async function installFromFile(f) { if (ON_APK) return pcOnly("Cài plugin"); return install(await parseSource(await f.text(), null)); }
   async function remove(id) {
     const r = recs.find(x => x.id === id); if (!r) return;
     if (!await ask("Gỡ plugin?", `<p>Gỡ <b>${esc(r.manifest.name)}</b> và xoá dữ liệu nó đã lưu?</p>`, "Gỡ")) return;
@@ -465,6 +489,7 @@
   function statusOf(L, r) { if (!r.enabled) return ["off", "Tắt"]; if (!L) return ["off", "Chưa chạy"]; return { loading: ["wait", "Đang tải…"], ready: ["ok", "Đang chạy"], silent: ["bad", "Không phản hồi"], error: ["bad", "Lỗi"] }[L.status] || ["wait", "…"]; }
   function refreshUi() { const d = document.querySelector(".plugdlg"), ov = d && d.parentElement; if (ov && ov._render) ov._render(); }
   function openPlugins() {
+    if (ON_APK) { pcOnly("Tiện ích (plugin, chợ Micron, extension)"); return; }
     if (document.querySelector(".plugdlg")) return;
     const ov = document.createElement("div"); ov.className = "overlay";
     ov.innerHTML = `<div class="dialog plugdlg" role="dialog" aria-modal="true" aria-labelledby="plgT">
@@ -507,7 +532,7 @@
   /* ===== khởi động ===== */
   async function init() {
     markReady();
-    recs = await dbAll(); recs.forEach(r => { if (r.enabled) load(r); });
+    recs = await dbAll(); if (!ON_APK) recs.forEach(r => { if (r.enabled) load(r); });
     const h = new URLSearchParams(location.hash.replace(/^#/, "")), q = new URLSearchParams(location.search);
     const imp = h.get("import") || q.get("import"), plg = h.get("plugin") || q.get("plugin");
     if (imp || plg) { try { history.replaceState(null, "", location.pathname); } catch (_) {} }
@@ -521,7 +546,7 @@
   if (typeof homeEl !== "undefined") {
     homeEl.addEventListener("click", e => { const b = e.target.closest('.hnav [data-go="plugins"]'); if (!b) return; e.stopImmediatePropagation(); homeEl.querySelectorAll(".hnav button").forEach(x => x.removeAttribute("aria-current")); homeEl.querySelector('.hnav [data-go="top"]')?.setAttribute("aria-current", "page"); openPlugins(); }, true);
   }
-  window.BravinPlugins = { list: () => recs.map(r => ({ id: r.id, name: r.manifest.name, enabled: r.enabled, status: (live.get(r.id) || {}).status || "off" })), installFromUrl, installFromFile, installParsed: install, parseSource, remove, openManager: openPlugins, commands, runCommand, PERMS };
+  window.BravinPlugins = { pcOnly, onApk: ON_APK, list: () => recs.map(r => ({ id: r.id, name: r.manifest.name, enabled: r.enabled, status: (live.get(r.id) || {}).status || "off" })), installFromUrl, installFromFile, installParsed: install, parseSource, remove, openManager: openPlugins, commands, runCommand, PERMS };
   window.openPlugins = openPlugins;
   init();
 })();

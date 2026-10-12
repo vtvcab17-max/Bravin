@@ -21,6 +21,7 @@ Before writing code (trước khi sửa bất cứ gì):
 | SDK plugin, chợ Micron | `docs/PLUGIN_SDK.md` |
 | Định dạng `bravin-project` (Antifact → Bravin) | `docs/BRAVIN_PROJECT_FORMAT.md` |
 | Khu Phim AI (LocalMiniDrama) | `docs/PHIM_AI_LOCALMINIDRAMA.md`, `tools/phimai-installer/README.md` |
+| Bản Samsung (S Pen, DeX, Air actions), plugin trên APK | `docs/SAMSUNG.md` |
 
 ## Working Rules (quy tắc làm việc)
 
@@ -62,8 +63,8 @@ npm run serve        # chạy thử ở http://localhost:8080
 CI (`.github/workflows/verify.yml`) chạy `init.sh` cho mỗi lần đẩy và PR.
 
 Dựng sản phẩm (chỉ khi người dùng cần tệp cài):
-- APK: `cd android && KS_PASS=<mật khẩu> VER=<x.y> CODE=<n> bash build.sh <đường dẫn app>`
-- Windows: theo `desktop/installer/README.txt` (payload lấy từ `desktop/app`).
+- APK: `cd android && KS_PASS=<mật khẩu> VER=<x.y> CODE=<n> [FLAVOR=samsung] bash build.sh <đường dẫn app>` (khoá `vincut-release.jks` không có trong repo: chép vào `android/` lúc dựng rồi xoá). Bản Samsung công khai ở `downloads/Bravin_Samsung_<ver>.apk`.
+- Windows: theo `desktop/installer/README.txt` (payload lấy từ `desktop/app`). Dựng xong chép bộ cài vào `app/downloads/Bravin_Setup_Windows.exe` (link trong hộp thoại "Cần Bravin trên máy tính" của APK).
 - Bộ cài Phim AI: `tools/phimai-installer/README.md`.
 
 ## Deploy
@@ -77,6 +78,8 @@ Dựng sản phẩm (chỉ khi người dùng cần tệp cài):
 - `makensis` gặp tên tệp không phải ASCII thì cần `LANG=C.UTF-8 LC_ALL=C.UTF-8`, nếu không sẽ segfault.
 - Tệp `.ps1` có tiếng Việt phải lưu UTF-8 có BOM (Windows PowerShell 5.1).
 - Bản Windows chạy không cần mạng: không dùng CDN hay Google Fonts trong `desktop/app`.
+- `*.apk` bị `.gitignore` chặn, trừ `downloads/*.apk`.
+- Dựng Android với `android-23.jar`: API mới hơn (vd. `isInMultiWindowMode`) phải gọi qua reflection, thuộc tính manifest API 24+ làm aapt lỗi.
 
 ## End of Session (trước khi kết thúc)
 

@@ -12,6 +12,7 @@ Trình dựng video chạy trên trình duyệt, Android và máy tính (bản w
 - Trợ lý AI: Claude trên claude.ai, hoặc "Luồng AI" dạng canvas (node AI, điều kiện, gộp, lặp…) với API chỉ cần dán mã, AI local qua đường link, hoặc model nhúng chạy ngay trong ứng dụng.
 - Xuất MP4 bằng WebCodecs, phụ đề SRT, FCP XML.
 - **Phim AI (4.10)**: nhúng LocalMiniDrama tiếng Việt (MIT © xuanyustudio) để AI viết kịch bản → phân cảnh → ảnh → video; tệp tạo xong tự vào thư viện, nút ＋ Dự án tạo dự án cùng tên phim. Hướng dẫn: `app/huong-dan/phim-ai.html` (trên web: `/huong-dan/phim-ai.html`), bộ cài Windows có sẵn Node.js và ffmpeg ở `downloads/PhimAI_Setup_1.2.8.exe` (cách dựng: `tools/phimai-installer/`), mã nguồn cho macOS/Linux ở `app/downloads/`. Chi tiết kỹ thuật: `docs/PHIM_AI_LOCALMINIDRAMA.md`.
+- **Bravin cho Samsung (4.11)**: APK riêng `app.bravin.samsung` với vẽ tay S Pen theo lực nhấn, Air View, Air actions, tự nhận Samsung DeX. Trên mọi bản Android, cài plugin yêu cầu dùng bản máy tính. Hướng dẫn: `app/huong-dan/samsung.html`, kỹ thuật: `docs/SAMSUNG.md`.
 
 ## Cấu trúc thư mục
 | Thư mục | Nội dung |

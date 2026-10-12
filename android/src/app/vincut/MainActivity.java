@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.hardware.display.DisplayManager;
 import android.view.Display;
 import android.database.Cursor;
@@ -179,7 +180,36 @@ public class MainActivity extends Activity {
         if (hasFocus) immersive();
     }
 
+    /** Samsung DeX (máy tính để bàn): đọc cờ ẩn của Samsung qua reflection, máy khác trả false */
+    boolean isDex() {
+        try {
+            Configuration c = getResources().getConfiguration(); Class<?> k = c.getClass();
+            return k.getField("SEM_DESKTOP_MODE_ENABLED").getInt(k) == k.getField("semDesktopModeEnabled").getInt(c);
+        } catch (Throwable e) { return false; }
+    }
+    /** isInMultiWindowMode() có từ API 24, dựng với android-23 nên gọi qua reflection */
+    boolean inMultiWindow() { try { return (Boolean) Activity.class.getMethod("isInMultiWindowMode").invoke(this); } catch (Throwable e) { return false; } }
+    String deviceJson() {
+        PackageManager pm = getPackageManager(); boolean spen = false;
+        try { spen = pm.hasSystemFeature("com.sec.feature.spen_usp"); } catch (Throwable ignored) { }
+        org.json.JSONObject o = new org.json.JSONObject();
+        try {
+            o.put("manufacturer", Build.MANUFACTURER); o.put("model", Build.MODEL); o.put("sdk", Build.VERSION.SDK_INT);
+            o.put("samsung", "samsung".equalsIgnoreCase(Build.MANUFACTURER)); o.put("spen", spen); o.put("dex", isDex());
+            o.put("package", getPackageName());
+            o.put("multiWindow", inMultiWindow());
+        } catch (Throwable ignored) { }
+        return o.toString();
+    }
+    @Override
+    public void onConfigurationChanged(Configuration nc) {
+        super.onConfigurationChanged(nc);
+        if (web != null) web.post(new Runnable() { public void run() { web.evaluateJavascript("window.dispatchEvent(new Event('bravin-config'))", null); } });
+        notifyDisplays();
+    }
+
     void immersive() {
+        if (isDex() || inMultiWindow()) return; // DeX / cửa sổ: giữ thanh tác vụ
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
                 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_FULLSCREEN);
@@ -284,6 +314,9 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public String displays() { return displaysJson(); }
+
+        @JavascriptInterface
+        public String device() { return deviceJson(); }
 
         @JavascriptInterface
         public void setOrientation(final String mode) {

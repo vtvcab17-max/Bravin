@@ -92,10 +92,17 @@ try {
     return "tải bộ cài + Bật Phim AI + Hướng dẫn";
   });
 
-  await step("Trang hướng dẫn Phim AI tải đủ ảnh", async () => {
+  await step("Bản web/PC: Tiện ích mở trình quản lý plugin", async () => {
+    await page.evaluate(() => openPlugins()); await page.waitForTimeout(200);
+    const r = await page.evaluate(() => ({ mgr: !!document.querySelector(".plugdlg"), pc: !!document.querySelector(".pconly") }));
+    await page.evaluate(() => document.querySelector(".plugdlg [data-close]")?.click());
+    assert(r.mgr && !r.pc, JSON.stringify(r)); return "không bị chặn";
+  });
+
+  for (const guide of ["phim-ai", "samsung"]) await step(`Trang hướng dẫn ${guide}.html tải đủ ảnh, không tràn`, async () => {
     const g = await ctx.newPage(); const errs = [];
     g.on("pageerror", (e) => errs.push(e.message));
-    const resp = await g.goto(`${BASE}/huong-dan/phim-ai.html`, { waitUntil: "load" });
+    const resp = await g.goto(`${BASE}/huong-dan/${guide}.html`, { waitUntil: "load" });
     assert(resp && resp.ok(), "HTTP " + (resp && resp.status()));
     await g.evaluate(async () => { for (const i of document.images) { i.loading = "eager"; } window.scrollTo(0, document.body.scrollHeight); await new Promise((r) => setTimeout(r, 800)); });
     const bad = await g.evaluate(() => [...document.images].filter((i) => !i.complete || !i.naturalWidth).map((i) => i.getAttribute("src")));
@@ -115,6 +122,64 @@ try {
   });
 
   await step("Không có lỗi JavaScript trong cả phiên", async () => { assert(!pageErrors.length, pageErrors.join(" | ")); });
+
+  // ---- Bản Samsung (APK giả lập: VINCutAndroid + meta bravin-edition) ----
+  const sctx = await browser.newContext({ viewport: { width: 1280, height: 800 }, userAgent: "Mozilla/5.0 (Linux; Android 14; SM-X916B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36 BravinSmoke" });
+  await sctx.route(/^https?:\/\/(?!127\.0\.0\.1)/, (r) => r.abort());
+  await sctx.route("**/index.html", async (r) => { const res = await r.fetch(); r.fulfill({ response: res, body: (await res.text()).replace("<head>", '<head><meta name="bravin-edition" content="samsung">') }); });
+  await sctx.addInitScript(() => { window.__dev = { manufacturer: "samsung", model: "SM-X916B", samsung: true, spen: true, dex: false }; window.VINCutAndroid = { version: () => "1.1", displays: () => '{"displays":[],"external":0}', device: () => JSON.stringify(window.__dev), setOrientation: () => {}, persistUrl: () => "" }; });
+  const sp = await sctx.newPage(); const sErr = []; sp.on("pageerror", (e) => sErr.push(String(e.message || e)));
+  await step("Samsung: nhận bản Samsung + S Pen, có nút Vẽ tay", async () => {
+    await sp.goto(`${BASE}/index.html`, { waitUntil: "load" }); await sp.waitForTimeout(2500);
+    const r = await sp.evaluate(() => ({ ed: BravinSamsung.edition, cls: document.body.className, btn: !!document.querySelector("#samDrawBtn") }));
+    assert(r.ed === "samsung" && /\bsamsung\b/.test(r.cls) && /\bspen\b/.test(r.cls) && r.btn, JSON.stringify(r));
+    return r.cls.replace(/\s*athome/, "");
+  });
+  await step("APK: bấm Tiện ích / cài plugin thì yêu cầu bản PC", async () => {
+    await sp.evaluate(() => openPlugins()); await sp.waitForTimeout(200);
+    const a = await sp.evaluate(() => ({ pc: !!document.querySelector(".pconly"), mgr: !!document.querySelector(".plugdlg"), dl: document.querySelector(".pconly a.btn")?.getAttribute("href") }));
+    await sp.evaluate(() => document.querySelector(".pconly .pcclose").click());
+    const b = await sp.evaluate(async () => { const r = await BravinPlugins.installFromUrl("https://example.com/manifest.json"); const pc = !!document.querySelector(".pconly"); document.querySelector(".pconly .pcclose")?.click(); return { r, pc }; });
+    assert(a.pc && !a.mgr && /Bravin_Setup_Windows\.exe$/.test(a.dl || ""), JSON.stringify(a));
+    assert(b.r === null && b.pc, "installFromUrl vẫn cài trên APK");
+    return "hộp thoại + link bộ cài Windows";
+  });
+  await step("Samsung: vẽ tay S Pen theo lực nhấn, bỏ qua lòng bàn tay, đưa vào timeline", async () => {
+    await sp.evaluate(() => newProject("16:9", "Thử S Pen")); await sp.waitForTimeout(500);
+    await sp.evaluate(() => openPenDraw()); await sp.waitForTimeout(200);
+    const r = await sp.evaluate(() => {
+      const c = document.querySelector(".sdraw canvas"), box = c.getBoundingClientRect();
+      const ev = (type, x, y, o) => c.dispatchEvent(new PointerEvent(type, Object.assign({ bubbles: true, cancelable: true, clientX: box.x + x * box.width, clientY: box.y + y * box.height, pointerId: 7, pointerType: "pen", pressure: 0.5, buttons: 1, button: 0, isPrimary: true }, o)));
+      ev("pointerdown", 0.1, 0.7, { pressure: 0.05 });
+      for (let i = 1; i <= 40; i++) ev("pointermove", 0.1 + i * 0.02, 0.7, { pressure: i / 40 });
+      ev("pointerup", 0.9, 0.7, { pressure: 0, buttons: 0 });
+      ev("pointerdown", 0.3, 0.2, { pointerId: 9, pointerType: "touch" }); ev("pointermove", 0.7, 0.2, { pointerId: 9, pointerType: "touch" }); ev("pointerup", 0.7, 0.2, { pointerId: 9, pointerType: "touch", buttons: 0 });
+      const g = c.getContext("2d"), W = c.width, H = c.height;
+      const col = (fx) => { const x = Math.round(fx * W), d = g.getImageData(x, 0, 1, H).data; let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 20) n++; return n; };
+      const top = (() => { const d = g.getImageData(0, 0, W, Math.round(H * 0.4)).data; let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i]) n++; return n; })();
+      return { thin: col(0.15), thick: col(0.85), top };
+    });
+    assert(r.thick > r.thin * 3, `nét không theo lực nhấn: đầu ${r.thin}px, cuối ${r.thick}px`);
+    assert(r.top === 0, "chạm ngón tay vẫn vẽ (không chống lòng bàn tay)");
+    await sp.evaluate(() => document.querySelector(".sdraw-done").click()); await sp.waitForTimeout(700);
+    const a = await sp.evaluate(() => ({ open: !!document.querySelector(".sdraw"), clip: C.map((c) => media.get(c.mediaId)?.name).find((n) => /^Vẽ tay/.test(n || "")) }));
+    assert(!a.open && a.clip, JSON.stringify(a));
+    return `nét ${r.thin}px → ${r.thick}px, ${a.clip} trên track phủ`;
+  });
+  await step("Samsung: Air View hiện chú thích khi rê bút", async () => {
+    const t = await sp.evaluate(async () => {
+      const el = document.querySelector("#samDrawBtn"), r = el.getBoundingClientRect();
+      el.dispatchEvent(new PointerEvent("pointermove", { bubbles: true, clientX: r.x + r.width / 2, clientY: r.y + r.height / 2, pointerType: "pen", buttons: 0 }));
+      await new Promise((res) => setTimeout(res, 500)); const tip = document.querySelector(".airview"); return tip && !tip.hidden ? tip.textContent : null;
+    });
+    assert(t, "không hiện chú thích"); return t;
+  });
+  await step("Samsung: nhận Samsung DeX khi cấu hình đổi", async () => {
+    const d = await sp.evaluate(async () => { window.__dev.dex = true; window.dispatchEvent(new Event("bravin-config")); await new Promise((r) => setTimeout(r, 150)); return document.body.classList.contains("dex"); });
+    assert(d, "không bật lớp dex"); return "body.dex";
+  });
+  await step("Samsung: không lỗi JavaScript", async () => { assert(!sErr.length, sErr.join(" | ")); });
+  await sctx.close();
 } finally {
   await browser.close(); server.kill();
 }

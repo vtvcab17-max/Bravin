@@ -26,6 +26,7 @@ function fakeContext(target, x, y) { longPressAt = performance.now(); haptic(10)
 window.addEventListener("pointerdown", e => {
   if (e.pointerType === "pen") {
     penLast = performance.now();
+    if (e.target.closest && e.target.closest(".sdraw")) return; // vẽ tay (samsung.js) tự xử lý bút
     if (penHoverHover) { penHoverHover = false; hoverOn = false; }
     if (e.button === 5 || (e.buttons & 32)) { // eraser end
       const d = e.target.closest && e.target.closest("#grid .clip"); if (d) { e.preventDefault(); e.stopImmediatePropagation(); const f = clipById(d.dataset.id); if (f && !isLocked(clipTrack(f.k, f.c))) { sel = { k: f.k, id: f.c.id }; deleteSel(); haptic(15); toast("Đã xoá clip bằng đầu tẩy."); } }

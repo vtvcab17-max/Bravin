@@ -2,9 +2,9 @@
 
 ## Current State
 
-**Last Updated:** 2026-10-12 10:45 (UTC+7)
-**Phiên bản:** 4.10 trên web (https://bravin.vtvcab17.workers.dev), APK versionCode gần nhất: **17**
-**Active Feature:** feat-007 Cài thử PhimAI_Setup trên Windows thật (đang chờ người dùng)
+**Last Updated:** 2026-10-12 14:10 (UTC+7)
+**Phiên bản:** 4.11 trên web (https://bravin.vtvcab17.workers.dev). APK versionCode gần nhất: **18** (cả `app.vincut` và `app.bravin.samsung`)
+**Active Feature:** không có. Chờ người dùng thử trên thiết bị thật: feat-007 (Windows), feat-012 (Galaxy)
 
 ## Status
 
@@ -15,25 +15,35 @@
 - [x] Harness: AGENTS.md, init.sh, tests/verify/, CI verify.yml thay pages.yml (luôn đỏ vì repo không bật GitHub Pages; web chạy trên Cloudflare).
 - [x] Xoá mật khẩu keystore khỏi docs/ARCHITECTURE.md; init.sh chặn tái phạm.
 
+- [x] 4.11 Bravin cho Samsung (feat-011): APK `app.bravin.samsung`, vẽ tay S Pen theo lực nhấn, Air View, Air actions, DeX; plugin trên mọi APK yêu cầu bản PC; trang `app/huong-dan/samsung.html`.
+
 ### What's In Progress
 - [ ] feat-006/007: bộ cài Phim AI chưa được cài thử trên Windows thật.
 
 ### What's Next
+1. Người dùng cài `downloads/Bravin_Samsung_4.11.apk` trên Galaxy có S Pen, thử Air actions + DeX (feat-012).
 1. Người dùng cài thử PhimAI_Setup_1.2.8.exe trên Windows (feat-007), gửi `server-error.log` nếu lỗi.
 2. Đổi mật khẩu keystore (feat-008) ở máy giữ khoá.
 3. Ký số bộ cài (feat-009) nếu có chứng chỉ.
 
 ## Blockers / Risks
+- [ ] Bản Samsung chưa thử trên Galaxy thật (Air actions, đầu tẩy, DeX reflection) – feat-012.
 - [ ] Windows thật: agent không chạy được .exe; chỉ kiểm tra được PE x64 + ABI better-sqlite3 v127 khớp Node 22.
 - [ ] Mật khẩu keystore cũ còn trong lịch sử git công khai (khoá .jks không có trong repo nên rủi ro thấp).
 - [ ] Bộ cài chưa ký số: Windows SmartScreen cảnh báo, người dùng phải bấm More info → Run anyway.
 
 ## Decisions Made
+- **Bản Samsung là gói riêng `app.bravin.samsung`** (cài song song, dữ liệu riêng) thay vì chỉ một cờ trong APK thường: Air actions và cửa sổ DeX khai báo trong manifest, biểu tượng riêng để phân biệt.
+- **Plugin bị chặn trên mọi APK** (kể cả DeX) theo yêu cầu người dùng; bản web/Windows giữ nguyên.
+- **APK Samsung để ở `downloads/`** (28 MB > giới hạn 25 MiB của Cloudflare); `.gitignore` mở ngoại lệ `!downloads/*.apk`.
 - **Bộ cài Phim AI để ở `downloads/` (ngoài `app/`)**: Cloudflare giới hạn 25 MiB/tệp; phiên Claude bị chặn tạo GitHub Releases. Tải qua raw.githubusercontent.
 - **Bỏ `.github/workflows/pages.yml`**: chưa từng chạy thành công; deploy thật là Cloudflare Workers. Thay bằng `verify.yml`.
 - **desktop/app là sản phẩm dựng** từ app/ bằng `tools/make_desktop_app.py`, không sửa tay.
 
 ## Files Modified This Session
+- 4.11 Samsung: `app/js/samsung.js` (mới), `app/js/plugins.js`, `app/js/input.js`, `app/css/app.css`, `app/index.html`, `app/huong-dan/samsung.html` (mới), `app/downloads/Bravin_Setup_Windows.exe`, `android/build.sh`, `android/res-samsung/` (mới), `android/src/app/vincut/MainActivity.java`, `desktop/installer/setup.nsi`, `downloads/Bravin_Samsung_4.11.apk`, `docs/SAMSUNG.md`, `tests/verify/smoke.mjs`
+
+### Phiên trước (harness)
 - `AGENTS.md`, `CLAUDE.md`, `init.sh`, `package.json`, `feature_list.json`, `progress.md`, `session-handoff.md`
 - `tests/verify/static.mjs`, `tests/verify/smoke.mjs`, `tests/serve_static.js` (thêm kiểu MIME svg/woff2/ttf…)
 - `.github/workflows/verify.yml` (mới), `.github/workflows/pages.yml` (xoá)

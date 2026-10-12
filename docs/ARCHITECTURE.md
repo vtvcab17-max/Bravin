@@ -213,3 +213,7 @@ Antifact 1.1 → Xuất → "Gửi sang Bravin" tạo `.bravin.json` (`format:"b
 - `js/antifact.js`: đọc schema 1 + 2: nhiều clip mỗi track, ảnh / video / âm thanh, keyframe (x, y, width, height, scale, rotation, opacity + easing → `c.kf`), hiệu ứng vào/ra (→ `c.anim`), camera 2D được "nướng" thành keyframe của từng lớp (15 mẫu/giây + thời điểm khoá), `parallax`. Báo cáo sau khi nhập liệt kê phần bỏ qua.
 - Thả file vào bất kỳ đâu: ở Trang chủ thì `.bravin.json` mở thành dự án mới; trong trình dựng thì `importFiles`. Thư viện và hộp phông chữ giữ trình xử lý riêng (`defaultPrevented`).
 - Đặc tả cho ứng dụng xuất file: `docs/BRAVIN_PROJECT_FORMAT.md`; file mẫu: `samples/bravin-project/`.
+
+
+## Bravin cho Samsung (4.11)
+APK thứ hai `app.bravin.samsung` dựng bằng `FLAVOR=samsung` (Air actions, cửa sổ DeX, biểu tượng riêng). `js/samsung.js`: vẽ tay S Pen theo lực nhấn thành lớp PNG trên track phủ, Air View, nhận DeX qua `VINCutAndroid.device()` + sự kiện `bravin-config`. `plugins.js`: trên mọi APK, Tiện ích/cài plugin hiện hộp thoại "Cần Bravin trên máy tính". Chi tiết: `docs/SAMSUNG.md`.

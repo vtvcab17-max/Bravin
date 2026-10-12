@@ -1,7 +1,12 @@
 {
   "project": "Bravin",
   "updated": "2026-10-12",
-  "statuses": ["not-started", "in-progress", "blocked", "done"],
+  "statuses": [
+    "not-started",
+    "in-progress",
+    "blocked",
+    "done"
+  ],
   "features": [
     {
       "id": "feat-001",
@@ -25,7 +30,9 @@
       "id": "feat-003",
       "name": "Motion Tracking (plugin Micron) + corner pin",
       "description": "examples/plugins/motion-tracking, app/js/cornerpin.js",
-      "dependencies": ["feat-002"],
+      "dependencies": [
+        "feat-002"
+      ],
       "status": "done",
       "version": "4.9",
       "evidence": "tests/motion-tracking/bench.js ở phiên 4.9."
@@ -52,7 +59,9 @@
       "id": "feat-006",
       "name": "Bộ cài Windows Phim AI một chạm",
       "description": "downloads/PhimAI_Setup_1.2.8.exe (Node 22 + thư viện Windows + ffmpeg), liên kết bravinlmd://start, thẻ cài đặt và tự nối trong khu Phim AI",
-      "dependencies": ["feat-005"],
+      "dependencies": [
+        "feat-005"
+      ],
       "status": "in-progress",
       "version": "4.10",
       "evidence": "Thẻ cài đặt và tự nối: Playwright (UA Windows) thấy nút tải + Bật Phim AI, bật máy chủ thì nối sau ~10 giây. Link tải trả 200, 63075059 byte. CHƯA cài thử trên Windows thật."
@@ -61,7 +70,9 @@
       "id": "feat-007",
       "name": "Cài thử PhimAI_Setup trên Windows thật",
       "description": "Cài trên Windows 10/11 sạch: bộ cài chạy, PhimAI.exe bật máy chủ, http://localhost:5679 mở được, Bravin web nối được, bravinlmd://start hoạt động, gỡ cài đặt giữ/xoá dữ liệu đúng. Nếu lỗi: lấy %LOCALAPPDATA%\\Programs\\PhimAI\\app\\backend-node\\data\\server-error.log",
-      "dependencies": ["feat-006"],
+      "dependencies": [
+        "feat-006"
+      ],
       "status": "blocked",
       "blocked_by": "Cần máy Windows thật (agent chỉ có Linux)",
       "evidence": ""
@@ -87,8 +98,30 @@
       "id": "feat-010",
       "name": "Dịch nốt tài liệu LocalMiniDrama",
       "description": "CHANGELOG, docs/plans, backend-node/README, desktop/README, openclaw-skill (repo LocalMiniDrama-vi, ngoài repo này)",
-      "dependencies": ["feat-005"],
+      "dependencies": [
+        "feat-005"
+      ],
       "status": "not-started",
+      "evidence": ""
+    },
+    {
+      "id": "feat-011",
+      "name": "Bravin cho Samsung (S Pen, DeX, Air actions)",
+      "description": "APK riêng app.bravin.samsung: vẽ tay S Pen theo lực nhấn, Air View (rê bút hiện chú thích), Air actions (vẫy bút điều khiển phát/cắt/hoàn tác), tự nhận Samsung DeX; trên mọi APK, bấm cài plugin thì yêu cầu dùng bản PC",
+      "dependencies": [],
+      "status": "done",
+      "version": "4.11",
+      "evidence": "./init.sh đạt: kiểm thử khói giả lập APK Samsung (stub VINCutAndroid + meta edition): nhận bản Samsung + S Pen; Tiện ích/installFromUrl hiện 'Cần Bravin trên máy tính' với link Bravin_Setup_Windows.exe; nét vẽ theo lực nhấn 4px → 26px, chạm ngón tay bị bỏ qua, 'Vẽ tay 1.png' vào track phủ; Air View hiện chú thích; body.dex khi bravin-config. Bản web vẫn mở trình quản lý plugin. aapt dump: app.bravin.samsung v18 'Bravin Samsung', REMOTE_ACTION + dex.launchwidth/height, 8 action, meta bravin-edition; bản thường app.vincut v18 không có meta."
+    },
+    {
+      "id": "feat-012",
+      "name": "Thử Bravin Samsung trên máy Galaxy thật",
+      "description": "Cài Bravin_Samsung_4.11.apk trên Galaxy có S Pen Bluetooth (Tab S, Note, S22–S24 Ultra): Air actions xuất hiện trong Cài đặt và điều khiển được phát/cắt/tua/hoàn tác; đầu tẩy xoá nét; lực nhấn thật; DeX mở cửa sổ 1440×900 và body.dex; hộp thoại plugin mở link tải Windows bằng trình duyệt ngoài.",
+      "dependencies": [
+        "feat-011"
+      ],
+      "status": "blocked",
+      "blocked_by": "Cần máy Galaxy thật",
       "evidence": ""
     }
   ]

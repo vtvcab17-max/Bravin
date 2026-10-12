@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Air actions (S Pen Remote): vẫy bút từ xa = phím tắt của Bravin.
+     Người dùng chỉnh trong Cài đặt > Tính năng nâng cao > S Pen > Air actions > Bravin Samsung. -->
+<remote-actions version="1.2">
+    <action id="bravin_play" label="@string/ra_play" priority="1" trigger_key="SPACE">
+        <preference name="gesture" value="click" />
+        <preference name="button_only" value="true" />
+    </action>
+    <action id="bravin_split" label="@string/ra_split" priority="2" trigger_key="S">
+        <preference name="gesture" value="double_click" />
+        <preference name="button_only" value="true" />
+    </action>
+    <action id="bravin_back" label="@string/ra_back" priority="3" trigger_key="DPAD_LEFT">
+        <preference name="gesture" value="swipe_left" />
+        <preference name="motion_only" value="true" />
+    </action>
+    <action id="bravin_fwd" label="@string/ra_fwd" priority="4" trigger_key="DPAD_RIGHT">
+        <preference name="gesture" value="swipe_right" />
+        <preference name="motion_only" value="true" />
+    </action>
+    <action id="bravin_marker" label="@string/ra_marker" priority="5" trigger_key="M">
+        <preference name="gesture" value="swipe_up" />
+        <preference name="motion_only" value="true" />
+    </action>
+    <action id="bravin_keyframe" label="@string/ra_keyframe" priority="6" trigger_key="K">
+        <preference name="gesture" value="swipe_down" />
+        <preference name="motion_only" value="true" />
+    </action>
+    <action id="bravin_undo" label="@string/ra_undo" priority="7" trigger_key="CTRL+Z">
+        <preference name="gesture" value="circle_ccw" />
+        <preference name="motion_only" value="true" />
+    </action>
+    <action id="bravin_redo" label="@string/ra_redo" priority="8" trigger_key="CTRL+Y">
+        <preference name="gesture" value="circle_cw" />
+        <preference name="motion_only" value="true" />
+    </action>
+</remote-actions>

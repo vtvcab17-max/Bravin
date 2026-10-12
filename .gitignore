@@ -8,3 +8,6 @@ node_modules/
 *.apk
 .DS_Store
 Thumbs.db
+
+# Bản phát hành công khai (tải qua raw.githubusercontent)
+!downloads/*.apk

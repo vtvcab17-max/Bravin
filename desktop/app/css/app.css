@@ -567,3 +567,33 @@ body.phone .ltabs{flex-wrap:nowrap}
 #plugDock .plugwrap.large iframe{height:auto;flex:1;min-height:0}
 @media (max-width:700px){#plugDock.large{left:0;right:0;top:0;bottom:0}#plugDock.large .plugwrap.large{border-radius:0}#plugDock .plugwrap.large iframe{height:auto}}
 .afdrop{position:fixed;inset:12px;z-index:90;border:3px dashed var(--accent);border-radius:16px;background:rgba(5,10,12,.72);display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;font-size:18px;font-weight:600;pointer-events:none}
+
+/* ---------- Bravin cho Samsung (samsung.js): Air View, vẽ tay S Pen, cài đặt; plugin cần bản PC ---------- */
+.airview{position:fixed;z-index:200;max-width:260px;padding:6px 10px;border-radius:10px;background:rgba(20,22,30,.95);color:#fff;font-size:12.5px;line-height:1.35;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.35)}
+.sdraw{position:fixed;inset:0;z-index:90;background:#0b0c0f;display:flex;flex-direction:column;color:var(--fg,#e7e7ec)}
+.sdraw-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:8px 12px;border-bottom:1px solid var(--line)}
+.sdraw-bar b{font-size:16px}
+.sdraw-colors{display:flex;gap:6px}
+.sdc{width:28px;height:28px;min-width:28px;padding:0;border-radius:50%;background:var(--c)!important;border:2px solid rgba(255,255,255,.25)!important}
+.sdc[aria-pressed=true]{outline:3px solid var(--accent,#7b6cf6);outline-offset:2px}
+.sdraw-size{display:flex;align-items:center;gap:6px;font-size:13px}.sdraw-size input{width:110px}
+.sdraw-stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:12px}
+.sdraw-frame{position:relative;flex:none;background:#000;border-radius:6px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.08)}
+.sdraw-frame img,.sdraw-frame canvas{position:absolute;inset:0;width:100%;height:100%}
+.sdraw-frame img{opacity:.55;object-fit:contain}
+.sdraw-frame canvas{touch-action:none;cursor:crosshair}
+.sdraw-hint{margin:0;padding:0 14px 12px;font-size:12px;color:var(--muted)}
+body.sdraw-open{overscroll-behavior:none}
+.samopts{display:flex;flex-direction:column;gap:8px;margin:8px 0}
+.samopts .chk{align-items:flex-start;gap:8px;font-size:13.5px}
+.samtbl{width:100%;border-collapse:collapse;font-size:13px;margin:4px 0 8px}
+.samtbl th,.samtbl td{text-align:left;padding:5px 6px;border-bottom:1px solid var(--line)}
+.samtbl th{color:var(--muted);font-size:12px}
+.pconly .dlact{display:flex;gap:8px;margin-top:10px}
+.pconly .dlact a.btn{display:inline-flex;align-items:center;text-decoration:none;border-radius:999px;padding:9px 16px;font-weight:700}
+.pconly .dlact a.btn.primary{background:var(--accent,#7b6cf6);color:#fff}
+.pconly p{margin:6px 0;line-height:1.55}.pconly .pcsteps{margin:6px 0;padding-left:20px;line-height:1.6;font-size:13.5px}
+body.spen #samDrawBtn{color:var(--acc-hi,#8e81f8)}
+/* DeX: chuột chính xác, nút gọn hơn bản cảm ứng */
+body.dex .menu button{min-height:30px}
+.samdlg{max-height:calc(100dvh - 32px);overflow:auto}

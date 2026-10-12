@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bravin cho Samsung · Hướng dẫn</title>
+<meta name="description" content="Bravin Samsung 4.11: vẽ tay S Pen theo lực nhấn, Air View, Air actions, Samsung DeX. Cài đặt và cách dùng.">
+<link rel="icon" href="../icons/icon-32.png">
+<style>
+@font-face{font-family:"Plus Jakarta Sans";src:url(../fonts/jakarta-vietnamese.woff2) format("woff2");font-weight:200 800;font-display:swap;unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:"Plus Jakarta Sans";src:url(../fonts/jakarta-latin-ext.woff2) format("woff2");font-weight:200 800;font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+1EF2-1EFF}
+@font-face{font-family:"Plus Jakarta Sans";src:url(../fonts/jakarta-latin.woff2) format("woff2");font-weight:200 800;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2212}
+:root{--bg:#131417;--panel:#1b1c21;--panel2:#24252c;--fg:#e7e7ec;--muted:#9d9ea9;--accent:#7b6cf6;--acc-hi:#8e81f8;--acc-ct:#2a2550;--on-acc-ct:#d6d0fd;--gold:#f2c14e;--ok:#3ddc84;--bad:#ef6a5a;--line:rgba(255,255,255,.07);--code:#0e0f12}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f6f6f9;--panel:#fff;--panel2:#eeeef4;--fg:#1b1c21;--muted:#5f6070;--accent:#5b4be0;--acc-hi:#6c5ce7;--acc-ct:#e9e6ff;--on-acc-ct:#3b2fa8;--gold:#a8740a;--ok:#11834a;--bad:#c23a2b;--line:rgba(0,0,0,.08);--code:#f0f0f5}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:500 16px/1.65 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:var(--acc-hi)}
+code,kbd{font:13.5px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--code);padding:2px 6px;border-radius:6px}
+pre{background:var(--code);padding:12px 14px;border-radius:12px;overflow:auto;font:13.5px/1.5 ui-monospace,Menlo,Consolas,monospace}
+.wrap{max-width:880px;margin:0 auto;padding:0 16px}
+header.top{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;align-items:center;gap:12px;height:56px}
+header.top img{width:26px;height:26px}
+header.top b{font-size:16px}
+header.top .sp{flex:1}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:10px 18px;font-weight:700;text-decoration:none;background:var(--panel2);color:var(--fg);white-space:nowrap}
+.btn.primary{background:var(--accent);color:#fff}
+.btn.primary:hover{background:var(--acc-hi)}
+.hero{padding:44px 0 18px}
+.hero .eyebrow{color:var(--acc-hi);font-weight:700;letter-spacing:.04em;font-size:13px;text-transform:uppercase}
+.hero h1{font-size:clamp(30px,6vw,46px);line-height:1.12;margin:8px 0 14px;letter-spacing:-.01em}
+.hero p{color:var(--muted);font-size:18px;margin:0 0 22px;max-width:680px}
+.cta{display:flex;flex-wrap:wrap;gap:10px}
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:28px 0 8px}
+.flow div{background:var(--panel);border-radius:16px;padding:14px}
+.flow b{display:block;font-size:14px}.flow span{color:var(--muted);font-size:13px}
+nav.toc{background:var(--panel);border-radius:18px;padding:14px 18px;margin:26px 0}
+nav.toc b{font-size:13px;color:var(--muted)}
+nav.toc ol{margin:6px 0 0;padding-left:20px;columns:2;column-gap:28px}
+nav.toc a{color:var(--fg);text-decoration:none}nav.toc a:hover{color:var(--acc-hi)}
+section{padding:22px 0 8px;scroll-margin-top:64px}
+h2{font-size:24px;margin:0 0 10px;display:flex;align-items:center;gap:10px}
+h2 .n{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--acc-ct);color:var(--on-acc-ct);font-size:15px}
+h3{font-size:17px;margin:18px 0 6px}
+ol.steps{padding-left:22px}ol.steps li{margin:6px 0}
+figure{margin:16px 0;background:var(--panel);border-radius:16px;overflow:hidden}
+figure img{display:block;width:100%;height:auto}
+figcaption{padding:10px 14px;color:var(--muted);font-size:14px}
+.note{background:var(--acc-ct);color:var(--on-acc-ct);border-radius:14px;padding:12px 16px;margin:14px 0}
+.warn{background:color-mix(in srgb,var(--gold) 16%,var(--panel));border-radius:14px;padding:12px 16px;margin:14px 0}
+.tbl{overflow-x:auto;margin:12px 0}
+table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:560px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:700;font-size:13px}
+details{background:var(--panel);border-radius:14px;padding:12px 16px;margin:10px 0}
+summary{cursor:pointer;font-weight:700}
+footer{color:var(--muted);font-size:14px;padding:30px 0 50px;border-top:1px solid var(--line);margin-top:30px}
+@media (max-width:640px){.flow{grid-template-columns:1fr 1fr}nav.toc ol{columns:1}header.top .hide-s{display:none}.hero p{font-size:16px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <img src="../icons/icon.svg" alt=""><b>Bravin</b><span class="hide-s" style="color:var(--muted)">· cho Samsung</span>
+  <span class="sp"></span>
+  <a class="btn primary" href="https://github.com/vtvcab17-max/Bravin/raw/main/downloads/Bravin_Samsung_4.11.apk">Tải APK</a>
+</div></header>
+<main class="wrap">
+  <div class="hero">
+    <div class="eyebrow">Bravin 4.11 · Bản riêng cho Galaxy</div>
+    <h1>Dựng video bằng S Pen, mở rộng ra DeX</h1>
+    <p>Bravin Samsung là bản Android riêng cho máy Galaxy: vẽ tay theo lực nhấn của S Pen, rê bút xem chú thích, vẫy bút từ xa để phát, cắt, hoàn tác, và tự chuyển giao diện máy tính khi cắm Samsung DeX.</p>
+    <div class="cta">
+      <a class="btn primary" href="https://github.com/vtvcab17-max/Bravin/raw/main/downloads/Bravin_Samsung_4.11.apk">⬇ Tải Bravin Samsung 4.11 (APK, 28 MB)</a>
+      <a class="btn" href="#cai-dat">Cách cài</a>
+    </div>
+    <div class="flow" aria-label="Tính năng">
+      <div><b>Vẽ tay S Pen</b><span>nét to nhỏ theo lực nhấn, đầu tẩy, chống chạm lòng bàn tay</span></div>
+      <div><b>Air View</b><span>rê bút trên nút để xem chú thích</span></div>
+      <div><b>Air actions</b><span>vẫy bút: phát, cắt, tua, hoàn tác</span></div>
+      <div><b>Samsung DeX</b><span>cửa sổ rộng, chuột, phím tắt như PC</span></div>
+    </div>
+  </div>
+
+  <nav class="toc" aria-label="Mục lục"><b>Mục lục</b>
+    <ol>
+      <li><a href="#cai-dat">Cài Bravin Samsung</a></li>
+      <li><a href="#ve-tay">Vẽ tay bằng S Pen</a></li>
+      <li><a href="#air-view">Air View và cử chỉ bút</a></li>
+      <li><a href="#air-actions">Air actions</a></li>
+      <li><a href="#dex">Samsung DeX</a></li>
+      <li><a href="#plugin">Plugin cần bản PC</a></li>
+      <li><a href="#hoi-dap">Hỏi đáp</a></li>
+    </ol>
+  </nav>
+
+  <section id="cai-dat">
+    <h2><span class="n">1</span>Cài Bravin Samsung</h2>
+    <ol class="steps">
+      <li>Trên máy Galaxy, tải <a href="https://github.com/vtvcab17-max/Bravin/raw/main/downloads/Bravin_Samsung_4.11.apk"><b>Bravin_Samsung_4.11.apk</b></a>.</li>
+      <li>Mở tệp vừa tải. Nếu máy hỏi, bật <b>Cho phép từ nguồn này</b> cho trình duyệt hoặc ứng dụng Tệp của tôi, rồi bấm <b>Cài đặt</b>.</li>
+      <li>Biểu tượng <b>Bravin Samsung</b> có chữ S xanh ở góc. Bản này cài <b>song song</b> với Bravin thường, dự án lưu riêng; chuyển dự án bằng <b>Xuất .json</b> / <b>Mở dự án</b>.</li>
+    </ol>
+    <div class="note">Hợp với Galaxy Tab S, Galaxy S Ultra, Galaxy Z Fold (có S Pen), và mọi máy Galaxy chạy Android 7 trở lên. Máy không có S Pen vẫn dùng được, chỉ không có phần bút.</div>
+  </section>
+
+  <section id="ve-tay">
+    <h2><span class="n">2</span>Vẽ tay bằng S Pen</h2>
+    <ol class="steps">
+      <li>Mở một dự án, đặt kim ở chỗ muốn vẽ.</li>
+      <li>Bấm nút <b>✎</b> (cạnh nút Tiện ích trên thanh timeline), hoặc Tiện ích → <b>Vẽ tay bằng S Pen</b>, hoặc <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> trên bàn phím.</li>
+      <li>Vẽ trên khung hình đang hiện: <b>đè mạnh nét to, đè nhẹ nét mảnh</b>. Lật <b>đầu tẩy</b> của bút (hoặc chọn ⌫ Tẩy) để xoá.</li>
+      <li>Ô <b>Chỉ nhận bút</b> bật sẵn: tay tì lên màn hình không vẽ bậy. Muốn vẽ bằng ngón tay thì bỏ chọn.</li>
+      <li>Bấm <b>Đưa vào timeline</b>: nét vẽ thành ảnh trong suốt dài 3 giây trên track phủ tại kim. Kéo dài, đổi vị trí, thêm keyframe như clip thường.</li>
+    </ol>
+  </section>
+
+  <section id="air-view">
+    <h2><span class="n">3</span>Air View và cử chỉ bút</h2>
+    <div class="tbl"><table>
+      <tr><th>Thao tác</th><th>Kết quả</th></tr>
+      <tr><td>Rê bút trên một nút</td><td>Hiện chú thích nút đó (Air View). Tắt trong Tiện ích → Cài đặt S Pen và DeX.</td></tr>
+      <tr><td>Rê bút trên timeline</td><td>Xem trước khung hình tại vị trí bút</td></tr>
+      <tr><td>Nút bên + chạm, hoặc giữ bút</td><td>Mở menu chuột phải</td></tr>
+      <tr><td>Đầu tẩy chạm clip trên timeline</td><td>Xoá clip đó</td></tr>
+      <tr><td>Đặt bút gần màn hình</td><td>Tự bỏ qua lòng bàn tay trên timeline và khung xem</td></tr>
+    </table></div>
+  </section>
+
+  <section id="air-actions">
+    <h2><span class="n">4</span>Air actions (vẫy bút từ xa)</h2>
+    <p>Rút S Pen ra, giữ nút bên và vẫy. Bật ở <b>Cài đặt → Tính năng nâng cao → S Pen → Air actions → Bravin Samsung</b>; ở đó đổi được từng thao tác.</p>
+    <div class="tbl"><table>
+      <tr><th>Thao tác bút</th><th>Bravin làm</th><th>Phím tương đương</th></tr>
+      <tr><td>Bấm nút bút</td><td>Phát / dừng</td><td><kbd>Space</kbd></td></tr>
+      <tr><td>Bấm đúp nút bút</td><td>Cắt clip tại kim</td><td><kbd>S</kbd></td></tr>
+      <tr><td>Vẫy sang trái / phải</td><td>Lùi / tiến 1 khung hình</td><td><kbd>←</kbd> <kbd>→</kbd></td></tr>
+      <tr><td>Vẫy lên</td><td>Đặt / bỏ đánh dấu</td><td><kbd>M</kbd></td></tr>
+      <tr><td>Vẫy xuống</td><td>Thêm keyframe</td><td><kbd>K</kbd></td></tr>
+      <tr><td>Xoay ngược / theo chiều kim đồng hồ</td><td>Hoàn tác / làm lại</td><td><kbd>Ctrl+Z</kbd> <kbd>Ctrl+Y</kbd></td></tr>
+    </table></div>
+    <div class="warn">Air actions cần S Pen có Bluetooth: Galaxy Note10 trở lên, S22–S24 Ultra, Tab S6 trở lên (trừ dòng Lite/FE), hoặc bút S Pen Pro. Galaxy S25 Ultra và các dòng Lite/FE không có Air actions; vẽ tay, Air View và cử chỉ bút vẫn dùng được.</div>
+  </section>
+
+  <section id="dex">
+    <h2><span class="n">5</span>Samsung DeX</h2>
+    <ol class="steps">
+      <li>Bật DeX (kéo thanh thông báo → DeX, hoặc cắm cáp HDMI / màn hình USB-C).</li>
+      <li>Mở Bravin Samsung: cửa sổ mở rộng 1440×900, giao diện máy tính đầy đủ, không khoá xoay, giữ thanh tác vụ DeX.</li>
+      <li>Dùng chuột (chuột phải mở menu) và bàn phím: mọi phím tắt kiểu Premiere như bản PC. Kéo giãn cửa sổ thoải mái, Bravin tự sắp lại.</li>
+    </ol>
+  </section>
+
+  <section id="plugin">
+    <h2><span class="n">6</span>Plugin cần bản PC</h2>
+    <p>Trên mọi bản Android (Bravin và Bravin Samsung, kể cả khi dùng DeX), bấm <b>Tiện ích</b> hoặc cài plugin sẽ hiện thông báo <b>Cần Bravin trên máy tính</b>. Plugin chạy mã của bên thứ ba và cần quyền mạng, tệp nên chỉ mở trên máy tính.</p>
+    <div class="cta"><a class="btn" href="../downloads/Bravin_Setup_Windows.exe">⬇ Bravin cho Windows</a><a class="btn" href="../">Bản web (Chrome/Edge trên máy tính)</a></div>
+  </section>
+
+  <section id="hoi-dap">
+    <h2><span class="n">7</span>Hỏi đáp</h2>
+    <details><summary>Có cần gỡ Bravin thường không?</summary><p>Không. Hai bản cài song song, dữ liệu riêng. Chuyển dự án bằng Xuất .json rồi Mở dự án ở bản kia.</p></details>
+    <details><summary>Nét vẽ có xuất ra video không?</summary><p>Có. Nét vẽ là một lớp ảnh PNG trên track phủ nên xuất video như mọi lớp khác.</p></details>
+    <details><summary>Không thấy Bravin Samsung trong danh sách Air actions?</summary><p>Mở Bravin Samsung một lần rồi xem lại. Máy phải có S Pen Bluetooth (xem mục 4).</p></details>
+  </section>
+</main>
+<footer><div class="wrap">Bravin 4.11 · Bản Samsung · <a href="../">Mở Bravin</a> · <a href="phim-ai.html">Hướng dẫn Phim AI</a></div></footer>
+</body>
+</html>

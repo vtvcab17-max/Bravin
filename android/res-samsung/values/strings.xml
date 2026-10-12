@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ra_play">Phát / dừng</string>
+    <string name="ra_split">Cắt tại kim</string>
+    <string name="ra_back">Lùi 1 khung hình</string>
+    <string name="ra_fwd">Tiến 1 khung hình</string>
+    <string name="ra_marker">Đặt / bỏ đánh dấu</string>
+    <string name="ra_keyframe">Thêm keyframe</string>
+    <string name="ra_undo">Hoàn tác</string>
+    <string name="ra_redo">Làm lại</string>
+</resources>
