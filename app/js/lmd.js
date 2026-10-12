@@ -53,7 +53,7 @@ async function lmdCheck() {
       mixed ? "Bravin đang chạy qua https nên trình duyệt chặn địa chỉ http trong mạng LAN. Mở Bravin bản Windows, hoặc chạy LocalMiniDrama trên chính máy này và dùng http://localhost:5679."
         : window.VINCutAndroid && /localhost|127\.0\.0\.1/.test(LMD.base)
           ? "Trên điện thoại, LocalMiniDrama chạy ở máy tính: nhập địa chỉ máy tính trong cùng Wi-Fi vào ô bên trên, ví dụ http://192.168.1.5:5679, rồi bấm Kiểm tra."
-          : "Chạy LocalMiniDrama trên máy: mở thư mục LocalMiniDrama-vi, bấm đúp CHAY_PHIM_AI.bat (cần Node.js 18 trở lên). Nếu đổi cổng, sửa địa chỉ ở ô bên trên rồi bấm Kiểm tra.");
+          : "Phim AI chưa chạy trên máy này. Chưa cài thì tải bộ cài ở trên; đã cài thì bấm «▶ Bật Phim AI» hoặc biểu tượng Phim AI trên Desktop. Đổi cổng thì sửa ô địa chỉ phía trên.");
     LMD.health = null; return out;
   }
   LMD.health = h;
@@ -194,14 +194,48 @@ function lmdStatus(msg) {
   chip.className = "lmdchip " + (LMD.hello ? "ok" : LMD.health ? "warn" : "bad");
   chip.textContent = LMD.hello ? `Đã nối · LMD ${LMD.hello.version || ""}` : LMD.health ? "Máy chủ có, chưa bắt tay" : "Chưa nối";
 }
+const LMD_DL = {
+  win: "https://github.com/vtvcab17-max/Bravin/raw/main/downloads/PhimAI_Setup_1.2.8.exe",
+  winSize: "63 MB",
+  src: "https://bravin.vtvcab17.workers.dev/downloads/LocalMiniDrama-vi_1.2.8.zip",
+  guide: "huong-dan/phim-ai.html",
+};
+const lmdOS = () => window.VINCutAndroid || /Android|iPhone|iPad/i.test(navigator.userAgent) ? "mobile" : /Windows/i.test(navigator.userAgent) ? "win" : "other";
+function lmdInstallCard() {
+  const os = lmdOS(), g = LMD_DL.guide;
+  if (os === "mobile") return `<div class="lmdinst"><h3>Phim AI chạy trên máy tính</h3>
+    <ol><li>Cài Phim AI trên máy tính Windows: mở <b>bravin.vtvcab17.workers.dev</b> trên máy tính → Phim AI → Tải bộ cài.</li>
+    <li>Máy tính và điện thoại dùng chung Wi-Fi. Trên máy tính gõ <code>ipconfig</code> để xem địa chỉ IPv4, ví dụ 192.168.1.5.</li>
+    <li>Nhập <code>http://192.168.1.5:5679</code> vào ô địa chỉ phía trên rồi bấm ra ngoài.</li></ol>
+    <p class="lmdnew"><a href="${g}#dien-thoai" target="_blank" rel="noopener">Xem hướng dẫn chi tiết</a></p></div>`;
+  const dl = os === "win"
+    ? `<a class="lmdbig primary" href="${LMD_DL.win}">⬇ Tải Phim AI cho Windows <small>${LMD_DL.winSize} · có sẵn mọi thứ, không cần cài thêm</small></a>`
+    : `<a class="lmdbig primary" href="${LMD_DL.src}">⬇ Tải Phim AI cho macOS / Linux <small>12 MB · cần Node.js 18 trở lên</small></a>`;
+  const steps = os === "win"
+    ? `<li><b>Tải bộ cài</b> bằng nút bên dưới.</li><li><b>Mở tệp vừa tải</b> → Tiếp → Cài đặt → Xong (để nguyên ô «Bật Phim AI ngay»). Không cần quyền quản trị.</li><li><b>Chờ vài giây</b>: Bravin tự nối và mở Phim AI. Lần sau chỉ cần bấm «▶ Bật Phim AI».</li>`
+    : `<li>Cài <a href="https://nodejs.org" target="_blank" rel="noopener">Node.js 18+</a>.</li><li>Tải và giải nén gói bên dưới, mở Terminal trong thư mục đó, chạy <code>bash chay_phim_ai.sh</code>.</li><li>Chờ vài giây: Bravin tự nối và mở Phim AI.</li>`;
+  return `<div class="lmdinst"><h3>Cài Phim AI để bắt đầu</h3><ol>${steps}</ol>
+    <div class="row wrap">${dl}${os === "win" ? '<a class="lmdbig" href="bravinlmd://start" title="Dành cho máy đã cài Phim AI">▶ Bật Phim AI <small>đã cài rồi thì bấm đây</small></a>' : ""}</div>
+    <p class="lmdwait"><span class="lmdspin"></span> Đang chờ Phim AI chạy trên máy này…</p>
+    <p class="lmdnew"><a href="${g}" target="_blank" rel="noopener">Hướng dẫn sử dụng</a>${os === "win" ? ` · <a href="${LMD_DL.src}">mã nguồn (macOS/Linux)</a>` : ""}</p></div>`;
+}
+function lmdWaitServer() {
+  clearInterval(LMD.waitT);
+  LMD.waitT = setInterval(async () => {
+    if (!LMD.panel) { clearInterval(LMD.waitT); return; }
+    try { const r = await fetch(LMD.base + "/health", { cache: "no-store" }); if (r.ok) { clearInterval(LMD.waitT); toast("Phim AI đã chạy, đang nối…"); lmdConnect(true); } } catch (_) {}
+  }, 3000);
+}
 function lmdRenderCheck(list) {
   const box = LMD.panel && LMD.panel.querySelector(".lmdcheck"); if (!box) return;
   const bad = list.filter(x => !x.ok && !x.warn);
-  box.innerHTML = `<h3>Kiểm tra độ tương thích</h3><ul></ul><div class="row"><button type="button" class="primary" data-a="re">Kiểm tra lại</button>${bad.length ? "" : '<button type="button" data-a="go">Mở Phim AI</button>'}</div>${bad.length ? '<p class="lmdnew">Chưa có LocalMiniDrama? <a href="huong-dan/phim-ai.html#cai-dat" target="_blank" rel="noopener">Xem hướng dẫn cài</a> · <a href="https://bravin.vtvcab17.workers.dev/downloads/LocalMiniDrama-vi_1.2.8.zip">tải LocalMiniDrama-vi</a></p>' : ""}`;
+  const noServer = list[0] && !list[0].ok && list[0].name === "Máy chủ LocalMiniDrama";
+  box.innerHTML = (noServer ? lmdInstallCard() : "") + `<h3>${noServer ? "Chi tiết kiểm tra" : "Kiểm tra độ tương thích"}</h3><ul></ul><div class="row"><button type="button" class="${noServer ? "" : "primary"}" data-a="re">Kiểm tra lại</button>${bad.length ? "" : '<button type="button" data-a="go">Mở Phim AI</button>'}</div>${bad.length && !noServer ? `<p class="lmdnew"><a href="${LMD_DL.guide}#su-co" target="_blank" rel="noopener">Xem cách xử lý sự cố</a></p>` : ""}`;
   const ul = box.querySelector("ul");
   for (const x of list) { const li = document.createElement("li"); li.className = x.ok ? "ok" : x.warn ? "warn" : "bad"; li.innerHTML = `<b></b><span></span>${x.fix ? "<small></small>" : ""}`; li.querySelector("b").textContent = (x.ok ? "✓ " : x.warn ? "! " : "✕ ") + x.name; li.querySelector("span").textContent = x.info; if (x.fix) li.querySelector("small").textContent = x.fix; ul.appendChild(li); }
   box.querySelector('[data-a="re"]').onclick = () => lmdConnect(true);
   const go = box.querySelector('[data-a="go"]'); if (go) go.onclick = () => lmdShowFrame();
+  if (noServer) lmdWaitServer(); else clearInterval(LMD.waitT);
 }
 function lmdShowFrame() {
   const p = LMD.panel; if (!p) return; p.querySelector(".lmdcheck").hidden = true;
@@ -242,7 +276,7 @@ function openLMD() {
   lmdStatus(); lmdConnect(false);
 }
 function closeLMD() {
-  if (!LMD.open) return; LMD.open = false; window.removeEventListener("resize", LMD.place || (() => {})); try { LMD.ro && LMD.ro.disconnect(); } catch (_) {}
+  if (!LMD.open) return; LMD.open = false; clearInterval(LMD.waitT); window.removeEventListener("resize", LMD.place || (() => {})); try { LMD.ro && LMD.ro.disconnect(); } catch (_) {}
   if (LMD.frame) { LMD.frame.classList.remove("show"); LMD.frame.removeAttribute("style"); }
   LMD.panel && LMD.panel.remove(); LMD.panel = null; document.body.classList.remove("jzopen");
   if (typeof renderAll === "function") renderAll(); if (typeof drawFrame === "function") drawFrame();

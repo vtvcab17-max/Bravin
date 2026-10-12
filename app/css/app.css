@@ -466,12 +466,23 @@ body.phone .ltabs{flex-wrap:nowrap}
 .lmdcheck{max-width:720px;margin:28px auto;padding:0 16px}
 .lmdcheck h3{margin:0 0 12px}
 .lmdcheck ul{list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column;gap:8px}
-.lmdcheck li{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:10px;border:1px solid var(--line)}
-.lmdcheck li.ok b{color:#3ddc84}.lmdcheck li.warn b{color:var(--gold,#f2c14e)}.lmdcheck li.bad b{color:#ff6b6b}
-.lmdcheck li span{font-size:13px;opacity:.85}.lmdcheck li small{font-size:12px;opacity:.75}
+.lmdcheck ul li{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:10px;border:1px solid var(--line)}
+.lmdcheck ul li.ok b{color:#3ddc84}.lmdcheck ul li.warn b{color:var(--gold,#f2c14e)}.lmdcheck ul li.bad b{color:#ff6b6b}
+.lmdcheck ul li span{font-size:13px;opacity:.85}.lmdcheck ul li small{font-size:12px;opacity:.75}
 .lmdcheck .row{display:flex;gap:8px}
 .lmdhelp{font-size:13px;color:var(--acc-hi,#8e81f8);text-decoration:none;white-space:nowrap;padding:6px 4px}.lmdhelp:hover{text-decoration:underline}
-.lmdnew{font-size:13px;opacity:.85;margin-top:14px}.lmdnew a{color:var(--acc-hi,#8e81f8)}
+.lmdnew{font-size:13px;opacity:.85;margin-top:14px}
+.lmdinst{background:var(--panel,#1b1c21);border-radius:18px;padding:18px 20px;margin:0 0 22px}
+.lmdinst h3{margin:0 0 8px;font-size:18px}
+.lmdinst ol{margin:0 0 14px;padding-left:20px;line-height:1.6;font-size:14px}.lmdinst li{margin:3px 0}
+.lmdinst code{font-size:12.5px;background:rgba(127,127,127,.18);padding:1px 6px;border-radius:6px}
+.lmdinst .row.wrap{flex-wrap:wrap}
+.lmdbig{display:inline-flex;flex-direction:column;gap:2px;text-decoration:none;color:inherit;background:var(--panel2,#24252c);border-radius:16px;padding:12px 18px;font-weight:700;font-size:15px}
+.lmdbig small{font-weight:500;font-size:12px;opacity:.8}
+.lmdbig.primary{background:var(--accent,#7b6cf6);color:#fff}.lmdbig.primary:hover{background:var(--acc-hi,#8e81f8)}
+.lmdwait{display:flex;align-items:center;gap:8px;font-size:13px;opacity:.85;margin:14px 0 0}
+.lmdspin{width:12px;height:12px;border-radius:50%;border:2px solid currentColor;border-right-color:transparent;animation:lmdspin .9s linear infinite}
+@keyframes lmdspin{to{transform:rotate(360deg)}}.lmdnew a{color:var(--acc-hi,#8e81f8)}
 @media (max-width:1180px){.lmdurl{width:130px}.lmdpanel .jzsub{display:none}}
 @media (max-width:860px){.lmdpanel .jzbar{flex-wrap:wrap}.lmdurl,.lmdpanel .lmdst{display:none}}
 

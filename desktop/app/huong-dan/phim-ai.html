@@ -63,7 +63,7 @@ footer{color:var(--muted);font-size:14px;padding:30px 0 50px;border-top:1px soli
 <header class="top"><div class="wrap">
   <img src="../icons/icon.svg" alt=""><b>Bravin</b><span class="hide-s" style="color:var(--muted)">· Hướng dẫn Phim AI</span>
   <span class="sp"></span>
-  <a class="btn hide-s" href="../downloads/LocalMiniDrama-vi_1.2.8.zip" download>Tải LocalMiniDrama</a>
+  <a class="btn hide-s" href="https://github.com/vtvcab17-max/Bravin/raw/main/downloads/PhimAI_Setup_1.2.8.exe">Tải Phim AI</a>
   <a class="btn primary" href="../">Mở Bravin</a>
 </div></header>
 
@@ -73,7 +73,8 @@ footer{color:var(--muted);font-size:14px;padding:30px 0 50px;border-top:1px soli
     <h1>Làm phim ngắn bằng AI, tệp tự chạy vào timeline</h1>
     <p>Khu Phim AI đưa LocalMiniDrama (bản tiếng Việt) vào ngay trong Bravin. AI viết kịch bản, tách phân cảnh, tạo ảnh và video. Tệp nào tạo xong sẽ tự nằm trong thư viện Bravin để bạn dựng tiếp.</p>
     <div class="cta">
-      <a class="btn primary" href="../downloads/LocalMiniDrama-vi_1.2.8.zip" download>⬇ Tải LocalMiniDrama-vi 1.2.8 (12 MB)</a>
+      <a class="btn primary" href="https://github.com/vtvcab17-max/Bravin/raw/main/downloads/PhimAI_Setup_1.2.8.exe">⬇ Tải Phim AI cho Windows (63 MB)</a>
+      <a class="btn" href="../downloads/LocalMiniDrama-vi_1.2.8.zip" download>macOS / Linux (12 MB)</a>
       <a class="btn" href="#cai-dat">Xem cách cài</a>
     </div>
     <div class="flow" aria-label="Quy trình">
@@ -104,22 +105,30 @@ footer{color:var(--muted);font-size:14px;padding:30px 0 50px;border-top:1px soli
     <div class="tbl"><table>
       <tr><th>Thứ cần có</th><th>Ghi chú</th></tr>
       <tr><td>Máy tính Windows, macOS hoặc Linux</td><td>LocalMiniDrama chạy trên máy tính. Điện thoại dùng được qua Wi-Fi (xem mục 8).</td></tr>
-      <tr><td><b>Node.js 18 trở lên</b></td><td>Tải bản LTS ở <a href="https://nodejs.org" target="_blank" rel="noopener">nodejs.org</a>, cài như phần mềm thường.</td></tr>
+      <tr><td>Bộ cài <b>Phim AI cho Windows</b></td><td>Có sẵn Node.js và ffmpeg, cài là dùng. macOS/Linux dùng gói mã nguồn và cần <a href="https://nodejs.org" target="_blank" rel="noopener">Node.js 18+</a>.</td></tr>
       <tr><td>Bravin 4.10</td><td>Bản web (trang này), bản Windows hoặc bản Android đều có khu Phim AI.</td></tr>
       <tr><td>API Key của dịch vụ AI</td><td>Ít nhất một mô hình văn bản. Muốn có ảnh/video thì thêm mô hình ảnh và video (Volcengine Seedance, Kling, Gemini, Tongyi…). Bạn trả phí trực tiếp cho nhà cung cấp.</td></tr>
-      <tr><td>ffmpeg (không bắt buộc)</td><td>Chỉ cần khi ghép video cả tập. Xem mục 9.</td></tr>
+
     </table></div>
   </section>
 
   <section id="cai-dat">
-    <h2><span class="n">2</span>Cài và chạy LocalMiniDrama</h2>
+    <h2><span class="n">2</span>Cài Phim AI</h2>
+    <h3>Windows 10/11 (khuyên dùng)</h3>
     <ol class="steps">
-      <li>Tải <a href="../downloads/LocalMiniDrama-vi_1.2.8.zip" download><b>LocalMiniDrama-vi_1.2.8.zip</b></a> rồi giải nén ra một thư mục, ví dụ <code>D:\LocalMiniDrama-vi</code>.</li>
-      <li><b>Windows:</b> bấm đúp <code>CHAY_PHIM_AI.bat</code>.<br><b>macOS / Linux:</b> mở Terminal trong thư mục đó, chạy <code>bash chay_phim_ai.sh</code>.</li>
-      <li>Lần đầu, tập lệnh tự cài thư viện (vài phút, cần mạng). Các lần sau mở gần như ngay.</li>
-      <li>Thấy dòng <code>Server started on port 5679</code> là xong. Trình duyệt tự mở <code>http://localhost:5679</code>.</li>
+      <li>Tải <a href="https://github.com/vtvcab17-max/Bravin/raw/main/downloads/PhimAI_Setup_1.2.8.exe"><b>PhimAI_Setup_1.2.8.exe</b></a> (63 MB). Bộ cài có sẵn Node.js, thư viện và ffmpeg, không phải cài gì thêm.</li>
+      <li>Mở tệp vừa tải. Nếu Windows hiện «Windows protected your PC», bấm <b>More info</b> → <b>Run anyway</b>.</li>
+      <li>Bấm <b>Tiếp</b> → <b>Cài đặt</b> → <b>Xong</b>, để nguyên ô <b>«Bật Phim AI ngay»</b>. Không cần quyền quản trị.</li>
+      <li>Lần đầu, Windows có thể hỏi cho phép <b>Node.js</b> qua tường lửa: chọn <b>Allow</b> (cần nếu muốn dùng từ điện thoại).</li>
     </ol>
-    <div class="note"><b>Giữ cửa sổ dòng lệnh mở</b> trong lúc làm phim. Đóng nó là tắt LocalMiniDrama. Dữ liệu phim nằm trong <code>backend-node/data/</code>, không gửi lên mạng.</div>
+    <p>Từ lần sau: bấm biểu tượng <b>Phim AI</b> trên Desktop, hoặc nút <b>▶ Bật Phim AI</b> ngay trong Bravin (trình duyệt hỏi mở PhimAI.exe thì chọn Mở). Tắt: Start Menu → Phim AI → <b>Tắt Phim AI</b>.</p>
+    <div class="note">Phim AI chạy ngầm trên máy, không có cửa sổ. Dữ liệu phim nằm ở <code>%LOCALAPPDATA%\Programs\PhimAI\app\backend-node\data</code>, không gửi lên mạng. Dùng một mình (không qua Bravin) thì mở <code>http://localhost:5679</code>.</div>
+    <h3>macOS / Linux</h3>
+    <ol class="steps">
+      <li>Cài <a href="https://nodejs.org" target="_blank" rel="noopener">Node.js 18 trở lên</a> (bản LTS).</li>
+      <li>Tải <a href="../downloads/LocalMiniDrama-vi_1.2.8.zip" download><b>LocalMiniDrama-vi_1.2.8.zip</b></a>, giải nén, mở Terminal trong thư mục đó, chạy <code>bash chay_phim_ai.sh</code>. Lần đầu tự cài thư viện (vài phút).</li>
+      <li>Muốn ghép video cả tập thì cài thêm ffmpeg (<code>brew install ffmpeg</code> hoặc <code>sudo apt install ffmpeg</code>).</li>
+    </ol>
   </section>
 
   <section id="mo-khu">
@@ -128,8 +137,9 @@ footer{color:var(--muted);font-size:14px;padding:30px 0 50px;border-top:1px soli
       <li>Mở Bravin, mở hoặc tạo một dự án.</li>
       <li>Bấm nút <b>Phim AI</b> trên thanh trên cùng (cạnh JIZURA). Ở Trang chủ có thêm ô <b>Phim AI</b> trong phần công cụ.</li>
       <li>Bravin tự <b>kiểm tra độ tương thích</b>. Đạt hết thì giao diện LocalMiniDrama hiện ngay trong khu, góc trên có nhãn xanh <b>Đã nối · LMD 1.2.8-vi</b>.</li>
+      <li>Chưa cài hoặc chưa bật Phim AI thì khu hiện thẻ <b>Cài Phim AI để bắt đầu</b> với nút tải bộ cài và nút <b>▶ Bật Phim AI</b>. Trang tự chờ: Phim AI vừa chạy là Bravin nối ngay, không cần tải lại.</li>
     </ol>
-    <figure><img src="anh/1-kiem-tra.jpg" alt="Khu Phim AI báo chưa kết nối được máy chủ LocalMiniDrama, kèm cách sửa" loading="lazy" width="1200" height="713"><figcaption>Khi LocalMiniDrama chưa chạy, khu Phim AI chỉ rõ mục nào lỗi và cách sửa. Chạy <code>CHAY_PHIM_AI.bat</code> rồi bấm <b>Kiểm tra lại</b>.</figcaption></figure>
+    <figure><img src="anh/1-kiem-tra.jpg" alt="Khu Phim AI hiện thẻ Cài Phim AI để bắt đầu với nút tải bộ cài Windows và nút Bật Phim AI" loading="lazy" width="1200" height="713"><figcaption>Chưa có Phim AI trên máy: khu hiện nút <b>⬇ Tải Phim AI cho Windows</b> và <b>▶ Bật Phim AI</b>, rồi tự chờ. Phim AI vừa chạy là Bravin nối ngay.</figcaption></figure>
     <div class="tbl"><table>
       <tr><th>Mục kiểm tra</th><th>Ý nghĩa</th></tr>
       <tr><td>Máy chủ LocalMiniDrama</td><td>LocalMiniDrama đang chạy ở địa chỉ trong ô trên thanh (mặc định <code>http://localhost:5679</code>).</td></tr>
@@ -193,7 +203,7 @@ footer{color:var(--muted);font-size:14px;padding:30px 0 50px;border-top:1px soli
   <section id="dien-thoai">
     <h2><span class="n">8</span>Dùng trên điện thoại</h2>
     <ol class="steps">
-      <li>Chạy LocalMiniDrama trên máy tính như mục 2. Điện thoại và máy tính dùng chung Wi-Fi.</li>
+      <li>Cài và bật Phim AI trên máy tính như mục 2. Điện thoại và máy tính dùng chung Wi-Fi.</li>
       <li>Xem địa chỉ IP của máy tính. Windows: mở Command Prompt, gõ <code>ipconfig</code>, lấy dòng <i>IPv4 Address</i>, ví dụ <code>192.168.1.5</code>.</li>
       <li>Trên app Bravin Android, mở <b>Phim AI</b>, sửa ô địa chỉ thành <code>http://192.168.1.5:5679</code>, bấm ra ngoài để kiểm tra lại.</li>
       <li>Lần đầu, Windows có thể hỏi cho phép Node.js qua tường lửa: chọn <b>Private networks</b> → <b>Allow</b>.</li>
@@ -205,11 +215,11 @@ footer{color:var(--muted);font-size:14px;padding:30px 0 50px;border-top:1px soli
     <h2><span class="n">9</span>Xử lý sự cố</h2>
     <div class="tbl"><table>
       <tr><th>Hiện tượng</th><th>Cách xử lý</th></tr>
-      <tr><td>✕ Máy chủ LocalMiniDrama</td><td>Chạy <code>CHAY_PHIM_AI.bat</code>, chờ dòng <code>Server started on port 5679</code>, bấm <b>Kiểm tra lại</b>. Đổi cổng thì sửa ô địa chỉ cho khớp.</td></tr>
-      <tr><td>Tập lệnh báo «Chua co Node.js»</td><td>Cài Node.js LTS ở nodejs.org, đóng rồi mở lại tập lệnh.</td></tr>
+      <tr><td>✕ Máy chủ LocalMiniDrama</td><td>Chưa cài: tải bộ cài ở mục 2. Đã cài: bấm <b>▶ Bật Phim AI</b> trong Bravin hoặc biểu tượng Phim AI trên Desktop, chờ vài giây. Vẫn lỗi: xem <code>…\PhimAI\app\backend-node\data\server-error.log</code>.</td></tr>
+      <tr><td>macOS/Linux: báo thiếu Node.js</td><td>Cài Node.js LTS ở nodejs.org rồi chạy lại <code>bash chay_phim_ai.sh</code>.</td></tr>
       <tr><td>Cài thư viện thất bại</td><td>Kiểm tra mạng rồi chạy lại. Đừng chép thư mục <code>node_modules</code> từ máy khác.</td></tr>
       <tr><td>✕ Cầu nối Bravin</td><td>Bạn đang chạy LocalMiniDrama bản gốc. Dùng bản LocalMiniDrama-vi tải ở trang này.</td></tr>
-      <tr><td>! ffmpeg</td><td>Chép <code>ffmpeg.exe</code> từ gói LocalMiniDrama gốc (<code>backend-node/tools/ffmpeg/ffmpeg.exe</code>) vào cùng chỗ trong LocalMiniDrama-vi, hoặc tải bản «essentials» ở <a href="https://www.gyan.dev/ffmpeg/builds/" target="_blank" rel="noopener">gyan.dev</a> và chép <code>bin/ffmpeg.exe</code> vào <code>backend-node/tools/ffmpeg/</code>. macOS/Linux: cài ffmpeg vào PATH. Chạy lại LocalMiniDrama.</td></tr>
+      <tr><td>! ffmpeg</td><td>Bộ cài Windows đã có sẵn ffmpeg. macOS/Linux: cài ffmpeg (<code>brew install ffmpeg</code> / <code>sudo apt install ffmpeg</code>) rồi chạy lại.</td></tr>
       <tr><td>Tệp không vào thư viện</td><td>Kiểm tra ô <b>Tự đẩy vào thư viện</b> đang bật và đang có dự án Bravin mở (tên hiện trên thanh). Phim mới nối lần đầu thì bấm <b>⇪ Đẩy ngay</b>.</td></tr>
       <tr><td>Bravin báo «Không mở được … »</td><td>Trình duyệt không đọc được định dạng video đó. Dùng Chrome hoặc Edge mới.</td></tr>
       <tr><td>AI báo lỗi khoá / mô hình</td><td>Vào <b>Cấu hình AI</b>, bấm <b>Kiểm tra</b> từng dòng, sửa API Key hoặc tên mô hình.</td></tr>
@@ -226,6 +236,6 @@ footer{color:var(--muted);font-size:14px;padding:30px 0 50px;border-top:1px soli
   </section>
 </main>
 
-<footer><div class="wrap">Bravin 4.10 · Khu Phim AI dùng <a href="https://github.com/xuanyustudio/LocalMiniDrama" target="_blank" rel="noopener">LocalMiniDrama</a> (MIT © xuanyustudio), bản tiếng Việt. · <a href="../">Mở Bravin</a></div></footer>
+<footer><div class="wrap">Bravin 4.10 · Phim AI 1.2.8 cho Windows có sẵn Node.js 22 và ffmpeg · Khu Phim AI dùng <a href="https://github.com/xuanyustudio/LocalMiniDrama" target="_blank" rel="noopener">LocalMiniDrama</a> (MIT © xuanyustudio), bản tiếng Việt. · <a href="../">Mở Bravin</a></div></footer>
 </body>
 </html>

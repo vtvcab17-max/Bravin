@@ -1,0 +1,27 @@
+PHIM AI 1.2.8 – LocalMiniDrama tiếng Việt (bản cài Windows)
+
+DÙNG CÙNG BRAVIN
+1. Mở Bravin (bản web https://bravin.vtvcab17.workers.dev/ hoặc bản Windows) -> bấm "Phim AI".
+2. Nếu Phim AI chưa bật, bấm "Bật Phim AI" trong Bravin (trình duyệt hỏi mở PhimAI.exe thì chọn Mở),
+   hoặc bấm biểu tượng "Phim AI" trên Desktop. Bravin tự nối lại sau vài giây.
+3. Vào "Cấu hình AI" (góc trên phải) dán API Key của dịch vụ AI, bấm Kiểm tra.
+4. Làm phim. Ảnh/video/âm thanh tạo xong tự vào thư viện Bravin (nhóm "Phim AI").
+   Nút "+ Dự án" tạo dự án Bravin cùng tên phim.
+
+DÙNG MỘT MÌNH
+- Bấm "Phim AI" trên Desktop: máy chủ bật ngầm và trình duyệt mở http://localhost:5679
+
+TẮT
+- Start Menu -> Phim AI -> "Tắt Phim AI".
+
+LẦN ĐẦU
+- Windows có thể hỏi cho phép "Node.js" qua tường lửa: chọn Private networks -> Allow
+  (cần nếu muốn dùng từ điện thoại qua Wi-Fi: http://<IP máy tính>:5679).
+
+DỮ LIỆU
+- Phim, ảnh, video, cấu hình AI nằm ở: %LOCALAPPDATA%\Programs\PhimAI\app\backend-node\data
+- Gỡ cài đặt sẽ hỏi có xoá dữ liệu hay không.
+- Nhật ký lỗi: ...\app\backend-node\data\server-error.log
+
+Hướng dẫn đầy đủ: https://bravin.vtvcab17.workers.dev/huong-dan/phim-ai.html
+LocalMiniDrama: MIT © xuanyustudio. Bản tiếng Việt và cầu nối Bravin: MIT.
