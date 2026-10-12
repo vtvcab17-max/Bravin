@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+  body{padding:12px}
+  .row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--bv-line)}
+  input{width:100%;box-sizing:border-box;padding:8px;margin:10px 0 6px;border-radius:7px;border:1px solid var(--bv-line);background:var(--bv-panel);color:inherit;font:inherit}
+  button{padding:8px 12px;border-radius:7px;border:0;background:var(--bv-accent);color:#fff;font:inherit;cursor:pointer}
+  #err{color:#ff8a80;margin-top:6px}
+</style></head>
+<body>
+  <div class="row"><span>Thời lượng</span><b id="dur">–</b></div>
+  <div class="row"><span>Số clip</span><b id="n">–</b></div>
+  <div class="row"><span>Clip chữ</span><b id="nt">–</b></div>
+  <div class="row"><span>Đang chọn</span><b id="s">–</b></div>
+  <input id="txt" placeholder="Chữ cần thêm tại kim" value="Xin chào Bravin">
+  <button id="add">Thêm chữ tại kim</button><div id="err"></div>
+  <script src="bravin-sdk.js"></script>
+  <script src="app.js"></script>
+</body></html>

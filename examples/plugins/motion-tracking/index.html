@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Motion Tracking</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div class="clipbox" id="clipBox"><b id="clipName">Chưa chọn clip</b><span id="clipMeta" class="mut"></span></div>
+    <button id="pickClip" class="btn">Dùng clip đang chọn</button>
+    <label class="fld">Kiểu theo dõi
+      <select id="model">
+        <option value="persp">Phối cảnh (mặt phẳng)</option>
+        <option value="sim">Vị trí + xoay + tỉ lệ</option>
+        <option value="trans">Chỉ vị trí</option>
+      </select></label>
+    <label class="fld">Độ chi tiết
+      <select id="quality"><option value="480">Nhanh</option><option value="720" selected>Cân bằng</option><option value="960">Chính xác</option></select></label>
+    <button id="helpBtn" class="btn ghost" title="Xem hướng dẫn" aria-label="Xem hướng dẫn">?</button>
+  </header>
+  <main class="main">
+    <section class="stage" id="stage">
+      <div class="tools" id="tools" role="toolbar" aria-label="Công cụ">
+        <button class="tool on" data-tool="pen" title="Bút: bấm để thêm điểm, bấm điểm đầu để khép vùng (P)">✎ Bút</button>
+        <button class="tool" data-tool="edit" title="Sửa: kéo điểm, kéo trong vùng để dời cả vùng (V)">⤧ Sửa</button>
+        <button class="tool" id="clearPoly" title="Xoá vùng và dữ liệu theo dõi">✕ Xoá vùng</button>
+      </div>
+      <div class="view" id="view"><canvas id="cvFrame"></canvas><canvas id="cvOv"></canvas>
+        <div class="empty" id="empty"><p><b>Chọn một clip video</b> trên timeline Bravin rồi bấm <b>Dùng clip đang chọn</b>.</p><p class="mut">Hoặc chuột phải vào clip → <i>Motion Tracking: theo dõi clip này</i>.</p></div>
+        <div class="busy" id="busy" hidden></div>
+      </div>
+      <p class="hint" id="hint" aria-live="polite"></p>
+    </section>
+    <aside class="side">
+      <div class="card" id="trackBox">
+        <h3>Theo dõi</h3>
+        <div class="trk" id="trackBtns">
+          <button class="btn" data-trk="-1,0" title="Theo dõi ngược về đầu clip (Shift+←)">◀◀</button>
+          <button class="btn" data-trk="-1,1" title="Lùi 1 khung có theo dõi">◀</button>
+          <button class="btn" data-trk="1,1" title="Tới 1 khung có theo dõi">▶</button>
+          <button class="btn pri" data-trk="1,0" title="Theo dõi tới cuối clip (Shift+→)">▶▶</button>
+          <button class="btn stop" id="stopBtn" hidden>Dừng</button>
+        </div>
+        <label class="chk"><input type="checkbox" id="antiDrift" checked> Chống trôi (bám lại khung gốc)</label>
+        <label class="chk"><input type="checkbox" id="occl" checked> Xử lý vật che (tự bắt lại)</label>
+        <p class="stat" id="stat">Chưa theo dõi.</p>
+      </div>
+      <div class="card" id="applyBox">
+        <h3>Áp dụng</h3>
+        <label class="rng">Làm mượt <input type="range" id="smooth" min="0" max="8" step="1" value="1"><span id="smoothV">1</span></label>
+        <div class="act">
+          <button class="btn" data-apply="mask">Mask theo vùng</button>
+          <label class="chk sm"><input type="checkbox" id="maskInv"> Đảo (giữ phần ngoài)</label>
+        </div>
+        <div class="act">
+          <button class="btn" data-apply="blur">Làm mờ vùng</button>
+          <label class="rng sm">Độ mờ <input type="range" id="blurAmt" min="5" max="100" value="40"></label>
+        </div>
+        <div class="act">
+          <button class="btn" data-apply="mosaic">Che mosaic</button>
+          <label class="rng sm">Cỡ khối <input type="range" id="mosAmt" min="6" max="80" value="24"></label>
+        </div>
+        <div class="act">
+          <button class="btn" data-apply="attach">Gắn clip theo vùng</button>
+          <select id="attachTo" aria-label="Clip cần gắn"></select>
+          <span class="row2"><label class="chk sm"><input type="checkbox" id="attRot" checked> Xoay theo</label><label class="chk sm"><input type="checkbox" id="attScale" checked> Co giãn theo</label></span>
+        </div>
+        <div class="act">
+          <button class="btn" data-apply="pin">Thay màn hình (corner pin)</button>
+          <select id="pinTo" aria-label="Clip sẽ dán vào vùng"></select>
+        </div>
+        <button class="btn ghost" id="peek" hidden>Thu nhỏ để xem kết quả</button>
+        <p class="mut sm">Mọi thay đổi đều hoàn tác được bằng Ctrl+Z trong Bravin.</p>
+      </div>
+    </aside>
+  </main>
+  <footer class="scrub">
+    <button class="btn ghost" id="prevF" title="Khung trước (←)">‹</button>
+    <div class="bar"><canvas id="confBar" aria-label="Độ tin cậy theo từng khung"></canvas><input type="range" id="seek" min="0" max="0" value="0" aria-label="Khung hình"></div>
+    <button class="btn ghost" id="nextF" title="Khung sau (→)">›</button>
+    <span class="tc" id="tc">0:00.00</span>
+  </footer>
+</div>
+<div class="tour" id="tour" hidden>
+  <div class="spot" id="tourSpot"></div>
+  <div class="tcard" id="tourCard" role="dialog" aria-modal="true" aria-labelledby="tourT">
+    <div class="tstep" id="tourStep"></div>
+    <h2 id="tourT"></h2>
+    <div id="tourBody"></div>
+    <div class="tbtns"><button class="btn ghost" id="tourSkip">Bỏ qua</button><span class="sp"></span><button class="btn" id="tourBack">Quay lại</button><button class="btn pri" id="tourNext">Tiếp</button></div>
+  </div>
+</div>
+<script src="bravin-sdk.js"></script>
+<script src="tracker.js"></script>
+<script src="app.js"></script>
+</body></html>

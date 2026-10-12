@@ -71,6 +71,7 @@ function splitParts(c, b, off) { // keyframes, animations, transitions, word tim
   if (c.tr) { b.tr = c.tr; delete c.tr; }
   if (c.words) { b.words = c.words.filter(w => w[1] > off).map(w => [Math.max(0, w[0] - off), w[1] - off, w[2]]); c.words = c.words.filter(w => w[0] < off); }
   if (c.fadeOut) { b.fadeOut = c.fadeOut; delete c.fadeOut; } if (b.fadeIn) delete b.fadeIn;
+  if (c.pin && c.pin.keys) { const K = c.pin.keys; c.pin = { keys: K.filter(k => k.t <= off + 1e-4) }; b.pin = { keys: K.filter(k => k.t >= off - 1e-4).map(k => ({ t: Math.max(0, Math.round((k.t - off) * 1000) / 1000), v: k.v.slice() })) }; if (!c.pin.keys.length) delete c.pin; if (!b.pin.keys.length) delete b.pin; }
 }
 function splitV(c, off) { // returns the right half, inserted after c
   const b = { ...deep(c), id: nid("v"), gap: 0 }, sp = c.speed || 1;

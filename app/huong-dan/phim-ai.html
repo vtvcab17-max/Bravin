@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Hướng dẫn Phim AI · Bravin</title>
+<meta name="description" content="Cách dùng khu Phim AI trong Bravin 4.10: LocalMiniDrama tiếng Việt, kiểm tra tương thích, tự đẩy tệp vào thư viện, nút ＋ Dự án.">
+<link rel="icon" href="../icons/icon-32.png">
+<style>
+@font-face{font-family:"Plus Jakarta Sans";src:url(../fonts/jakarta-vietnamese.woff2) format("woff2");font-weight:200 800;font-display:swap;unicode-range:U+0102-0103,U+0110-0111,U+0128-0129,U+0168-0169,U+01A0-01A1,U+01AF-01B0,U+0300-0301,U+0303-0304,U+0308-0309,U+0323,U+0329,U+1EA0-1EF9,U+20AB}
+@font-face{font-family:"Plus Jakarta Sans";src:url(../fonts/jakarta-latin-ext.woff2) format("woff2");font-weight:200 800;font-display:swap;unicode-range:U+0100-02BA,U+02BD-02C5,U+02C7-02CC,U+02CE-02D7,U+02DD-02FF,U+1E00-1E9F,U+1EF2-1EFF}
+@font-face{font-family:"Plus Jakarta Sans";src:url(../fonts/jakarta-latin.woff2) format("woff2");font-weight:200 800;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2212}
+:root{--bg:#131417;--panel:#1b1c21;--panel2:#24252c;--fg:#e7e7ec;--muted:#9d9ea9;--accent:#7b6cf6;--acc-hi:#8e81f8;--acc-ct:#2a2550;--on-acc-ct:#d6d0fd;--gold:#f2c14e;--ok:#3ddc84;--bad:#ef6a5a;--line:rgba(255,255,255,.07);--code:#0e0f12}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#f6f6f9;--panel:#fff;--panel2:#eeeef4;--fg:#1b1c21;--muted:#5f6070;--accent:#5b4be0;--acc-hi:#6c5ce7;--acc-ct:#e9e6ff;--on-acc-ct:#3b2fa8;--gold:#a8740a;--ok:#11834a;--bad:#c23a2b;--line:rgba(0,0,0,.08);--code:#f0f0f5}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:500 16px/1.65 "Plus Jakarta Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+a{color:var(--acc-hi)}
+code,kbd{font:13.5px ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;background:var(--code);padding:2px 6px;border-radius:6px}
+pre{background:var(--code);padding:12px 14px;border-radius:12px;overflow:auto;font:13.5px/1.5 ui-monospace,Menlo,Consolas,monospace}
+.wrap{max-width:880px;margin:0 auto;padding:0 16px}
+header.top{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+header.top .wrap{display:flex;align-items:center;gap:12px;height:56px}
+header.top img{width:26px;height:26px}
+header.top b{font-size:16px}
+header.top .sp{flex:1}
+.btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:10px 18px;font-weight:700;text-decoration:none;background:var(--panel2);color:var(--fg);white-space:nowrap}
+.btn.primary{background:var(--accent);color:#fff}
+.btn.primary:hover{background:var(--acc-hi)}
+.hero{padding:44px 0 18px}
+.hero .eyebrow{color:var(--acc-hi);font-weight:700;letter-spacing:.04em;font-size:13px;text-transform:uppercase}
+.hero h1{font-size:clamp(30px,6vw,46px);line-height:1.12;margin:8px 0 14px;letter-spacing:-.01em}
+.hero p{color:var(--muted);font-size:18px;margin:0 0 22px;max-width:680px}
+.cta{display:flex;flex-wrap:wrap;gap:10px}
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:28px 0 8px}
+.flow div{background:var(--panel);border-radius:16px;padding:14px}
+.flow b{display:block;font-size:14px}.flow span{color:var(--muted);font-size:13px}
+nav.toc{background:var(--panel);border-radius:18px;padding:14px 18px;margin:26px 0}
+nav.toc b{font-size:13px;color:var(--muted)}
+nav.toc ol{margin:6px 0 0;padding-left:20px;columns:2;column-gap:28px}
+nav.toc a{color:var(--fg);text-decoration:none}nav.toc a:hover{color:var(--acc-hi)}
+section{padding:22px 0 8px;scroll-margin-top:64px}
+h2{font-size:24px;margin:0 0 10px;display:flex;align-items:center;gap:10px}
+h2 .n{flex:none;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--acc-ct);color:var(--on-acc-ct);font-size:15px}
+h3{font-size:17px;margin:18px 0 6px}
+ol.steps{padding-left:22px}ol.steps li{margin:6px 0}
+figure{margin:16px 0;background:var(--panel);border-radius:16px;overflow:hidden}
+figure img{display:block;width:100%;height:auto}
+figcaption{padding:10px 14px;color:var(--muted);font-size:14px}
+.note{background:var(--acc-ct);color:var(--on-acc-ct);border-radius:14px;padding:12px 16px;margin:14px 0}
+.warn{background:color-mix(in srgb,var(--gold) 16%,var(--panel));border-radius:14px;padding:12px 16px;margin:14px 0}
+.tbl{overflow-x:auto;margin:12px 0}
+table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:560px}
+th,td{text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:700;font-size:13px}
+details{background:var(--panel);border-radius:14px;padding:12px 16px;margin:10px 0}
+summary{cursor:pointer;font-weight:700}
+footer{color:var(--muted);font-size:14px;padding:30px 0 50px;border-top:1px solid var(--line);margin-top:30px}
+@media (max-width:640px){.flow{grid-template-columns:1fr 1fr}nav.toc ol{columns:1}header.top .hide-s{display:none}.hero p{font-size:16px}}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <img src="../icons/icon.svg" alt=""><b>Bravin</b><span class="hide-s" style="color:var(--muted)">· Hướng dẫn Phim AI</span>
+  <span class="sp"></span>
+  <a class="btn hide-s" href="../downloads/LocalMiniDrama-vi_1.2.8.zip" download>Tải LocalMiniDrama</a>
+  <a class="btn primary" href="../">Mở Bravin</a>
+</div></header>
+
+<main class="wrap">
+  <div class="hero">
+    <div class="eyebrow">Bravin 4.10 · Khu Phim AI</div>
+    <h1>Làm phim ngắn bằng AI, tệp tự chạy vào timeline</h1>
+    <p>Khu Phim AI đưa LocalMiniDrama (bản tiếng Việt) vào ngay trong Bravin. AI viết kịch bản, tách phân cảnh, tạo ảnh và video. Tệp nào tạo xong sẽ tự nằm trong thư viện Bravin để bạn dựng tiếp.</p>
+    <div class="cta">
+      <a class="btn primary" href="../downloads/LocalMiniDrama-vi_1.2.8.zip" download>⬇ Tải LocalMiniDrama-vi 1.2.8 (12 MB)</a>
+      <a class="btn" href="#cai-dat">Xem cách cài</a>
+    </div>
+    <div class="flow" aria-label="Quy trình">
+      <div><b>1 · Kịch bản</b><span>AI viết truyện và thoại tiếng Việt</span></div>
+      <div><b>2 · Phân cảnh</b><span>nhân vật, bối cảnh, đạo cụ, góc máy</span></div>
+      <div><b>3 · Ảnh & video</b><span>tạo từng cảnh bằng mô hình bạn chọn</span></div>
+      <div><b>4 · Dựng trong Bravin</b><span>tệp tự vào thư viện «Phim AI»</span></div>
+    </div>
+  </div>
+
+  <nav class="toc" aria-label="Mục lục"><b>Mục lục</b>
+    <ol>
+      <li><a href="#can-gi">Cần chuẩn bị gì</a></li>
+      <li><a href="#cai-dat">Cài và chạy LocalMiniDrama</a></li>
+      <li><a href="#mo-khu">Mở khu Phim AI trong Bravin</a></li>
+      <li><a href="#cau-hinh-ai">Nhập API Key cho AI</a></li>
+      <li><a href="#lam-phim">Làm một bộ phim</a></li>
+      <li><a href="#tu-day">Tệp tự vào thư viện</a></li>
+      <li><a href="#du-an">Nút ＋ Dự án</a></li>
+      <li><a href="#dien-thoai">Dùng trên điện thoại</a></li>
+      <li><a href="#su-co">Xử lý sự cố</a></li>
+      <li><a href="#hoi-dap">Hỏi đáp</a></li>
+    </ol>
+  </nav>
+
+  <section id="can-gi">
+    <h2><span class="n">1</span>Cần chuẩn bị gì</h2>
+    <div class="tbl"><table>
+      <tr><th>Thứ cần có</th><th>Ghi chú</th></tr>
+      <tr><td>Máy tính Windows, macOS hoặc Linux</td><td>LocalMiniDrama chạy trên máy tính. Điện thoại dùng được qua Wi-Fi (xem mục 8).</td></tr>
+      <tr><td><b>Node.js 18 trở lên</b></td><td>Tải bản LTS ở <a href="https://nodejs.org" target="_blank" rel="noopener">nodejs.org</a>, cài như phần mềm thường.</td></tr>
+      <tr><td>Bravin 4.10</td><td>Bản web (trang này), bản Windows hoặc bản Android đều có khu Phim AI.</td></tr>
+      <tr><td>API Key của dịch vụ AI</td><td>Ít nhất một mô hình văn bản. Muốn có ảnh/video thì thêm mô hình ảnh và video (Volcengine Seedance, Kling, Gemini, Tongyi…). Bạn trả phí trực tiếp cho nhà cung cấp.</td></tr>
+      <tr><td>ffmpeg (không bắt buộc)</td><td>Chỉ cần khi ghép video cả tập. Xem mục 9.</td></tr>
+    </table></div>
+  </section>
+
+  <section id="cai-dat">
+    <h2><span class="n">2</span>Cài và chạy LocalMiniDrama</h2>
+    <ol class="steps">
+      <li>Tải <a href="../downloads/LocalMiniDrama-vi_1.2.8.zip" download><b>LocalMiniDrama-vi_1.2.8.zip</b></a> rồi giải nén ra một thư mục, ví dụ <code>D:\LocalMiniDrama-vi</code>.</li>
+      <li><b>Windows:</b> bấm đúp <code>CHAY_PHIM_AI.bat</code>.<br><b>macOS / Linux:</b> mở Terminal trong thư mục đó, chạy <code>bash chay_phim_ai.sh</code>.</li>
+      <li>Lần đầu, tập lệnh tự cài thư viện (vài phút, cần mạng). Các lần sau mở gần như ngay.</li>
+      <li>Thấy dòng <code>Server started on port 5679</code> là xong. Trình duyệt tự mở <code>http://localhost:5679</code>.</li>
+    </ol>
+    <div class="note"><b>Giữ cửa sổ dòng lệnh mở</b> trong lúc làm phim. Đóng nó là tắt LocalMiniDrama. Dữ liệu phim nằm trong <code>backend-node/data/</code>, không gửi lên mạng.</div>
+  </section>
+
+  <section id="mo-khu">
+    <h2><span class="n">3</span>Mở khu Phim AI trong Bravin</h2>
+    <ol class="steps">
+      <li>Mở Bravin, mở hoặc tạo một dự án.</li>
+      <li>Bấm nút <b>Phim AI</b> trên thanh trên cùng (cạnh JIZURA). Ở Trang chủ có thêm ô <b>Phim AI</b> trong phần công cụ.</li>
+      <li>Bravin tự <b>kiểm tra độ tương thích</b>. Đạt hết thì giao diện LocalMiniDrama hiện ngay trong khu, góc trên có nhãn xanh <b>Đã nối · LMD 1.2.8-vi</b>.</li>
+    </ol>
+    <figure><img src="anh/1-kiem-tra.jpg" alt="Khu Phim AI báo chưa kết nối được máy chủ LocalMiniDrama, kèm cách sửa" loading="lazy" width="1200" height="713"><figcaption>Khi LocalMiniDrama chưa chạy, khu Phim AI chỉ rõ mục nào lỗi và cách sửa. Chạy <code>CHAY_PHIM_AI.bat</code> rồi bấm <b>Kiểm tra lại</b>.</figcaption></figure>
+    <div class="tbl"><table>
+      <tr><th>Mục kiểm tra</th><th>Ý nghĩa</th></tr>
+      <tr><td>Máy chủ LocalMiniDrama</td><td>LocalMiniDrama đang chạy ở địa chỉ trong ô trên thanh (mặc định <code>http://localhost:5679</code>).</td></tr>
+      <tr><td>Cầu nối Bravin</td><td>Đúng bản LocalMiniDrama-vi đi kèm Bravin (bản gốc không có nút ＋ Dự án và tự đẩy).</td></tr>
+      <tr><td>Đọc tệp (CORS)</td><td>Bravin được phép tải ảnh/video từ LocalMiniDrama.</td></tr>
+      <tr><td>API dự án</td><td>Đọc được danh sách phim.</td></tr>
+      <tr><td>ffmpeg</td><td>Cảnh báo, không bắt buộc: cần để ghép video cả tập.</td></tr>
+      <tr><td>Ngôn ngữ AI</td><td>Cảnh báo, không bắt buộc: nên là tiếng Việt.</td></tr>
+    </table></div>
+  </section>
+
+  <section id="cau-hinh-ai">
+    <h2><span class="n">4</span>Nhập API Key cho AI</h2>
+    <ol class="steps">
+      <li>Trong khu Phim AI, bấm <b>Cấu hình AI</b> (góc trên phải của LocalMiniDrama).</li>
+      <li>Bấm một nút <b>Cấu hình nhanh</b> (Volcengine, Agnes, Tongyi…) để tạo sẵn bộ văn bản / ảnh / video, rồi dán API Key vào <b>từng dòng</b>. Hoặc bấm <b>Thêm cấu hình</b> để tự nhập nhà cung cấp tương thích OpenAI (DeepSeek, OpenRouter, Gemini…).</li>
+      <li>Bấm <b>Kiểm tra</b> ở mỗi dòng. Báo xanh là dùng được.</li>
+    </ol>
+    <div class="note"><b>Ngôn ngữ:</b> mặc định AI viết truyện, kịch bản, thoại, thuyết minh <b>bằng tiếng Việt</b>. Câu lệnh gửi cho mô hình tạo ảnh/video vẫn bằng tiếng Anh để ảnh đẹp và ổn định. Đổi ở ô <b>Ngôn ngữ phân cảnh</b> trong trang sản xuất (Tiếng Việt / Tiếng Trung / Tiếng Anh).</div>
+  </section>
+
+  <section id="lam-phim">
+    <h2><span class="n">5</span>Làm một bộ phim</h2>
+    <ol class="steps">
+      <li><b>Dự án mới</b> → đặt tên phim, chọn tỉ lệ (9:16 cho TikTok/Reels, 16:9 cho YouTube).</li>
+      <li><b>Kịch bản truyện</b>: nhập tóm tắt, chọn thể loại, số tập → <b>Tạo kịch bản</b>. Hoặc <b>Nhập tiểu thuyết</b>: dán văn bản có dòng <code>Chương 1</code>, <code>Tập 2</code>… AI tự tách tập.</li>
+      <li>Lần lượt theo cột trái: <b>Nhân vật → Đạo cụ → Bối cảnh</b> (trích từ kịch bản, tạo ảnh) → <b>Kịch bản phân cảnh</b> → <b>Ảnh phân cảnh</b> → <b>Video phân cảnh</b>.</li>
+      <li>Muốn nhanh: dùng <b>Chạy cả quy trình một chạm</b> ở cuối trang. Mỗi bước tự thử lại tối đa 3 lần khi lỗi.</li>
+      <li>Có ffmpeg thì bấm ghép để ra <b>video cả tập</b>.</li>
+    </ol>
+    <figure><img src="anh/2-phim-ai.jpg" alt="Trang sản xuất của LocalMiniDrama mở trong khu Phim AI của Bravin, góc dưới phải có thanh Bravin với nút Đẩy và ＋ Dự án" loading="lazy" width="1200" height="750"><figcaption>LocalMiniDrama trong Bravin. Thanh trên cùng cho biết phim nào đang nối với dự án Bravin nào. Góc dưới phải là thanh Bravin với nút <b>⇪ Đẩy</b> và <b>＋ Dự án</b>.</figcaption></figure>
+  </section>
+
+  <section id="tu-day">
+    <h2><span class="n">6</span>Tệp tự vào thư viện</h2>
+    <p>Khi ô <b>Tự đẩy vào thư viện</b> đang bật, cứ khoảng 6 giây Bravin xem phim đang mở. Tệp nào LocalMiniDrama <b>tạo thành công</b> sẽ được nhập vào thư viện của dự án Bravin đang mở, trong nhóm <b>Phim AI</b>:</p>
+    <div class="tbl"><table>
+      <tr><th>Loại tệp</th><th>Tên trong thư viện</th></tr>
+      <tr><td>Ảnh phân cảnh</td><td><code>Phim AI · T1 · C03 · ảnh.png</code></td></tr>
+      <tr><td>Video phân cảnh</td><td><code>Phim AI · T1 · C03 · video.mp4</code></td></tr>
+      <tr><td>Lồng tiếng thoại / thuyết minh</td><td><code>Phim AI · T1 · C03 · thoại.mp3</code>, <code>… · thuyết minh.mp3</code></td></tr>
+      <tr><td>Ảnh nhân vật, bối cảnh, đạo cụ</td><td><code>Phim AI · Nhân vật · Lan.png</code>…</td></tr>
+      <tr><td>Video cả tập</td><td><code>Phim AI · T1 · cả tập.mp4</code></td></tr>
+    </table></div>
+    <p><code>T1</code> là tập 1, <code>C03</code> là cảnh 3. Kéo tệp từ nhóm Phim AI xuống timeline như mọi tệp khác. Bấm <b>Về timeline</b> để dựng; khu Phim AI vẫn chạy ngầm và tiếp tục đẩy tệp mới.</p>
+    <figure><img src="anh/3-thu-vien.jpg" alt="Trình dựng Bravin, thư viện có nhóm Phim AI chứa ảnh và video từ LocalMiniDrama" loading="lazy" width="1200" height="750"><figcaption>Nhóm <b>Phim AI</b> trong thư viện của dự án.</figcaption></figure>
+    <div class="warn"><b>Lần đầu nối một phim với một dự án</b>, Bravin không đổ hết tệp cũ vào để khỏi làm rối thư viện. Muốn lấy chúng, bấm <b>⇪ Đẩy ngay</b> (trên thanh khu Phim AI) hoặc <b>⇪ Đẩy</b> (góc dưới phải LocalMiniDrama). Tệp đã nhập sẽ không bị nhập trùng. Tạo lại một cảnh thì bản mới được nhập thành tệp mới.</div>
+  </section>
+
+  <section id="du-an">
+    <h2><span class="n">7</span>Nút ＋ Dự án</h2>
+    <p>Đang làm phim nào trong LocalMiniDrama, bấm <b>＋ Dự án</b> (góc dưới phải, hoặc trên thanh khu Phim AI). Bravin sẽ:</p>
+    <ol class="steps">
+      <li>lưu dự án đang mở;</li>
+      <li>tạo <b>dự án Bravin mới cùng tên với phim</b>, khung hình theo tỉ lệ của phim;</li>
+      <li>mở dự án đó và <b>nhập sẵn mọi tệp</b> phim đã có, từ đó tiếp tục tự đẩy tệp mới.</li>
+    </ol>
+    <p>Mỗi lần bấm là một dự án mới. Muốn quay lại dự án cũ, mở nó ở Trang chủ Bravin.</p>
+  </section>
+
+  <section id="dien-thoai">
+    <h2><span class="n">8</span>Dùng trên điện thoại</h2>
+    <ol class="steps">
+      <li>Chạy LocalMiniDrama trên máy tính như mục 2. Điện thoại và máy tính dùng chung Wi-Fi.</li>
+      <li>Xem địa chỉ IP của máy tính. Windows: mở Command Prompt, gõ <code>ipconfig</code>, lấy dòng <i>IPv4 Address</i>, ví dụ <code>192.168.1.5</code>.</li>
+      <li>Trên app Bravin Android, mở <b>Phim AI</b>, sửa ô địa chỉ thành <code>http://192.168.1.5:5679</code>, bấm ra ngoài để kiểm tra lại.</li>
+      <li>Lần đầu, Windows có thể hỏi cho phép Node.js qua tường lửa: chọn <b>Private networks</b> → <b>Allow</b>.</li>
+    </ol>
+    <div class="warn">Bravin <b>bản web</b> (mở trong trình duyệt qua https) chỉ nối được LocalMiniDrama chạy trên <b>chính máy đó</b> (<code>localhost</code>). Muốn nối qua mạng nội bộ, dùng bản Android hoặc bản Windows.</div>
+  </section>
+
+  <section id="su-co">
+    <h2><span class="n">9</span>Xử lý sự cố</h2>
+    <div class="tbl"><table>
+      <tr><th>Hiện tượng</th><th>Cách xử lý</th></tr>
+      <tr><td>✕ Máy chủ LocalMiniDrama</td><td>Chạy <code>CHAY_PHIM_AI.bat</code>, chờ dòng <code>Server started on port 5679</code>, bấm <b>Kiểm tra lại</b>. Đổi cổng thì sửa ô địa chỉ cho khớp.</td></tr>
+      <tr><td>Tập lệnh báo «Chua co Node.js»</td><td>Cài Node.js LTS ở nodejs.org, đóng rồi mở lại tập lệnh.</td></tr>
+      <tr><td>Cài thư viện thất bại</td><td>Kiểm tra mạng rồi chạy lại. Đừng chép thư mục <code>node_modules</code> từ máy khác.</td></tr>
+      <tr><td>✕ Cầu nối Bravin</td><td>Bạn đang chạy LocalMiniDrama bản gốc. Dùng bản LocalMiniDrama-vi tải ở trang này.</td></tr>
+      <tr><td>! ffmpeg</td><td>Chép <code>ffmpeg.exe</code> từ gói LocalMiniDrama gốc (<code>backend-node/tools/ffmpeg/ffmpeg.exe</code>) vào cùng chỗ trong LocalMiniDrama-vi, hoặc tải bản «essentials» ở <a href="https://www.gyan.dev/ffmpeg/builds/" target="_blank" rel="noopener">gyan.dev</a> và chép <code>bin/ffmpeg.exe</code> vào <code>backend-node/tools/ffmpeg/</code>. macOS/Linux: cài ffmpeg vào PATH. Chạy lại LocalMiniDrama.</td></tr>
+      <tr><td>Tệp không vào thư viện</td><td>Kiểm tra ô <b>Tự đẩy vào thư viện</b> đang bật và đang có dự án Bravin mở (tên hiện trên thanh). Phim mới nối lần đầu thì bấm <b>⇪ Đẩy ngay</b>.</td></tr>
+      <tr><td>Bravin báo «Không mở được … »</td><td>Trình duyệt không đọc được định dạng video đó. Dùng Chrome hoặc Edge mới.</td></tr>
+      <tr><td>AI báo lỗi khoá / mô hình</td><td>Vào <b>Cấu hình AI</b>, bấm <b>Kiểm tra</b> từng dòng, sửa API Key hoặc tên mô hình.</td></tr>
+    </table></div>
+  </section>
+
+  <section id="hoi-dap">
+    <h2><span class="n">10</span>Hỏi đáp</h2>
+    <details><summary>Phim và tệp của tôi có bị gửi lên mạng không?</summary><p>Không. Kịch bản, ảnh, video lưu trong <code>backend-node/data/</code> trên máy bạn. Chỉ nội dung gửi cho nhà cung cấp AI bạn tự cấu hình mới đi ra ngoài.</p></details>
+    <details><summary>Có mất phí không?</summary><p>LocalMiniDrama và Bravin miễn phí. Bạn trả phí API trực tiếp cho nhà cung cấp AI (tuỳ mô hình, video thường đắt nhất).</p></details>
+    <details><summary>Ký hiệu <code>@图片1</code> trong chế độ toàn năng là gì?</summary><p>Đó là cú pháp mà Seedance 2.0 và Kling Omni yêu cầu để chỉ ảnh tham chiếu thứ 1, 2… Giữ nguyên, không dịch, và để một dấu cách sau nó.</p></details>
+    <details><summary>Tắt Bravin rồi mở lại có mất tệp đã đẩy không?</summary><p>Không. Tệp đã đẩy được lưu trong dự án Bravin trên thiết bị, như tệp bạn tự nhập.</p></details>
+    <details><summary>Ai làm ra LocalMiniDrama?</summary><p>LocalMiniDrama là phần mềm mã nguồn mở (giấy phép MIT) của xuanyustudio. Bravin bổ sung bản dịch tiếng Việt và cầu nối với Bravin, phát hành cùng giấy phép MIT.</p></details>
+  </section>
+</main>
+
+<footer><div class="wrap">Bravin 4.10 · Khu Phim AI dùng <a href="https://github.com/xuanyustudio/LocalMiniDrama" target="_blank" rel="noopener">LocalMiniDrama</a> (MIT © xuanyustudio), bản tiếng Việt. · <a href="../">Mở Bravin</a></div></footer>
+</body>
+</html>

@@ -125,7 +125,7 @@ function motionPanel(box, c) {
   }
   appliedList(box, c, kind);
   const b2 = el("div", "row"); box.appendChild(b2);
-  btnRow(b2, [["Đặt lại chuyển động", () => { pushUndo(); for (const k of ["x", "y", "scale", "angle", "opacity", "flip", "flipV", "rot", "blur", "kf", "_curve"]) delete c[k]; renderAll(); }]]);
+  btnRow(b2, [["Đặt lại chuyển động", () => { pushUndo(); for (const k of ["x", "y", "scale", "angle", "opacity", "flip", "flipV", "rot", "blur", "mosaic", "pin", "kf", "_curve"]) delete c[k]; renderAll(); }]]);
 }
 
 /* summary of everything applied to this clip, with jump + remove */
@@ -198,6 +198,7 @@ const EC_PROPS = {
   flipV: { n: "Lật dọc", min: 0, max: 1, step: 0.01, def: c => c.flipV ? 1 : 0, set: (c, v) => { if (v >= 0.5) c.flipV = true; else delete c.flipV; }, f: ffFlip, toggle: true, unit: 100 },
   opacity: { n: "Độ mờ", min: 0, max: 1, step: 0.01, def: c => c.opacity == null ? 1 : c.opacity, set: (c, v) => c.opacity = v, f: v => Math.round(v * 100) + "%", unit: 100 },
   blur: { n: "Độ nhoè", min: 0, max: 100, step: 0.5, def: c => c.blur || 0, set: (c, v) => { if (v > 0) c.blur = v; else delete c.blur; }, f: v => (+v).toFixed(1), unit: 1 },
+  mosaic: { n: "Mosaic (cỡ khối)", min: 0, max: 120, step: 1, def: c => c.mosaic || 0, set: (c, v) => { if (v > 0) c.mosaic = v; else delete c.mosaic; }, f: v => v > 0 ? Math.round(v) + " px" : "tắt", unit: 1 },
   blend: { n: "Hoà trộn", discrete: true, def: c => c.blend || "normal", set: (c, v) => { if (v === "normal") delete c.blend; else c.blend = v; } },
   speed: { n: "Tốc độ", min: 0.05, max: 20, step: 0.01, def: c => c.speed || 1, set: (c, v) => { c.speed = Math.round(v * 100) / 100; if (c.speed === 1) delete c.speed; }, f: v => (+v).toFixed(2) + "x", unit: 1, time: true },
   vol: { n: "Âm lượng", min: -40, max: 12, step: 0.5, def: c => c.vol || 0, set: (c, v) => c.vol = v, f: v => v <= -40 ? "tắt" : (v > 0 ? "+" : "") + (+v).toFixed(1) + " dB", unit: 1, audio: true },
@@ -208,7 +209,7 @@ const EC_PAD = 9; const ecX = f => `calc(${EC_PAD}px + (100% - ${2 * EC_PAD}px) 
 function ecGroups(c) {
   const kind = tabKind(c), vis = isVisual(c), G = [];
   if (vis) G.push(["motion", "Chuyển động", ["x", "y", "scale", "angle", "flipH", "flipV"]]);
-  if (vis) G.push(["opac", "Độ mờ và hoà trộn", isMediaClip(c) ? ["opacity", "blur", "blend"] : ["opacity", "blur"]]);
+  if (vis) G.push(["opac", "Độ mờ và hoà trộn", isMediaClip(c) ? ["opacity", "blur", "mosaic", "blend"] : ["opacity", "blur"]]);
   if (kind === "fx" && c.fxType !== "filter") G.push(["fx", "Hiệu ứng", ["amt"]]);
   if (isMediaClip(c) && !c.freeze && (hasVideoSrc(c) || c.type === "audio")) G.push(["time", "Thời gian", ["speed"]]);
   if (c.type === "audio" || (hasVideoSrc(c) && !c.audioOut)) G.push(["audio", "Âm thanh", ["vol", "pan"]]);
@@ -240,7 +241,7 @@ function effectControls(box, c) {
     const gl = el("div", "ec-row ec-g"); const tw = el("button", "ec-tw"); tw.type = "button"; tw.setAttribute("aria-expanded", !closed); tw.innerHTML = `<span class="car">▾</span>`; tw.append(gname);
     tw.onclick = () => { ecState.closed[gid] = !closed; renderInspector(); };
     const rs = el("button", "icon ec-reset", "↺"); rs.type = "button"; rs.title = "Đặt lại " + gname.toLowerCase(); rs.setAttribute("aria-label", rs.title);
-    rs.onclick = () => { pushUndo(); for (const p of props) { if (c.kf) delete c.kf[p]; const d = { x: 0, y: 0, scale: 1, angle: 0, flipH: 0, flipV: 0, opacity: 1, blur: 0, blend: "normal", speed: 1, vol: 0, amt: 1 }[p]; EC_PROPS[p].set(c, d); if (p === "speed") delete c._curve; } if (c.kf && !Object.keys(c.kf).length) delete c.kf; renderAll(); };
+    rs.onclick = () => { pushUndo(); for (const p of props) { if (c.kf) delete c.kf[p]; const d = { x: 0, y: 0, scale: 1, angle: 0, flipH: 0, flipV: 0, opacity: 1, blur: 0, mosaic: 0, blend: "normal", speed: 1, vol: 0, amt: 1 }[p]; EC_PROPS[p].set(c, d); if (p === "speed") delete c._curve; } if (c.kf && !Object.keys(c.kf).length) delete c.kf; renderAll(); };
     gl.append(tw, rs); left.appendChild(gl);
     const glane = el("div", "ec-lane ec-glane"); inner.appendChild(glane); rowsR.push({ lane: glane, props, group: true });
     if (closed) continue;

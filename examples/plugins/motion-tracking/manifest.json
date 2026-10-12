@@ -1,0 +1,15 @@
+{
+  "id": "com.bravinall.motion-tracking",
+  "name": "Motion Tracking",
+  "version": "1.0.0",
+  "author": "Bravinall",
+  "apiVersion": 2,
+  "description": "Theo dõi chuyển động theo phối cảnh: khoanh vùng bằng bút, track xuôi/ngược, tự chống trôi, xử lý vật che. Áp dụng thành mask, làm mờ, mosaic, gắn chữ/sticker hoặc thay màn hình (corner pin).",
+  "entry": "index.html",
+  "permissions": ["timeline.read", "timeline.write", "video.frames", "playback", "ui"],
+  "panel": { "title": "Motion Tracking", "height": 640, "size": "large" },
+  "commands": [
+    { "id": "open-clip", "title": "Motion Tracking: theo dõi clip này", "context": "clip" },
+    { "id": "open", "title": "Mở Motion Tracking", "context": "global" }
+  ]
+}

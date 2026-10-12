@@ -106,7 +106,8 @@ function follow() { const x = t * pps, L = scroller.scrollLeft, W = scroller.cli
 function markUsed() { const used = new Set([...V.map(c => c.mediaId), ...C.map(c => c.mediaId)]); document.querySelectorAll(".mitem").forEach(d => d.classList.toggle("used", used.has(d.dataset.mid))); }
 function renderBin() {
   const bin = $("#bin"); bin.querySelectorAll(".mitem,.bingroup").forEach(e => e.remove());
-  const groups = [["Video", m => m.kind !== "audio"], ["Âm thanh", m => m.kind === "audio"]];
+  const isL = m => typeof lmdIsMedia === "function" && lmdIsMedia(m);
+  const groups = [["Phim AI", m => isL(m)], ["Video", m => m.kind !== "audio" && !isL(m)], ["Âm thanh", m => m.kind === "audio" && !isL(m)]];
   for (const [title, f] of groups) {
     const list = [...media.values()].filter(f); if (!list.length) continue;
     const h = document.createElement("div"); h.className = "bingroup"; h.textContent = title; bin.appendChild(h);

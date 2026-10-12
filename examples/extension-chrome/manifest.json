@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Gửi sang Bravin (mẫu cho đội ngũ)",
+  "version": "1.0.0",
+  "description": "Chuột phải vào video, ảnh, âm thanh hoặc link → Gửi sang Bravin. Ví dụ kết nối extension với Bravin qua cầu nối.",
+  "permissions": ["contextMenus", "scripting", "storage"],
+  "optional_host_permissions": ["https://*/*", "http://localhost/*", "http://127.0.0.1/*"],
+  "background": { "service_worker": "background.js" },
+  "options_page": "options.html",
+  "action": { "default_title": "Gửi sang Bravin", "default_popup": "options.html" }
+}

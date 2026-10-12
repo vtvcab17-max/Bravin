@@ -18,7 +18,7 @@ const EASE = {
 const EASE_NAMES = { linear: "Tuyến tính", inout: "Mượt hai đầu", in: "Chậm lúc đầu", out: "Chậm lúc cuối", back: "Bật lố", bounce: "Nảy", elastic: "Đàn hồi", hold: "Giữ rồi nhảy" };
 
 /* ---------- keyframes: c.kf = { prop: [{t, v, e}] }, t = seconds from clip start ---------- */
-const KF_PROPS = { x: "Vị trí X", y: "Vị trí Y", scale: "Kích thước", angle: "Góc xoay", flipH: "Lật ngang", flipV: "Lật dọc", opacity: "Độ mờ", blur: "Độ nhoè", blend: "Hoà trộn", speed: "Tốc độ", vol: "Âm lượng", amt: "Cường độ hiệu ứng" };
+const KF_PROPS = { x: "Vị trí X", y: "Vị trí Y", scale: "Kích thước", angle: "Góc xoay", flipH: "Lật ngang", flipV: "Lật dọc", opacity: "Độ mờ", blur: "Độ nhoè", blend: "Hoà trộn", speed: "Tốc độ", vol: "Âm lượng", amt: "Cường độ hiệu ứng", mosaic: "Mosaic" };
 const KF_DISCRETE = { blend: 1 }; // stepped (no interpolation), values are strings
 function kfList(c, prop) { return (c.kf && c.kf[prop]) || null; }
 function kfVal(c, prop, lt, def) {

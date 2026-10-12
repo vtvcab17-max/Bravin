@@ -7,7 +7,7 @@ APP=${1:-/home/claude/out/bravin/app}
 VER=${VER:-1.0}; CODE=${CODE:-1}
 rm -rf build www && mkdir -p build/classes www/fonts
 # 1) web app → assets/www
-for f in "$APP"/*; do b=$(basename "$f"); case "$b" in index.html|index.before*|durs.txt|nm|node_modules|*.tflite|rot_vp9.mp4) ;; *) cp -r "$f" www/ ;; esac; done
+for f in "$APP"/*; do b=$(basename "$f"); case "$b" in index.html|index.before*|durs.txt|nm|node_modules|*.tflite|rot_vp9.mp4|downloads) ;; *) cp -r "$f" www/ ;; esac; done
 cp /home/claude/fonts_var/mont.ttf /home/claude/fonts_var/mont_i.ttf /home/claude/fonts_var/play_i.ttf www/fonts/
 python3 - "$APP/index.html" www/index.html <<'PY'
 import sys,re

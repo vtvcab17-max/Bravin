@@ -2,7 +2,7 @@
 !include "MUI2.nsh"
 !include "FileFunc.nsh"
 !define APP "Bravin"
-!define VER "4.7"
+!define VER "4.10"
 !define UNKEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\Bravin"
 Name "${APP} ${VER}"
 OutFile "Bravin_Setup_${VER}.exe"
@@ -11,7 +11,7 @@ InstallDirRegKey HKCU "Software\Bravin" "InstallDir"
 RequestExecutionLevel user
 SetCompressor /SOLID lzma
 BrandingText "Bravin ${VER}"
-VIProductVersion "4.7.0.0"
+VIProductVersion "4.10.0.0"
 VIAddVersionKey "ProductName" "Bravin"
 VIAddVersionKey "FileDescription" "Cài đặt Bravin"
 VIAddVersionKey "FileVersion" "${VER}"

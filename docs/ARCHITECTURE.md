@@ -194,3 +194,22 @@ Nút 🔗 trong Thư viện (và nút "Dán link" ở vùng thả file) mở h�
 
 ## Nhập từ Antifact (js/antifact.js)
 Antifact 1.1 → Xuất → "Gửi sang Bravin" tạo `.bravin.json` (`format:"bravin-project"`: canvas, timeline, tracks[].clips[0] = ảnh PNG data-url + position/opacity/blendMode). Bravin nhận file này ở 2 chỗ: nút Mở dự án / Nhập ở Trang chủ (tạo dự án mới, khung hình tự chọn gần nhất 9:16·16:9·1:1·4:5) và nút nhập Thư viện (thêm vào dự án đang mở, tại kim). Mỗi layer = 1 track "video phủ" cùng tên, đúng vị trí (quy đổi px → x,y,scale), độ mờ, hòa trộn; layer ẩn → track tắt; màu nền canvas → track "Nền". Thứ tự: layer trên cùng của Antifact là track trên cùng. File `.antifact.json` (project gốc) chưa đọc được: báo hướng dẫn xuất lại.
+
+## Plugin & cầu nối extension (js/plugins.js, sdk/bravin-sdk.js)
+- Plugin = iframe `sandbox="allow-scripts"` + `srcdoc` do host dựng (CSP meta, theme, SDK được chèn). RPC `postMessage` có `id`; host nhận diện plugin bằng `event.source === iframe.contentWindow`; thiếu quyền → `permission_denied`.
+- Kho plugin: IndexedDB `bravin-plugins`; dữ liệu plugin: `localStorage` `bravin-pl:<id>:<key>` (≤1 MB). Gói `.bravinplugin.json` = `{format:"bravin-plugin", manifest, files}`; cài từ URL thì tải entry mỗi lần chạy (cache dự phòng offline).
+- Sự kiện: `renderAll` / `placePlayhead` / `hideHome` được bọc để phát `timeline.changed` (debounce 120 ms, so snapshot), `selection.changed`, `playhead` (throttle), `project.loaded`. Chỉ gửi cho plugin đã đăng ký.
+- Lệnh plugin chèn vào `clipMenuItems`/`multiMenuItems` (mục “Tiện ích”) và màn quản lý.
+- Cầu nối extension: `window.postMessage({bravin:"bridge"})` ⇄ `bravin-res`; mỗi extension phải được người dùng cho phép (`localStorage bravin-bridge-ok`). Tham số khởi động `#import=<url>` mở hộp tải link, `#plugin=<manifest url>` mở hộp cài plugin.
+- Tài liệu cho đội ngũ: `docs/PLUGIN_SDK.md`; mẫu: `examples/plugins/*`, `examples/extension-chrome/`; đóng gói: `tools/pack_plugin.py`.
+
+## Motion Tracking & SDK API v2 (4.9)
+- `js/cornerpin.js`: `pinAt(c, lt)` nội suy `c.pin.keys` (4 góc chuẩn hoá). `drawPinned` vẽ phối cảnh đúng bằng WebGL (ma trận nghịch đảo hình vuông → tứ giác, khử răng cưa 4 mẫu), không có WebGL thì dùng affine. `drawMediaLayer` dùng pin thay cho vị trí/cỡ/xoay khi có. `splitParts` chia `pin` khi cắt clip.
+- `c.mosaic` (keyframe được, mục Độ mờ và hoà trộn): thu nhỏ ảnh nguồn rồi phóng lại không làm mịn.
+- `plugins.js`: quyền `video.frames`. Phiên `frames.*` dùng `ElemSource` + `drawMediaLayer` của bản sao "sạch" (không mask, blur, pin, mosaic) vào canvas `plugFrames`, trả ArrayBuffer (transfer). Các lệnh `getClip`, `duplicateClip`, `setMask`, `setPin`, `setKeyframes`, `applyTrack`, `checkpoint`. Manifest `apiVersion` lớn hơn `API_VERSION` thì bị từ chối. Bảng plugin có chế độ lớn (`panel.size: "large"`, nút ⤢).
+- Plugin mẫu `examples/plugins/motion-tracking/`: `tracker.js` (Shi-Tomasi, LK kim tự tháp + kiểm tra xuôi/ngược, RANSAC T/S/H, chống trôi bằng warp về khung neo, che một phần thì rơi về bước tương tự, mất dấu thì dự đoán vận tốc giảm dần) và `app.js` (bút, mốc sửa, thanh tin cậy, áp dụng, hướng dẫn lần đầu).
+
+## bravin-project schema 2 (4.9.1)
+- `js/antifact.js`: đọc schema 1 + 2: nhiều clip mỗi track, ảnh / video / âm thanh, keyframe (x, y, width, height, scale, rotation, opacity + easing → `c.kf`), hiệu ứng vào/ra (→ `c.anim`), camera 2D được "nướng" thành keyframe của từng lớp (15 mẫu/giây + thời điểm khoá), `parallax`. Báo cáo sau khi nhập liệt kê phần bỏ qua.
+- Thả file vào bất kỳ đâu: ở Trang chủ thì `.bravin.json` mở thành dự án mới; trong trình dựng thì `importFiles`. Thư viện và hộp phông chữ giữ trình xử lý riêng (`defaultPrevented`).
+- Đặc tả cho ứng dụng xuất file: `docs/BRAVIN_PROJECT_FORMAT.md`; file mẫu: `samples/bravin-project/`.

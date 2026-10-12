@@ -1,0 +1,10 @@
+{
+  "id": "com.bravin.thong-ke",
+  "name": "Thống kê timeline",
+  "version": "1.0.0",
+  "author": "Đội ngũ Bravin",
+  "description": "Bảng nhỏ hiện số clip, thời lượng và cho thêm chữ nhanh tại vị trí kim.",
+  "entry": "index.html",
+  "permissions": ["timeline.read", "timeline.write", "ui"],
+  "panel": { "title": "Thống kê", "height": 300 }
+}

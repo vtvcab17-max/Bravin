@@ -2,6 +2,7 @@
 <html lang="vi">
 <head>
 <meta charset="utf-8">
+<meta name="bravin-version" content="4.10">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Bravin</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,7 +33,7 @@
 
   <div class="main">
     <section class="panel" id="libPanel" aria-label="Thư viện">
-      <div class="ph"><span>Thư viện</span><span class="phbtns"><button class="icon" id="dlBtn" title="Dán link để tải video về"><svg class="i" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></button><button class="icon" id="importBtn" title="Nhập file"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></span></div>
+      <div class="ph"><span>Thư viện</span><span class="phbtns"><button class="icon" id="plugBtn" title="Tiện ích (plugin, extension)"><svg class="i" viewBox="0 0 24 24"><path d="M9 3v4M15 3v4M7 7h10v5a5 5 0 0 1-10 0zM12 17v4"/></svg></button><button class="icon" id="dlBtn" title="Dán link để tải video về"><svg class="i" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg></button><button class="icon" id="importBtn" title="Nhập file"><svg class="i" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></span></div>
       <div class="bin" id="bin">
         <div class="drop" id="drop">Thả video, ảnh hoặc nhạc vào đây<br><small>Kéo clip đè lên một đoạn trên timeline để thay thế</small></div>
         <button type="button" class="dllink" id="dropLink">🔗 Dán link để tải về</button>
@@ -149,6 +150,7 @@
 <script src="js/audio.js"></script>
 <script src="js/media.js"></script>
 <script src="js/render.js"></script>
+<script src="js/cornerpin.js"></script>
 <script src="js/timeline.js"></script>
 <script src="js/inspector.js"></script>
 <script src="js/motion.js"></script>
@@ -175,10 +177,12 @@
 <script src="js/workspace.js"></script>
 <script src="js/compound.js"></script>
 <script src="js/antifact.js"></script>
+<script src="js/plugins.js"></script>
 <script src="js/fixes.js"></script>
 <script src="js/pen.js"></script>
 <script src="js/input.js"></script>
 <script src="js/lyrics.js"></script>
 <script src="js/jizura_bridge.js"></script>
+<script src="js/lmd.js"></script>
 <script src="js/phone.js"></script>
 <script src="js/boot.js"></script>

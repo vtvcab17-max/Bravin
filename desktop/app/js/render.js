@@ -125,6 +125,17 @@ function drawMediaLayer(ctx, c, lt, slot, isMain, T) {
     else { ctx.fillStyle = c.bgColor || "#027fa5"; ctx.fillRect(0, 0, W, H); }
     ctx.restore();
   }
+  const mos = kfVal(c, "mosaic", lt, c.mosaic || 0);
+  if (mos >= 1) { // mosaic: thu nhỏ rồi phóng lại đúng kích thước nguồn, không làm mịn
+    const bs = Math.max(1, mos * W / 1080 / Math.max(1e-6, s)), nw = Math.max(1, Math.round(cw / bs)), nh = Math.max(1, Math.round(ch / bs)), bw = Math.max(1, Math.round(cw)), bh = Math.max(1, Math.round(ch));
+    const ms = scratch("mosaicL", nw, nh), mb = scratch("mosaicB", bw, bh); ms.ctx.imageSmoothingEnabled = true; ms.ctx.clearRect(0, 0, nw, nh); ms.ctx.drawImage(img, cx, cy, cw, ch, 0, 0, nw, nh);
+    mb.ctx.imageSmoothingEnabled = false; mb.ctx.clearRect(0, 0, bw, bh); mb.ctx.drawImage(ms.canvas, 0, 0, nw, nh, 0, 0, bw, bh); img = mb.canvas; cx = 0; cy = 0; cw = bw; ch = bh;
+  }
+  const pinQ = typeof pinAt === "function" ? pinAt(c, lt) : null;
+  if (pinQ) {
+    tgt.save(); if (!fancy) tgt.globalAlpha *= X.opacity; if (X.blur > 0.3) tgt.filter = `blur(${X.blur * W / 1080}px)`;
+    drawPinned(tgt, img, cx, cy, cw, ch, pinQ, W, H, false); tgt.restore();
+  } else {
   tgt.save();
   if (!fancy) tgt.globalAlpha *= X.opacity;
   if (X.blur > 0.3) tgt.filter = `blur(${X.blur * W / 1080}px)`;
@@ -132,11 +143,13 @@ function drawMediaLayer(ctx, c, lt, slot, isMain, T) {
   const stb = c.stab && typeof stabAt === "function" ? stabAt(c, lt) : null; if (stb) { tgt.scale(stb.z, stb.z); if (stb.a) tgt.rotate(stb.a * Math.PI / 180); tgt.translate(stb.x * cw * s, stb.y * ch * s); }
   tgt.drawImage(img, cx, cy, cw, ch, -cw * s / 2, -ch * s / 2, cw * s, ch * s);
   tgt.restore();
+  }
   if (fancy) {
     if (hasNd) applyNodes(tgt, c, lt, T);
     if (hasMk) { const mc = drawMaskSet(c.masks, W, H, lt); if (mc) { tgt.save(); tgt.globalCompositeOperation = "destination-in"; tgt.drawImage(mc, 0, 0); tgt.restore(); } }
     ctx.save(); ctx.globalAlpha *= X.opacity; ctx.globalCompositeOperation = bl !== "normal" ? bl : "source-over"; ctx.drawImage(tgt.canvas, 0, 0); ctx.restore();
   }
+  if (pinQ) { let x0 = 1, y0 = 1, x1 = 0, y1 = 0; for (let i = 0; i < 8; i += 2) { x0 = Math.min(x0, pinQ[i]); x1 = Math.max(x1, pinQ[i]); y0 = Math.min(y0, pinQ[i + 1]); y1 = Math.max(y1, pinQ[i + 1]); } return { cx: (x0 + x1) / 2 * W, cy: (y0 + y1) / 2 * H, w: (x1 - x0) * W, h: (y1 - y0) * H, angle: 0 }; }
   return { cx: px, cy: py, w: cw * s, h: ch * s, angle: X.angle };
 }
 

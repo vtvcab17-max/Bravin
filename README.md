@@ -11,6 +11,7 @@ Trình dựng video chạy trên trình duyệt, Android và máy tính (bản w
 - Âm thanh: LUFS, khử ồn, ducking, đồng bộ âm thanh theo sóng.
 - Trợ lý AI: Claude trên claude.ai, hoặc "Luồng AI" dạng canvas (node AI, điều kiện, gộp, lặp…) với API chỉ cần dán mã, AI local qua đường link, hoặc model nhúng chạy ngay trong ứng dụng.
 - Xuất MP4 bằng WebCodecs, phụ đề SRT, FCP XML.
+- **Phim AI (4.10)**: nhúng LocalMiniDrama tiếng Việt (MIT © xuanyustudio) để AI viết kịch bản → phân cảnh → ảnh → video; tệp tạo xong tự vào thư viện, nút ＋ Dự án tạo dự án cùng tên phim. Hướng dẫn: `app/huong-dan/phim-ai.html` (trên web: `/huong-dan/phim-ai.html`), tải LocalMiniDrama-vi ở `app/downloads/`. Chi tiết kỹ thuật: `docs/PHIM_AI_LOCALMINIDRAMA.md`.
 
 ## Cấu trúc thư mục
 | Thư mục | Nội dung |
@@ -29,7 +30,7 @@ cd app
 python3 -m http.server 8080     # hoặc: node ../tests/serve_static.js . 8080
 # mở http://localhost:8080
 ```
-Trên Windows: mở `desktop/` và làm theo `HUONG_DAN.txt`. Khi sửa `app/`, chép lại vào `desktop/app/` (giữ phần đầu `index.html` dùng phông chữ cục bộ).
+Trên Windows: mở `desktop/` và làm theo `HUONG_DAN.txt`. Khi sửa `app/`, dựng lại `desktop/app/` bằng `python3 tools/make_desktop_app.py .` (thay Google Fonts bằng phông chữ cục bộ, bỏ `downloads/`).
 
 ## Kiểm thử
 ```bash

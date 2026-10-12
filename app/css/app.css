@@ -454,6 +454,27 @@ body.phone .ltabs{flex-wrap:nowrap}
 .jzhost{flex:1;min-height:0}
 #jzBtn{gap:6px}
 
+/* Khu Phim AI (LocalMiniDrama nhúng, đồng bộ thư viện) */
+#lmdBtn{gap:6px}
+.lmdframe{position:fixed;left:-20000px;top:0;width:1280px;height:800px;border:0;background:#0f1014;z-index:-1}
+.lmdframe.show{z-index:81}
+.lmdpanel .lmdchip{font-size:11px;padding:3px 9px;border-radius:999px;border:1px solid currentColor;white-space:nowrap}
+.lmdchip.ok{color:#3ddc84}.lmdchip.warn{color:var(--gold,#f2c14e)}.lmdchip.bad{color:#ff6b6b}
+.lmdpanel .jzbar{flex-wrap:nowrap}.lmdpanel .jzbar>*{flex-shrink:0}.lmdpanel .lmdst{flex-shrink:1;min-width:0;max-width:34vw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lmdurl{width:190px;font:12px ui-monospace,monospace;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:transparent;color:inherit}
+.lmdhost{position:relative;overflow:auto}
+.lmdcheck{max-width:720px;margin:28px auto;padding:0 16px}
+.lmdcheck h3{margin:0 0 12px}
+.lmdcheck ul{list-style:none;margin:0 0 16px;padding:0;display:flex;flex-direction:column;gap:8px}
+.lmdcheck li{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border-radius:10px;border:1px solid var(--line)}
+.lmdcheck li.ok b{color:#3ddc84}.lmdcheck li.warn b{color:var(--gold,#f2c14e)}.lmdcheck li.bad b{color:#ff6b6b}
+.lmdcheck li span{font-size:13px;opacity:.85}.lmdcheck li small{font-size:12px;opacity:.75}
+.lmdcheck .row{display:flex;gap:8px}
+.lmdhelp{font-size:13px;color:var(--acc-hi,#8e81f8);text-decoration:none;white-space:nowrap;padding:6px 4px}.lmdhelp:hover{text-decoration:underline}
+.lmdnew{font-size:13px;opacity:.85;margin-top:14px}.lmdnew a{color:var(--acc-hi,#8e81f8)}
+@media (max-width:1180px){.lmdurl{width:130px}.lmdpanel .jzsub{display:none}}
+@media (max-width:860px){.lmdpanel .jzbar{flex-wrap:wrap}.lmdurl,.lmdpanel .lmdst{display:none}}
+
 /* ---------- Trình quản lý phông chữ ---------- */
 .fontdlg{width:min(780px,calc(100vw - 24px));max-height:calc(100dvh - 24px);gap:10px}
 .fontdlg .fmhead,.dldlg .fmhead{display:flex;align-items:center;justify-content:space-between}
@@ -500,3 +521,38 @@ body.phone .ltabs{flex-wrap:nowrap}
 .clip.cmp{background:linear-gradient(135deg,#3b3560,#2a2547);border:1px solid #8f7cff}
 .clip.cmp .cl{font-weight:700}
 .grpnote{margin:0 0 8px;padding:6px 10px;border-radius:8px;background:rgba(143,124,255,.15);border:1px solid rgba(143,124,255,.4);font-size:12px;line-height:1.4}
+
+/* ---- Tiện ích (plugin / extension) ---- */
+.plugdlg{width:min(560px,calc(100vw - 24px))}
+.plugdlg .fmhead,.plugask h2{display:flex;align-items:center;justify-content:space-between}
+.plugdlg .fmx{min-width:36px;padding:6px 10px}
+.plugdlg h3{margin:6px 0 0;font-size:13px;color:var(--muted)}
+.plglist{display:flex;flex-direction:column;gap:8px;max-height:45vh;overflow:auto}
+.plgrow{border:1px solid var(--line);border-radius:9px;padding:10px;display:flex;flex-direction:column;gap:6px;background:var(--panel2)}
+.plgtop{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.plgdot{width:9px;height:9px;border-radius:50%;background:var(--muted)}
+.plgdot.ok{background:#4cc9a0}.plgdot.bad{background:var(--danger)}.plgdot.wait{background:var(--gold)}
+.plgchips{display:flex;gap:5px;flex-wrap:wrap}
+.plgchips span{font:11px var(--mono);padding:2px 7px;border-radius:10px;border:1px solid var(--line);color:var(--muted)}
+.plgact{display:flex;gap:6px;flex-wrap:wrap}
+.plginst{display:flex;flex-direction:column;gap:8px}
+.plugdlg .dlin{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:inherit;font:inherit;box-sizing:border-box}
+.plugdlg .dlact,.plugask .dlact{display:flex;gap:8px;flex-wrap:wrap}
+.plugdlg .dlst{margin:0;font-size:13px}.plugdlg .dlst.bad{color:#ff8a80}
+.plugask{width:min(460px,calc(100vw - 24px))}
+.plugask h2{margin:0;font-size:17px}
+.plperms{margin:4px 0;padding-left:20px;line-height:1.55}
+#plugDock{position:fixed;right:12px;bottom:12px;z-index:60;width:min(360px,calc(100vw - 24px));pointer-events:none}
+#plugDock .plugwrap{pointer-events:auto;background:var(--panel);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.5);overflow:hidden;display:flex;flex-direction:column}
+#plugDock .plugwrap[hidden]{display:none}
+#plugDock .plugwrap iframe{border:0;width:100%;height:var(--ph,420px);background:var(--bg)}
+.plughead{display:flex;align-items:center;justify-content:space-between;padding:6px 8px 6px 12px;border-bottom:1px solid var(--line);font-weight:600;font-size:13px}
+.plugx{background:none;border:0;color:inherit;cursor:pointer;padding:4px 8px;font-size:14px}
+@media (max-width:700px){#plugDock{right:0;left:0;bottom:0;width:auto}#plugDock .plugwrap{border-radius:12px 12px 0 0}#plugDock .plugwrap iframe{height:min(var(--ph,420px),60vh)}}
+.plughb{display:flex;gap:2px}
+.plugsz{background:none;border:0;color:inherit;cursor:pointer;padding:4px 8px;font-size:14px}
+#plugDock.large{left:max(12px,3vw);right:max(12px,3vw);top:max(10px,3vh);bottom:max(10px,3vh);width:auto}
+#plugDock.large .plugwrap.large{height:100%}
+#plugDock .plugwrap.large iframe{height:auto;flex:1;min-height:0}
+@media (max-width:700px){#plugDock.large{left:0;right:0;top:0;bottom:0}#plugDock.large .plugwrap.large{border-radius:0}#plugDock .plugwrap.large iframe{height:auto}}
+.afdrop{position:fixed;inset:12px;z-index:90;border:3px dashed var(--accent);border-radius:16px;background:rgba(5,10,12,.72);display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;font-size:18px;font-weight:600;pointer-events:none}

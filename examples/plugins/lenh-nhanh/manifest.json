@@ -1,0 +1,13 @@
+{
+  "id": "com.bravin.lenh-nhanh",
+  "name": "Lệnh nhanh",
+  "version": "1.0.0",
+  "author": "Đội ngũ Bravin",
+  "description": "Không có giao diện. Thêm lệnh vào menu chuột phải của clip và danh sách Tiện ích.",
+  "entry": "index.html",
+  "permissions": ["timeline.read", "timeline.write", "ui"],
+  "commands": [
+    { "id": "outro", "title": "Thêm chữ cảm ơn ở cuối video", "context": "global" },
+    { "id": "tieude", "title": "Tạo tiêu đề từ tên file", "context": "clip" }
+  ]
+}
