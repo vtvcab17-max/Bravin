@@ -1,0 +1,95 @@
+{
+  "project": "Bravin",
+  "updated": "2026-10-12",
+  "statuses": ["not-started", "in-progress", "blocked", "done"],
+  "features": [
+    {
+      "id": "feat-001",
+      "name": "Cổng kiểm chứng (harness)",
+      "description": "AGENTS.md, init.sh, tests/verify/static.mjs + smoke.mjs, CI verify.yml, feature_list.json, progress.md, session-handoff.md",
+      "dependencies": [],
+      "status": "done",
+      "version": "4.10",
+      "evidence": "./init.sh: kiểm tra tĩnh đạt (54 tệp JS, 6 JSON, phiên bản khớp, desktop/app đồng bộ, không lộ khoá); kiểm thử khói đạt 9/9 cho app/ và desktop/app/. validate-harness: 20/100 → xem progress.md."
+    },
+    {
+      "id": "feat-002",
+      "name": "SDK plugin + chợ Micron",
+      "description": "app/js/plugins.js, app/sdk/bravin-sdk.js, ví dụ examples/plugins, extension Chrome mẫu",
+      "dependencies": [],
+      "status": "done",
+      "version": "4.8",
+      "evidence": "Đã thử ở phiên 4.8 (Playwright). Kiểm thử khói xác nhận BravinPlugins đã nạp."
+    },
+    {
+      "id": "feat-003",
+      "name": "Motion Tracking (plugin Micron) + corner pin",
+      "description": "examples/plugins/motion-tracking, app/js/cornerpin.js",
+      "dependencies": ["feat-002"],
+      "status": "done",
+      "version": "4.9",
+      "evidence": "tests/motion-tracking/bench.js ở phiên 4.9."
+    },
+    {
+      "id": "feat-004",
+      "name": "Nhập bravin-project schema 2 (Antifact → Bravin)",
+      "description": "app/js/antifact.js, docs/BRAVIN_PROJECT_FORMAT.md, samples/bravin-project",
+      "dependencies": [],
+      "status": "done",
+      "version": "4.9.1",
+      "evidence": "Mẫu plain/camera nhập đúng vị trí, keyframe, camera, báo cáo cảnh báo (phiên 4.9.1). Kiểm thử khói xác nhận afHandleFile đã nạp."
+    },
+    {
+      "id": "feat-005",
+      "name": "Khu Phim AI (LocalMiniDrama tiếng Việt)",
+      "description": "app/js/lmd.js: nhúng LocalMiniDrama-vi, kiểm tra tương thích, tự đẩy tệp tạo xong vào thư viện nhóm Phim AI, nút + Dự án cùng tên phim; trang app/huong-dan/phim-ai.html",
+      "dependencies": [],
+      "status": "done",
+      "version": "4.10",
+      "evidence": "Playwright với máy chủ LocalMiniDrama thật ở origin khác: 6/6 mục kiểm tra đạt, ⇪ Đẩy nhập ảnh/video/thoại, cảnh mới tự vào thư viện trong 9 giây, + Dự án tạo «Cô gái thiết kế» 16:9 đủ 5 tệp. Đang chạy trên web (WebFetch lmd.js?v=36dec84)."
+    },
+    {
+      "id": "feat-006",
+      "name": "Bộ cài Windows Phim AI một chạm",
+      "description": "downloads/PhimAI_Setup_1.2.8.exe (Node 22 + thư viện Windows + ffmpeg), liên kết bravinlmd://start, thẻ cài đặt và tự nối trong khu Phim AI",
+      "dependencies": ["feat-005"],
+      "status": "in-progress",
+      "version": "4.10",
+      "evidence": "Thẻ cài đặt và tự nối: Playwright (UA Windows) thấy nút tải + Bật Phim AI, bật máy chủ thì nối sau ~10 giây. Link tải trả 200, 63075059 byte. CHƯA cài thử trên Windows thật."
+    },
+    {
+      "id": "feat-007",
+      "name": "Cài thử PhimAI_Setup trên Windows thật",
+      "description": "Cài trên Windows 10/11 sạch: bộ cài chạy, PhimAI.exe bật máy chủ, http://localhost:5679 mở được, Bravin web nối được, bravinlmd://start hoạt động, gỡ cài đặt giữ/xoá dữ liệu đúng. Nếu lỗi: lấy %LOCALAPPDATA%\\Programs\\PhimAI\\app\\backend-node\\data\\server-error.log",
+      "dependencies": ["feat-006"],
+      "status": "blocked",
+      "blocked_by": "Cần máy Windows thật (agent chỉ có Linux)",
+      "evidence": ""
+    },
+    {
+      "id": "feat-008",
+      "name": "Đổi mật khẩu keystore Android",
+      "description": "Mật khẩu cũ từng nằm trong docs/ARCHITECTURE.md (đã xoá khỏi bản hiện tại nhưng còn trong lịch sử git). Đổi bằng keytool -storepasswd / -keypasswd trên máy giữ vincut-release.jks; khoá ký không đổi nên APK vẫn cài đè được.",
+      "dependencies": [],
+      "status": "blocked",
+      "blocked_by": "Cần người giữ keystore thực hiện",
+      "evidence": ""
+    },
+    {
+      "id": "feat-009",
+      "name": "Ký số bộ cài Windows",
+      "description": "Ký Bravin_Setup và PhimAI_Setup để Windows không hiện «Windows protected your PC»",
+      "dependencies": [],
+      "status": "not-started",
+      "evidence": ""
+    },
+    {
+      "id": "feat-010",
+      "name": "Dịch nốt tài liệu LocalMiniDrama",
+      "description": "CHANGELOG, docs/plans, backend-node/README, desktop/README, openclaw-skill (repo LocalMiniDrama-vi, ngoài repo này)",
+      "dependencies": ["feat-005"],
+      "status": "not-started",
+      "evidence": ""
+    }
+  ]
+}

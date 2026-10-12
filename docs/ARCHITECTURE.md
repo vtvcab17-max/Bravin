@@ -66,7 +66,7 @@ Tài liệu kỹ thuật cho người phát triển tiếp. Tên nội bộ cũ 
 
 **AI trên máy:** thư viện tải từ cdn.jsdelivr.net, model Whisper từ huggingface.co (dự phòng: registry.npmmirror.com gói sts-whisper-*), model tách nền từ storage.googleapis.com. Trang trên claude.ai chặn các nguồn này; dùng app Android hoặc bản Windows. Ghi đè nguồn khi thử nghiệm bằng `window.VINCUT_AI = {...}`.
 
-**Android (`android/`):** WebView + máy chủ nội bộ 127.0.0.1:47865 (có Range), cầu nối `VINCutAndroid` (lưu file vào Download/VINCut, ghi file theo vị trí khi xuất MP4, nhớ quyền đọc file đã chọn, chữ thành giọng nói bằng TextToSpeech của máy). Dựng bằng `build.sh` (aapt + javac + dx + zipalign + apksigner từ gói Ubuntu, không cần Gradle). Khoá ký `vincut-release.jks` (mật khẩu mặc định `vincut2026`, đổi bằng biến `KS_PASS`) phải giữ nguyên để bản cập nhật cài đè được. APK phải dưới 30 MB để gửi qua chat: bản 3.0 dùng video xem trước 432p cho dự án mẫu.
+**Android (`android/`):** WebView + máy chủ nội bộ 127.0.0.1:47865 (có Range), cầu nối `VINCutAndroid` (lưu file vào Download/VINCut, ghi file theo vị trí khi xuất MP4, nhớ quyền đọc file đã chọn, chữ thành giọng nói bằng TextToSpeech của máy). Dựng bằng `build.sh` (aapt + javac + dx + zipalign + apksigner từ gói Ubuntu, không cần Gradle). Khoá ký `vincut-release.jks` (mật khẩu đưa vào bằng biến `KS_PASS`, không ghi trong repo) phải giữ nguyên để bản cập nhật cài đè được. APK phải dưới 30 MB để gửi qua chat: bản 3.0 dùng video xem trước 432p cho dự án mẫu.
 
 **Windows (`serve.ps1`):** thêm `/tts` (giọng Windows qua WinRT, dự phòng System.Speech) và kiểu file .mjs/.wasm. Phần `/tts` chưa chạy thử được trên Windows thật.
 

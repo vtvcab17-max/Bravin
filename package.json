@@ -1,0 +1,16 @@
+{
+  "name": "bravin",
+  "private": true,
+  "description": "Bravin: trình dựng video web/Android/Windows. Ứng dụng là HTML/CSS/JS thuần trong app/, không cần build.",
+  "scripts": {
+    "verify": "bash init.sh",
+    "verify:quick": "bash init.sh --quick",
+    "test": "node tests/verify/smoke.mjs app && node tests/verify/smoke.mjs desktop/app",
+    "lint": "node tests/verify/static.mjs",
+    "build:desktop": "python3 tools/make_desktop_app.py .",
+    "serve": "node tests/serve_static.js app 8080"
+  },
+  "devDependencies": {
+    "playwright": "1.56.0"
+  }
+}
