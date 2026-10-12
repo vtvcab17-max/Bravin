@@ -1,17 +1,17 @@
 # Bravin cho Samsung (4.11)
 
-Bản Android riêng cho máy Galaxy: gói `app.bravin.samsung`, tên "Bravin Samsung", biểu tượng có chữ S xanh. Cài song song với Bravin thường (`app.vincut`), dữ liệu riêng.
+Bản Android riêng cho máy Galaxy: gói `app.bravin.samsung`, tên "Bravin Samsung", biểu tượng có chữ S xanh. Cài song song với Bravin thường (`app.bravin`, trước 4.11 versionCode 19 là `app.vincut`), dữ liệu riêng. Nộp Galaxy Store: `docs/STORE.md`.
 
 Hướng dẫn cho người dùng: `app/huong-dan/samsung.html` (web: `/huong-dan/samsung.html`). Tải APK: `https://github.com/vtvcab17-max/Bravin/raw/main/downloads/Bravin_Samsung_4.11.apk`.
 
 ## Dựng
 ```bash
 cd android
-KS_PASS=<mật khẩu> VER=4.11 CODE=18 FLAVOR=samsung bash build.sh <đường dẫn app>   # → build/Bravin_Samsung.apk
-KS_PASS=<mật khẩu> VER=4.11 CODE=18 bash build.sh <đường dẫn app>                   # bản thường
+KS_PASS=<mật khẩu> VER=4.11 CODE=19 FLAVOR=samsung bash build.sh <đường dẫn app>   # → build/Bravin_Samsung.apk + .aab
+KS_PASS=<mật khẩu> VER=4.11 CODE=19 bash build.sh <đường dẫn app>                   # bản thường app.bravin
 ```
 `FLAVOR=samsung` làm 4 việc:
-1. `aapt --rename-manifest-package app.bravin.samsung` (lớp Java vẫn là `app.vincut.*`, không cần R).
+1. `aapt2 link --rename-manifest-package app.bravin.samsung` (lớp Java vẫn là `app.vincut.*`, không cần R).
 2. Thêm `res-samsung/` làm lớp phủ tài nguyên: biểu tượng có chữ S, `xml/remote_actions.xml`, chuỗi nhãn Air actions.
 3. Sửa manifest: nhãn "Bravin Samsung"; intent-filter + meta-data `com.samsung.android.support.REMOTE_ACTION`; meta-data `com.samsung.android.dex.launchwidth/launchheight` = 1440×900.
 4. Chèn `<meta name="bravin-edition" content="samsung">` vào `www/index.html`.

@@ -29,6 +29,9 @@ import java.util.concurrent.TimeUnit;
 import android.util.Base64;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.WindowInsets;
+import android.widget.FrameLayout;
+import android.content.pm.ApplicationInfo;
 import android.webkit.ConsoleMessage;
 import android.webkit.JavascriptInterface;
 import android.webkit.PermissionRequest;
@@ -52,6 +55,7 @@ import java.util.Map;
 public class MainActivity extends Activity {
     static final int REQ_FILE = 11, REQ_MIC = 12, REQ_STORAGE = 13;
     WebView web;
+    FrameLayout root;
     LocalServer server;
     ValueCallback<Uri[]> fileCb;
     PermissionRequest pendingPerm;
@@ -84,10 +88,30 @@ public class MainActivity extends Activity {
         int port;
         try { port = server.start(); } catch (Exception e) { Toast.makeText(this, "Không mở được máy chủ nội bộ: " + e, Toast.LENGTH_LONG).show(); finish(); return; }
 
-        WebView.setWebContentsDebuggingEnabled(true);
+        // Chỉ bật gỡ lỗi WebView (chrome://inspect) ở bản debug, không bật ở bản phát hành lên store
+        WebView.setWebContentsDebuggingEnabled((getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0);
         web = new WebView(this);
         web.setBackgroundColor(Color.parseColor("#131417"));
-        setContentView(web);
+        // Android 15+ (target API 35/36) luôn vẽ tràn viền: bọc WebView trong khung có đệm bằng thanh hệ thống + phần khuyết camera
+        root = new FrameLayout(this);
+        root.setBackgroundColor(Color.parseColor("#131417"));
+        root.addView(web, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        root.setOnApplyWindowInsetsListener(new View.OnApplyWindowInsetsListener() {
+            @Override
+            public WindowInsets onApplyWindowInsets(View v, WindowInsets in) {
+                int l, t, r, bt;
+                if (Build.VERSION.SDK_INT >= 30) {
+                    android.graphics.Insets i = in.getInsets(WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout() | WindowInsets.Type.ime());
+                    l = i.left; t = i.top; r = i.right; bt = i.bottom;
+                } else {
+                    l = in.getSystemWindowInsetLeft(); t = in.getSystemWindowInsetTop(); r = in.getSystemWindowInsetRight(); bt = in.getSystemWindowInsetBottom();
+                }
+                v.setPadding(l, t, r, bt);
+                return in;
+            }
+        });
+        setContentView(root);
+        if (Build.VERSION.SDK_INT >= 33) registerBack();
         WebSettings s = web.getSettings();
         s.setJavaScriptEnabled(true);
         s.setDomStorageEnabled(true);
@@ -229,9 +253,17 @@ public class MainActivity extends Activity {
         super.onDestroy();
     }
 
+    /** Android 13+: cử chỉ "quay lại" dự đoán (target API 36 không còn gọi onBackPressed) */
+    void registerBack() {
+        getOnBackInvokedDispatcher().registerOnBackInvokedCallback(android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT,
+                new android.window.OnBackInvokedCallback() { public void onBackInvoked() { handleBack(); } });
+    }
+
     @Override
-    public void onBackPressed() {
-        if (web == null) { super.onBackPressed(); return; }
+    public void onBackPressed() { handleBack(); }
+
+    void handleBack() {
+        if (web == null) { finish(); return; }
         // close an open dialog / menu first (same as pressing Esc)
         web.evaluateJavascript("(function(){try{return window.vincutBack?vincutBack():0}catch(e){return 0}})()", new ValueCallback<String>() {
             @Override

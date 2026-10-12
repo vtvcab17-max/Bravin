@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="app.vincut" android:versionCode="3" android:versionName="4.0"
     android:installLocation="auto">
-    <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="34" />
+    <uses-sdk android:minSdkVersion="24" android:targetSdkVersion="36" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
@@ -15,7 +15,8 @@
     <supports-screens android:smallScreens="true" android:normalScreens="true" android:largeScreens="true"
         android:xlargeScreens="true" android:anyDensity="true" android:resizeable="true" />
     <application android:label="Bravin" android:icon="@mipmap/ic_launcher"
-        android:theme="@style/AppTheme" android:usesCleartextTraffic="true" android:hardwareAccelerated="true"
+        android:theme="@style/AppTheme" android:networkSecurityConfig="@xml/network_security_config"
+        android:enableOnBackInvokedCallback="true" android:appCategory="video" android:hardwareAccelerated="true"
         android:largeHeap="true" android:allowBackup="false" android:supportsRtl="true">
         <!-- Samsung: đa cửa sổ đời cũ, DeX giữ app khi đổi mật độ/màn hình, tỉ lệ màn hình dài -->
         <meta-data android:name="com.sec.android.support.multiwindow" android:value="true" />

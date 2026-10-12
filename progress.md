@@ -3,8 +3,8 @@
 ## Current State
 
 **Last Updated:** 2026-10-12 14:10 (UTC+7)
-**Phiên bản:** 4.11 trên web (https://bravin.vtvcab17.workers.dev). APK versionCode gần nhất: **18** (cả `app.vincut` và `app.bravin.samsung`)
-**Active Feature:** không có. Chờ người dùng thử trên thiết bị thật: feat-007 (Windows), feat-012 (Galaxy)
+**Phiên bản:** 4.11 trên web (https://bravin.vtvcab17.workers.dev). Android versionCode gần nhất: **19**: gói `app.bravin` (Google Play, AAB) và `app.bravin.samsung` (Galaxy Store), target API 36, khoá mới `bravin-release.jks`. Bản 18 cũ: `app.vincut`.
+**Active Feature:** feat-013 (Android đạt chuẩn store) chờ thử trên máy thật. Chờ người dùng thử trên thiết bị thật: feat-007 (Windows), feat-012 (Galaxy)
 
 ## Status
 
@@ -18,6 +18,7 @@
 - [x] 4.11 Bravin cho Samsung (feat-011): APK `app.bravin.samsung`, vẽ tay S Pen theo lực nhấn, Air View, Air actions, DeX; plugin trên mọi APK yêu cầu bản PC; trang `app/huong-dan/samsung.html`.
 
 ### What's In Progress
+- [ ] feat-013: AAB/APK target 36 đã dựng và kiểm tra tĩnh; chưa chạy trên Android 15/16 thật. Xem `docs/STORE.md`.
 - [ ] feat-006/007: bộ cài Phim AI chưa được cài thử trên Windows thật.
 
 ### What's Next
@@ -33,6 +34,8 @@
 - [ ] Bộ cài chưa ký số: Windows SmartScreen cảnh báo, người dùng phải bấm More info → Run anyway.
 
 ## Decisions Made
+- **Đổi gói cài đặt `app.vincut` → `app.bravin` (người dùng chọn 12/10/2026)**, khoá ký mới `bravin-release.jks` (alias `bravin`) do người dùng giữ. Lớp Java giữ `app.vincut.*`. Google Play nhận `Bravin.aab`, Galaxy Store nhận `Bravin_Samsung.apk`.
+- **Bỏ Gradle vẫn giữ nguyên**: aapt2 + android.jar 36 + dx + bundletool (phiên agent không tải được SDK từ Google).
 - **Bản Samsung là gói riêng `app.bravin.samsung`** (cài song song, dữ liệu riêng) thay vì chỉ một cờ trong APK thường: Air actions và cửa sổ DeX khai báo trong manifest, biểu tượng riêng để phân biệt.
 - **Plugin bị chặn trên mọi APK** (kể cả DeX) theo yêu cầu người dùng; bản web/Windows giữ nguyên.
 - **APK Samsung để ở `downloads/`** (28 MB > giới hạn 25 MiB của Cloudflare); `.gitignore` mở ngoại lệ `!downloads/*.apk`.

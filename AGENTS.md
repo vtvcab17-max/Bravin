@@ -63,7 +63,7 @@ npm run serve        # chạy thử ở http://localhost:8080
 CI (`.github/workflows/verify.yml`) chạy `init.sh` cho mỗi lần đẩy và PR.
 
 Dựng sản phẩm (chỉ khi người dùng cần tệp cài):
-- APK: `cd android && KS_PASS=<mật khẩu> VER=<x.y> CODE=<n> [FLAVOR=samsung] bash build.sh <đường dẫn app>` (khoá `vincut-release.jks` không có trong repo: chép vào `android/` lúc dựng rồi xoá). Bản Samsung công khai ở `downloads/Bravin_Samsung_<ver>.apk`.
+- Android (AAB cho Google Play + APK): `cd android && KS_PASS=<mật khẩu> VER=<x.y> CODE=<n> [FLAVOR=samsung] bash build.sh <đường dẫn app>`. Từ 4.11 (versionCode 19): gói `app.bravin` / `app.bravin.samsung`, target API 36, khoá `bravin-release.jks` alias `bravin` (không có trong repo: chép vào `android/` lúc dựng rồi xoá). Công cụ và cách nộp store: `docs/STORE.md`.
 - Windows: theo `desktop/installer/README.txt` (payload lấy từ `desktop/app`). Dựng xong chép bộ cài vào `app/downloads/Bravin_Setup_Windows.exe` (link trong hộp thoại "Cần Bravin trên máy tính" của APK).
 - Bộ cài Phim AI: `tools/phimai-installer/README.md`.
 
@@ -79,7 +79,8 @@ Dựng sản phẩm (chỉ khi người dùng cần tệp cài):
 - Tệp `.ps1` có tiếng Việt phải lưu UTF-8 có BOM (Windows PowerShell 5.1).
 - Bản Windows chạy không cần mạng: không dùng CDN hay Google Fonts trong `desktop/app`.
 - `*.apk` bị `.gitignore` chặn, trừ `downloads/*.apk`.
-- Dựng Android với `android-23.jar`: API mới hơn (vd. `isInMultiWindowMode`) phải gọi qua reflection, thuộc tính manifest API 24+ làm aapt lỗi.
+- Android dựng bằng `android.jar` API 36 + aapt2 + dx (không Gradle). API mới hơn minSdk 24 phải bọc `if (Build.VERSION.SDK_INT >= N)`. Target 36: tràn viền bắt buộc (đệm theo WindowInsets trong `MainActivity`), cử chỉ quay lại đi qua `OnBackInvokedCallback`, http chỉ được tới 127.0.0.1 (`res/xml/network_security_config.xml`).
+- Phiên agent không tải được Android SDK từ Google (proxy chặn): `android.jar` lấy từ raw.githubusercontent (Reginer/aosp-android-jar), aapt2 và bundletool lấy từ npm (`aaptjs3`, `bundletoolheavy`), dx từ gói Ubuntu `dalvik-exchange`.
 
 ## End of Session (trước khi kết thúc)
 

@@ -19,7 +19,7 @@ Trình dựng video chạy trên trình duyệt, Android và máy tính (bản w
 |---|---|
 | `app/` | Mã nguồn ứng dụng web hiện tại (HTML/CSS/JS thuần, không cần build). `vendor/transformers/` là bộ chạy AI nhúng. |
 | `desktop/` | Bản cài cho Windows: `Cai dat Bravin.bat` (tạo biểu tượng Desktop/Start Menu), `Mo Bravin.bat` (chạy không cần cài). `bravin.ps1` là máy chủ nội bộ, mở Bravin trong cửa sổ riêng của Edge/Chrome; `app/` là bản ứng dụng chạy không cần mạng (phông chữ và bộ chạy AI có sẵn). |
-| `android/` | Dự án Android (WebView) + `www/` là ứng dụng. `build.sh` để dựng APK (đặt biến `KS_PASS` là mật khẩu keystore). |
+| `android/` | Dự án Android (WebView) + `www/` là ứng dụng. `build.sh` dựng AAB (Google Play) và APK, target API 36 (đặt biến `KS_PASS` là mật khẩu keystore). Nộp store: `docs/STORE.md`. |
 | `tools/` | Script dựng bản web/PWA, logo, `package.json` các thư viện gốc. |
 | `docs/` | `ARCHITECTURE.md` (kiến trúc và từng nhóm tính năng), tài sản logo. |
 | `legacy/` | Mã nguồn các phiên bản cũ: trình dựng đầu tiên (`editor/`), bản chạy cục bộ VINCut, dự án Android cũ. |
@@ -41,7 +41,7 @@ node tests/fix4.js    # ví dụ: đồng bộ âm thanh (không cần video m�
 ```
 
 ## Ghi chú
-- Mã định danh nội bộ giữ tên cũ để tương thích dữ liệu: IndexedDB `vincut`, localStorage `vincut-*`, định dạng dự án `vincut`, `window.VINCutAndroid`, package `app.vincut`.
+- Mã định danh nội bộ giữ tên cũ để tương thích dữ liệu: IndexedDB `vincut`, localStorage `vincut-*`, định dạng dự án `vincut`, `window.VINCutAndroid`, package Java `app.vincut` (gói cài đặt từ 4.11 bản 19 là `app.bravin`).
 - Khoá ký APK (`*.jks`) bị loại khỏi git bằng `.gitignore`; giữ bản sao an toàn riêng.
 - Repo không kèm video hay dự án mẫu. Nút "Dự án mẫu" ở màn hình chính chỉ hiện khi có `project.json` cạnh ứng dụng.
 

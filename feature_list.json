@@ -123,6 +123,18 @@
       "status": "blocked",
       "blocked_by": "Cần máy Galaxy thật",
       "evidence": ""
+    },
+    {
+      "id": "feat-013",
+      "name": "Bravin Android đạt chuẩn Google Play / Galaxy Store",
+      "description": "Gói app.bravin (Google Play, AAB) và app.bravin.samsung (Galaxy Store, APK), target API 36 biên dịch với android.jar 36, tràn viền theo WindowInsets, cử chỉ quay lại OnBackInvokedCallback, http chỉ tới 127.0.0.1, tắt gỡ lỗi WebView ở bản phát hành, khoá mới bravin-release.jks. Còn thử trên máy thật.",
+      "dependencies": [
+        "feat-011"
+      ],
+      "status": "in-progress",
+      "version": "4.11 (19)",
+      "evidence": "build.sh: aapt2 2.20 + android.jar 36 + dx + bundletool 1.17.2 → Bravin.aab 7,6 MB, Bravin.apk 28,7 MB, Bravin_Samsung.aab/.apk. aapt2 dump badging: app.bravin / app.bravin.samsung versionCode 19, targetSdk 36, compileSdk 36; manifest có networkSecurityConfig, enableOnBackInvokedCallback=true, appCategory=video, không còn usesCleartextTraffic; bản Samsung giữ REMOTE_ACTION + dex.launchwidth/height. apksigner verify: v2+v3 hợp lệ, CN=Bravin, O=Bravinall, C=VN. 78/78 tệp assets không nén. classes.dex có handleBack/registerBack. Chưa chạy trên thiết bị (không có máy ảo Android trong phiên).",
+      "blocked_by": "Cần thử trên máy Android 15/16 thật hoặc Samsung Remote Test Lab"
     }
   ]
 }
